@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>考試王者 背多分</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="台灣最強證照考題練習平台，含考照路線圖推薦">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══ THEMES ══ */
+:root,[data-theme=dark]{--bg:#0b0b0f;--s1:#13131a;--s2:#1a1a24;--bd:#252535;--ac:#f5c542;--ac2:#ff6b35;--ok:#4ade80;--err:#f87171;--tx:#eeeef5;--tx2:#7878a0;--tx3:#3a3a55;--r:14px;--sh:0 4px 20px rgba(0,0,0,.5)}
+[data-theme=midnight]{--bg:#07101f;--s1:#0e1a30;--s2:#152240;--bd:#1e3058;--ac:#60a5fa;--ac2:#a78bfa;--ok:#34d399;--err:#fb7185;--tx:#dde8ff;--tx2:#5878a8;--tx3:#1e3050}
+[data-theme=forest]{--bg:#071410;--s1:#0e2018;--s2:#152c20;--bd:#1c3828;--ac:#4ade80;--ac2:#86efac;--ok:#4ade80;--err:#f87171;--tx:#d4fce8;--tx2:#508060;--tx3:#1e3828}
+[data-theme=ember]{--bg:#120a00;--s1:#1e1000;--s2:#281800;--bd:#3a2000;--ac:#fb923c;--ac2:#fbbf24;--ok:#4ade80;--err:#f87171;--tx:#fff0d8;--tx2:#906040;--tx3:#3a2000}
+[data-theme=light]{--bg:#f2f0eb;--s1:#fff;--s2:#ebe8e0;--bd:#d8d4c8;--ac:#d97706;--ac2:#b45309;--ok:#16a34a;--err:#dc2626;--tx:#1a1410;--tx2:#706858;--tx3:#c8c0b0;--sh:0 2px 12px rgba(0,0,0,.08)}
+[data-theme=soft]{--bg:#edf2f8;--s1:#fff;--s2:#e2eaf4;--bd:#c8d8ec;--ac:#2563eb;--ac2:#7c3aed;--ok:#059669;--err:#e11d48;--tx:#1a2540;--tx2:#506080;--tx3:#c0d0e4;--sh:0 2px 12px rgba(0,0,0,.06)}
+[data-theme=paper]{--bg:#faf6f0;--s1:#fff;--s2:#f2ece0;--bd:#ddd4c4;--ac:#7c3aed;--ac2:#db2777;--ok:#15803d;--err:#b91c1c;--tx:#1c1008;--tx2:#807060;--tx3:#d4c8b0;--sh:0 2px 8px rgba(0,0,0,.06)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto Sans TC',sans-serif;overscroll-behavior:none;transition:background .3s,color .3s}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}65%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes streak{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.mono{font-family:'JetBrains Mono',monospace}
+.syne{font-family:'Syne',sans-serif}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh)}
+.btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Noto Sans TC',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s}
+.btn:active{transform:scale(.98);filter:brightness(.9)}
+.btn-ac{background:var(--ac);color:#0b0b0f}
+.btn-ghost{background:var(--s1);color:var(--tx);border:1px solid var(--bd)}
+.btn-ok{background:rgba(74,222,128,.15);color:var(--ok);border:1px solid rgba(74,222,128,.3)}
+.btn:disabled{background:var(--s2);color:var(--tx3);cursor:not-allowed;transform:none}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 9px;border-radius:6px;letter-spacing:.5px}
+.tag-ac{background:rgba(245,197,66,.12);color:var(--ac)}
+.tag-ok{background:rgba(74,222,128,.12);color:var(--ok)}
+.tag-dim{background:var(--s2);color:var(--tx3)}
+.tag-hot{background:rgba(255,107,53,.12);color:var(--ac2)}
+.tag-new{background:rgba(96,165,250,.15);color:#60a5fa}
+.back-btn{background:none;border:none;color:var(--tx2);font-size:26px;cursor:pointer;padding:2px;line-height:1;flex-shrink:0}
+.topbar{padding:16px 18px 12px;display:flex;align-items:center;gap:10px;background:var(--s1);border-bottom:1px solid var(--bd);flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:700;flex:1}
+.divider{height:1px;background:var(--bd)}
+.sec-head{padding:0 18px 10px;display:flex;align-items:center;justify-content:space-between}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--tx3);text-transform:uppercase}
+
+/* THEME FAB */
+#themeFab{position:fixed;bottom:24px;right:18px;z-index:990;width:46px;height:46px;border-radius:50%;background:var(--s1);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--sh);transition:transform .15s}
+#themeFab:active{transform:scale(.9)}
+#themePanel{position:fixed;bottom:82px;right:18px;z-index:989;background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:16px;box-shadow:var(--sh);display:none;flex-direction:column;gap:10px;min-width:180px}
+#themePanel.open{display:flex;animation:slideUp .18s ease}
+.tp-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase}
+.tp-row{display:flex;gap:8px}
+.tp-dot{width:38px;height:38px;border-radius:10px;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .15s;position:relative}
+.tp-dot:active{transform:scale(.88)}
+.tp-dot.active{border-color:var(--ac)}
+.tp-dot span{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--tx2);white-space:nowrap;font-family:'JetBrains Mono',monospace}
+
+/* ══════════════ HOME ══════════════ */
+#home{background:var(--bg);overflow-y:auto}
+.home-hero{padding:50px 20px 20px;position:relative;overflow:hidden}
+.home-hero::after{content:'';position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(245,197,66,.07) 0%,transparent 70%);pointer-events:none}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--ac);text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-family:'Syne',sans-serif;font-size:36px;font-weight:900;line-height:1.05;letter-spacing:-1px;margin-bottom:4px}
+.hero-title .gold{color:var(--ac)}
+.hero-italic{font-size:14px;color:var(--tx2);font-style:italic;margin-bottom:10px}
+.hero-tag{font-size:12px;color:var(--tx2);line-height:1.7}
+
+/* Daily Question */
+.daily-wrap{margin:0 18px 16px}
+.daily-card{background:var(--s1);border:1.5px solid var(--ac);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.daily-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.daily-card:active{transform:scale(.99)}
+.daily-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.daily-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);letter-spacing:1px;text-transform:uppercase}
+.daily-done{font-size:11px;color:var(--ok)}
+.daily-q{font-size:13px;font-weight:700;line-height:1.5;color:var(--tx)}
+.daily-tap{font-size:11px;color:var(--tx2);margin-top:6px}
+
+/* Countdown */
+.countdown-wrap{margin:0 18px 16px}
+.countdown-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px}
+.countdown-ico{font-size:22px}
+.countdown-info{flex:1}
+.countdown-label{font-size:11px;color:var(--tx2);margin-bottom:2px}
+.countdown-days{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--ac)}
+.countdown-sub{font-size:10px;color:var(--tx3)}
+
+/* Stats */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 18px 16px}
+.stat-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 6px;text-align:center;box-shadow:var(--sh)}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--ac)}
+.stat-l{font-size:9px;color:var(--tx2);margin-top:2px}
+
+/* Streak */
+.streak-bar{margin:0 18px 16px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh)}
+.streak-fire{font-size:26px;animation:streak 2s infinite}
+.streak-info{flex:1}
+.streak-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--ac2)}
+.streak-label{font-size:11px;color:var(--tx2)}
+.streak-best{font-size:10px;color:var(--tx3);font-family:'JetBrains Mono',monospace}
+
+/* Progress */
+.prog-wrap{padding:0 18px 16px}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--tx2);margin-bottom:6px}
+.prog-bar{height:6px;background:var(--s2);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:99px;transition:width .6s ease}
+
+/* Route CTA */
+.route-cta{margin:0 18px 16px;background:linear-gradient(135deg,rgba(245,197,66,.1),rgba(255,107,53,.08));border:1.5px solid var(--ac);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.route-cta:active{transform:scale(.99)}
+.route-cta-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.route-cta-ico{font-size:28px}
+.route-cta-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+.route-cta-sub{font-size:12px;color:var(--tx2);line-height:1.5}
+.route-cta-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--ac);color:#0b0b0f;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif}
+
+/* Mode list */
+.mode-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.mode-card{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.mode-card:active{transform:scale(.98)}
+.mode-card.star{border-color:var(--ac)}
+.mode-ico{font-size:24px;width:40px;text-align:center;flex-shrink:0}
+.mode-info{flex:1}
+.mode-name{font-weight:700;font-size:14px}
+.mode-sub{font-size:11px;color:var(--tx2);margin-top:2px}
+.mode-arrow{color:var(--tx3);font-size:20px}
+
+/* Subject list */
+.subj-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.subj-card{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.subj-card:active{transform:scale(.98)}
+.subj-card.live{border-color:var(--ac)}
+.subj-ico{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.subj-info{flex:1}
+.subj-name{font-weight:700;font-size:13px}
+.subj-meta{font-size:11px;color:var(--tx2);margin-top:2px}
+
+/* Share unlock */
+.share-wrap{margin:0 18px 16px}
+.share-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.share-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.share-ico{font-size:22px}
+.share-title{font-weight:700;font-size:13px}
+.share-sub{font-size:11px;color:var(--tx2);line-height:1.6;margin-bottom:10px}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.share-btn:active{transform:scale(.98)}
+.share-unlocked{font-size:11px;color:var(--ok);text-align:center;margin-top:6px}
+
+/* Member CTA */
+.cta-wrap{margin:0 18px 16px}
+.cta-card{background:var(--s1);border:2px solid var(--ac);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.cta-card:active{transform:scale(.99)}
+.cta-crown{font-size:30px;margin-bottom:6px}
+.cta-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:900;margin-bottom:4px}
+.cta-sub{font-size:12px;color:var(--tx2);line-height:1.6}
+.cta-price{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--ac);margin-top:6px}
+.home-pad{height:90px}
+
+/* ══════════════ ROUTE FINDER ══════════════ */
+#routefinder{background:var(--bg)}
+.rf-body{flex:1;overflow-y:auto;padding:20px 18px 80px}
+.rf-hero{text-align:center;margin-bottom:24px}
+.rf-hero-ico{font-size:44px;margin-bottom:12px}
+.rf-hero-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;margin-bottom:6px}
+.rf-hero-sub{font-size:13px;color:var(--tx2);line-height:1.6}
+.industry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.ind-card{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:all .15s;text-align:center;box-shadow:var(--sh)}
+.ind-card:active{transform:scale(.96)}
+.ind-card.selected{border-color:var(--ac);background:rgba(245,197,66,.06)}
+.ind-ico{font-size:28px;margin-bottom:6px}
+.ind-name{font-size:13px;font-weight:700}
+.ind-sub{font-size:10px;color:var(--tx2);margin-top:2px}
+
+/* Route result */
+.route-result{display:none;animation:slideUp .25s ease}
+.route-result.show{display:block}
+.route-header{background:var(--s1);border:1.5px solid var(--ac);border-radius:var(--r);padding:16px;margin-bottom:16px;text-align:center;box-shadow:var(--sh)}
+.route-industry{font-family:'Syne',sans-serif;font-size:18px;font-weight:900;margin-bottom:4px}
+.route-salary{font-size:13px;color:var(--ok);font-weight:700}
+.route-desc{font-size:12px;color:var(--tx2);line-height:1.6;margin-top:6px}
+.route-steps{display:flex;flex-direction:column;gap:0}
+.route-step{display:flex;gap:12px;position:relative}
+.route-step:not(:last-child)::after{content:'';position:absolute;left:19px;top:42px;bottom:-8px;width:2px;background:var(--bd)}
+.step-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0;margin-top:4px;font-family:'JetBrains Mono',monospace}
+.step-circle.s1{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#0b0b0f}
+.step-circle.s2{background:rgba(245,197,66,.2);color:var(--ac);border:2px solid var(--ac)}
+.step-circle.s3{background:rgba(74,222,128,.15);color:var(--ok);border:2px solid var(--ok)}
+.step-circle.s4{background:rgba(96,165,250,.15);color:#60a5fa;border:2px solid #60a5fa}
+.step-circle.s5{background:rgba(167,139,250,.15);color:#a78bfa;border:2px solid #a78bfa}
+.step-body{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh)}
+.step-name{font-weight:700;font-size:14px;margin-bottom:4px}
+.step-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.step-desc{font-size:11px;color:var(--tx2);line-height:1.6}
+.step-salary{font-size:11px;color:var(--ok);font-weight:700;margin-top:4px}
+.diff-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:5px}
+.diff-easy{background:rgba(74,222,128,.15);color:var(--ok)}
+.diff-mid{background:rgba(245,197,66,.15);color:var(--ac)}
+.diff-hard{background:rgba(248,113,113,.15);color:var(--err)}
+.study-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:5px;background:var(--s2);color:var(--tx2)}
+.route-practice-btn{margin-top:4px;padding:8px 14px;background:var(--ac);color:#0b0b0f;border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.route-practice-btn:active{transform:scale(.97)}
+
+/* ══════════════ QUIZ ══════════════ */
+#quiz{background:var(--bg)}
+.quiz-bar{padding:14px 18px 10px;display:flex;align-items:center;gap:10px;background:var(--s1);border-bottom:1px solid var(--bd);flex-shrink:0}
+.quiz-meta{flex:1}
+.quiz-mode{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tx2);letter-spacing:1px}
+.quiz-ctr{font-size:13px;font-weight:700}
+.quiz-right{display:flex;align-items:center;gap:8px}
+.streak-badge{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--ac2);display:none}
+.quiz-timer{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ac);min-width:44px;text-align:right;display:none}
+.quiz-timer.warn{color:var(--err);animation:pulse 1s infinite}
+.qpb{height:4px;background:var(--s2);flex-shrink:0}
+.qpb-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+.quiz-body{flex:1;overflow-y:auto;padding:20px 18px 130px}
+.q-badge{display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx3)}
+.q-bookmark{background:none;border:none;font-size:18px;cursor:pointer;padding:0;line-height:1;margin-left:auto}
+.q-text{font-size:16px;font-weight:700;line-height:1.7;margin-bottom:5px}
+.q-hint{font-size:11px;color:var(--tx2);margin-bottom:20px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px 15px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:all .15s;font-size:14px;line-height:1.55;box-shadow:var(--sh)}
+.opt:active{transform:scale(.99)}
+.opt.sel{border-color:var(--ac);background:rgba(245,197,66,.06)}
+.opt.ok{border-color:var(--ok);background:rgba(74,222,128,.07)}
+.opt.bad{border-color:var(--err);background:rgba(248,113,113,.07);animation:shake .3s ease}
+.opt.hint{border-color:var(--ok);background:rgba(74,222,128,.04)}
+.ok-key{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--tx3);min-width:18px;flex-shrink:0;margin-top:2px}
+.opt.sel .ok-key{color:var(--ac)}
+.opt.ok .ok-key{color:var(--ok)}
+.opt.bad .ok-key{color:var(--err)}
+.opt.hint .ok-key{color:var(--ok)}
+.exp-card{margin-top:16px;border-radius:var(--r);padding:14px;display:none;animation:slideUp .2s ease}
+.exp-card.show{display:block}
+.exp-ok{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.25)}
+.exp-bad{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25)}
+.exp-icon{font-size:17px;margin-bottom:5px}
+.exp-title{font-weight:700;font-size:13px;margin-bottom:5px}
+.exp-ok .exp-title{color:var(--ok)}
+.exp-bad .exp-title{color:var(--err)}
+.exp-body{font-size:12px;color:var(--tx2);line-height:1.7}
+.streak-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--s1);border:2px solid var(--ac2);border-radius:20px;padding:20px 30px;text-align:center;z-index:500;display:none;animation:pop .3s ease;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.streak-popup.show{display:block}
+.sp-ico{font-size:42px;margin-bottom:8px}
+.sp-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;color:var(--ac2)}
+.sp-sub{font-size:13px;color:var(--tx2);margin-top:4px}
+.quiz-foot{position:fixed;bottom:0;left:0;right:0;padding:10px 18px 28px;background:linear-gradient(transparent,var(--bg) 30%)}
+
+/* ══════════════ EXAM ══════════════ */
+#examscreen{background:var(--bg)}
+.exam-card{margin:18px;background:var(--s1);border:1.5px solid var(--ac);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.exam-icon{font-size:36px;text-align:center;margin-bottom:12px}
+.exam-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;text-align:center;margin-bottom:8px}
+.exam-rules{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.exam-rule{display:flex;align-items:center;gap:10px;font-size:13px}
+
+/* ══════════════ RESULT ══════════════ */
+#result{background:var(--bg);padding:28px 20px;overflow-y:auto}
+.result-wrap{text-align:center}
+.score-ring{width:130px;height:130px;margin:0 auto 20px;border-radius:50%;border:3px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--s1);box-shadow:var(--sh);animation:pop .4s ease}
+.score-n{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--ac);line-height:1}
+.score-l{font-size:11px;color:var(--tx2);margin-top:4px}
+.result-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;margin-bottom:6px}
+.result-sub{font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:22px}
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.r-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--sh)}
+.r-n{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700}
+.r-n.g{color:var(--ok)}.r-n.r{color:var(--err)}
+.r-l{font-size:10px;color:var(--tx2);margin-top:2px}
+.r-acts{display:flex;flex-direction:column;gap:8px}
+
+/* ══════════════ REPORT ══════════════ */
+#report{background:var(--bg)}
+.report-body{flex:1;overflow-y:auto;padding:16px 18px 80px}
+.rep-hero{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:16px;box-shadow:var(--sh)}
+.rep-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rep-big{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:var(--ac)}
+.rep-label{font-size:11px;color:var(--tx2);margin-top:2px}
+.cat-list{display:flex;flex-direction:column;gap:8px}
+.cat-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;box-shadow:var(--sh)}
+.cat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cat-name{font-weight:700;font-size:13px}
+.cat-rate{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+.cat-bar{height:5px;background:var(--s2);border-radius:99px;overflow:hidden}
+.cat-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.cat-detail{font-size:11px;color:var(--tx2);margin-top:5px}
+
+/* ══════════════ WRONG / BOOKMARKS ══════════════ */
+#wronglist,#bookmarks{background:var(--bg)}
+.wlist-body{flex:1;overflow-y:auto;padding:12px 18px 80px}
+.wi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px;cursor:pointer;box-shadow:var(--sh);transition:all .15s}
+.wi:active{transform:scale(.99)}
+.wi-q{font-size:13px;font-weight:700;line-height:1.5;margin-bottom:5px}
+.wi-meta{font-size:10px;color:var(--tx3);font-family:'JetBrains Mono',monospace}
+.empty{text-align:center;padding:60px 16px;color:var(--tx3);font-size:13px;line-height:1.8}
+.empty-ico{font-size:38px;margin-bottom:12px}
+
+/* ══════════════ PAYWALL / MEMBER ══════════════ */
+#paywall{background:var(--bg);padding:30px 20px;justify-content:space-between}
+.pw-top{flex:1;display:flex;flex-direction:column;justify-content:center}
+.pw-ico{font-size:50px;text-align:center;margin-bottom:16px}
+.pw-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;text-align:center;line-height:1.2;margin-bottom:10px}
+.pw-title span{color:var(--ac)}
+.pw-sub{font-size:13px;color:var(--tx2);text-align:center;line-height:1.7;margin-bottom:22px}
+.pw-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.pw-feat{display:flex;align-items:center;gap:10px;font-size:13px}
+.pw-check{color:var(--ok);font-size:15px;flex-shrink:0}
+.price-box{background:var(--s1);border:2px solid var(--ac);border-radius:var(--r);padding:16px;text-align:center;margin-bottom:14px;box-shadow:var(--sh)}
+.price-lbl{font-size:11px;color:var(--tx2);margin-bottom:3px}
+.price-big{font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:700;color:var(--ac);line-height:1}
+.price-note{font-size:11px;color:var(--tx3);margin-top:5px}
+.pw-foot{padding-bottom:10px}
+.skip-btn{background:none;border:none;color:var(--tx3);font-size:13px;width:100%;padding:10px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+#memberscreen{background:var(--bg)}
+.mb-body{flex:1;overflow-y:auto;padding:18px 18px 80px}
+.mb-hero{background:var(--s1);border:2px solid var(--ac);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px;box-shadow:var(--sh)}
+.plan{background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.plan:active{transform:scale(.99)}
+.plan.rec{border-color:var(--ac)}
+.plan-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.plan-name{font-size:15px;font-weight:700}
+.plan-price{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--ac);margin-bottom:4px}
+.plan-desc{font-size:12px;color:var(--tx2);line-height:1.5}
+.plan-feats{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.plan-feat{font-size:12px;display:flex;gap:8px}
+.pf-check{color:var(--ok);flex-shrink:0}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.55);display:none;align-items:flex-end}
+.modal-sheet{background:var(--s1);border-radius:20px 20px 0 0;padding:22px 20px 36px;width:100%;border-top:1px solid var(--bd)}
+.modal-handle{width:34px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 18px}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- THEME FAB -->
+<button id="themeFab" onclick="toggleTP()">🎨</button>
+<div id="themePanel">
+  <div class="tp-label">配色主題</div>
+  <div class="tp-row">
+    <div class="tp-dot active" data-t="dark" onclick="setT('dark')" style="background:#13131a">🌑<span>黑夜</span></div>
+    <div class="tp-dot" data-t="midnight" onclick="setT('midnight')" style="background:#0e1a30">🌌<span>深海</span></div>
+    <div class="tp-dot" data-t="forest" onclick="setT('forest')" style="background:#0e2018">🌿<span>森林</span></div>
+    <div class="tp-dot" data-t="ember" onclick="setT('ember')" style="background:#1e1000">🌅<span>暖陽</span></div>
+  </div>
+  <div class="tp-row">
+    <div class="tp-dot" data-t="light" onclick="setT('light')" style="background:#fff;border-color:#d8d4c8">☀️<span>白晝</span></div>
+    <div class="tp-dot" data-t="soft" onclick="setT('soft')" style="background:#edf2f8">🌤️<span>薄霧</span></div>
+    <div class="tp-dot" data-t="paper" onclick="setT('paper')" style="background:#faf6f0">📄<span>米紙</span></div>
+  </div>
+</div>
+
+<!-- STREAK POPUP -->
+<div class="streak-popup" id="streakPopup">
+  <div class="sp-ico">🔥</div>
+  <div class="sp-title" id="spTitle">連勝 5！</div>
+  <div class="sp-sub">繼續保持，你在狀態中！</div>
+</div>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="home" class="screen active">
+  <div class="home-hero">
+    <div class="eyebrow">Taiwan Exam King Platform</div>
+    <h1 class="hero-title"><span class="gold">👑</span> 考試王者</h1>
+    <div class="hero-italic">背多分 · BeiDuoFen</div>
+    <p class="hero-tag">精選高頻考題 · 錯題追蹤 · 模擬考試<br>考照路線圖 · 無廣告買斷制</p>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown-wrap">
+    <div class="countdown-card card">
+      <div class="countdown-ico">📅</div>
+      <div class="countdown-info">
+        <div class="countdown-label">下次職安乙級考試</div>
+        <div class="countdown-days" id="countdownDays">計算中...</div>
+        <div class="countdown-sub" id="countdownDate">勞動部技能檢定中心</div>
+      </div>
+      <span class="tag tag-hot">倒數</span>
+    </div>
+  </div>
+
+  <!-- Daily Question -->
+  <div class="daily-wrap">
+    <div class="daily-card" onclick="startDaily()">
+      <div class="daily-header">
+        <div class="daily-label">📆 今日一題</div>
+        <div class="daily-done" id="dailyDone" style="display:none">✓ 已完成</div>
+      </div>
+      <div class="daily-q" id="dailyQ">載入中...</div>
+      <div class="daily-tap">點擊作答 →</div>
+    </div>
+  </div>
+
+  <!-- Streak -->
+  <div class="streak-bar card" style="margin:0 18px 16px">
+    <div class="streak-fire">🔥</div>
+    <div class="streak-info">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">當前連勝</div>
+    </div>
+    <div class="streak-best mono" id="streakBest">最高 0</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-box"><div class="stat-n" id="sTotal">0</div><div class="stat-l">已作答</div></div>
+    <div class="stat-box"><div class="stat-n" id="sRate">—</div><div class="stat-l">答對率</div></div>
+    <div class="stat-box"><div class="stat-n" id="sWrong">0</div><div class="stat-l">錯題數</div></div>
+    <div class="stat-box"><div class="stat-n" id="sBook">0</div><div class="stat-l">書籤</div></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-wrap">
+    <div class="prog-row"><span>職安乙級進度</span><span id="progTxt">0 / 60</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Route Finder CTA -->
+  <div class="route-cta" onclick="showScreen('routefinder')">
+    <div class="route-cta-top">
+      <div class="route-cta-ico">🗺️</div>
+      <div>
+        <div class="route-cta-title">找我的考照路線</div>
+        <div style="font-size:11px;color:var(--tx2)">依你的行業推薦最有效的證照順序</div>
+      </div>
+    </div>
+    <div class="route-cta-sub">告訴我你的職業，我幫你規劃從入門到高薪的完整考照路線圖 📈</div>
+    <div class="route-cta-btn">開始規劃 →</div>
+  </div>
+
+  <!-- Modes -->
+  <div class="sec-head"><div class="sec-label">練習模式</div></div>
+  <div class="mode-list">
+    <div class="mode-card star" onclick="openSubjModal()">
+      <div class="mode-ico">📋</div>
+      <div class="mode-info"><div class="mode-name">順序 / 隨機練習</div><div class="mode-sub">逐題作答，即時解析</div></div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card star" onclick="startExam()">
+      <div class="mode-ico">⏱️</div>
+      <div class="mode-info"><div class="mode-name">模擬考試</div><div class="mode-sub">限時100分鐘，出完整成績單</div></div>
+      <span class="tag tag-hot" style="flex-shrink:0">NEW</span>
+    </div>
+    <div class="mode-card" onclick="startMode('sprint')">
+      <div class="mode-ico">⚡</div>
+      <div class="mode-info"><div class="mode-name">考前衝刺</div><div class="mode-sub">只練從未作答過的題目</div></div>
+      <span class="tag tag-new" style="flex-shrink:0">NEW</span>
+    </div>
+    <div class="mode-card" onclick="startMode('wrong')">
+      <div class="mode-ico">🔁</div>
+      <div class="mode-info"><div class="mode-name">錯題複習</div><div class="mode-sub">針對弱點集中練習</div></div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card" onclick="showWrongList()">
+      <div class="mode-ico">📌</div>
+      <div class="mode-info"><div class="mode-name">錯題列表</div><div class="mode-sub">查看所有錯過的題目</div></div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card" onclick="showBookmarks()">
+      <div class="mode-ico">🔖</div>
+      <div class="mode-info"><div class="mode-name">書籤收藏</div><div class="mode-sub">我主動標記想複習的題目</div></div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card" onclick="showReport()">
+      <div class="mode-ico">📊</div>
+      <div class="mode-info"><div class="mode-name">學習進度報告</div><div class="mode-sub">哪個類別最弱一目了然</div></div>
+      <div class="mode-arrow">›</div>
+    </div>
+  </div>
+
+  <!-- Subjects -->
+  <div class="sec-head" style="margin-top:16px"><div class="sec-label">題庫科目</div></div>
+  <div class="subj-list">
+    <div class="subj-card live" onclick="openSubjModal()">
+      <div class="subj-ico">🦺</div>
+      <div class="subj-info"><div class="subj-name">職業安全衛生管理員 乙級</div><div class="subj-meta">60題 · 學科 · 含模擬考試</div></div>
+      <span class="tag tag-ok">開放中</span>
+    </div>
+    <div class="subj-card" onclick="comingSoon('就業服務乙級')">
+      <div class="subj-ico">💼</div>
+      <div class="subj-info"><div class="subj-name">就業服務乙級技術士</div><div class="subj-meta">即將上線</div></div>
+      <span class="tag tag-dim">即將上線</span>
+    </div>
+    <div class="subj-card" onclick="comingSoon('消防設備士')">
+      <div class="subj-ico">🔥</div>
+      <div class="subj-info"><div class="subj-name">消防設備士</div><div class="subj-meta">即將上線</div></div>
+      <span class="tag tag-dim">即將上線</span>
+    </div>
+    <div class="subj-card" onclick="comingSoon('職安甲級')">
+      <div class="subj-ico">⛑️</div>
+      <div class="subj-info"><div class="subj-name">職業安全管理師 甲級</div><div class="subj-meta">即將上線</div></div>
+      <span class="tag tag-dim">即將上線</span>
+    </div>
+    <div class="subj-card" onclick="comingSoon('保全丙級')">
+      <div class="subj-ico">🛡️</div>
+      <div class="subj-info"><div class="subj-name">保全人員丙/乙級</div><div class="subj-meta">即將上線</div></div>
+      <span class="tag tag-dim">即將上線</span>
+    </div>
+    <div class="subj-card" onclick="comingSoon('堆高機')">
+      <div class="subj-ico">🚜</div>
+      <div class="subj-info"><div class="subj-name">堆高機操作人員</div><div class="subj-meta">即將上線</div></div>
+      <span class="tag tag-dim">即將上線</span>
+    </div>
+  </div>
+
+  <!-- Share Unlock -->
+  <div class="share-wrap">
+    <div class="share-card">
+      <div class="share-header">
+        <div class="share-ico">🎁</div>
+        <div class="share-title">分享給朋友，解鎖更多題目</div>
+      </div>
+      <div class="share-sub">把考試王者分享給一位朋友，免費解鎖額外 <strong>20題</strong> 練習，不需付費！</div>
+      <button class="share-btn" onclick="doShare()" id="shareBtn">📤 分享考試王者</button>
+      <div class="share-unlocked" id="shareUnlocked" style="display:none">✓ 已解鎖 +20題 分享獎勵！</div>
+    </div>
+  </div>
+
+  <!-- Member CTA -->
+  <div class="cta-wrap" onclick="showScreen('memberscreen')">
+    <div class="cta-card">
+      <div class="cta-crown">👑</div>
+      <div class="cta-title">成為<span style="color:var(--ac)">王者會員</span></div>
+      <div class="cta-sub">解鎖全部科目 · 買斷永久使用 · 無廣告</div>
+      <div class="cta-price">$699</div>
+    </div>
+  </div>
+  <div class="home-pad"></div>
+</div>
+
+<!-- ══════════════ ROUTE FINDER ══════════════ -->
+<div id="routefinder" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">🗺️ 找我的考照路線</div>
+  </div>
+  <div class="rf-body">
+    <div class="rf-hero">
+      <div class="rf-hero-ico">🎯</div>
+      <div class="rf-hero-title">你的行業是哪個？</div>
+      <div class="rf-hero-sub">選擇最接近你現在或想轉職的行業<br>我幫你規劃最有效率的考照路線</div>
+    </div>
+    <div class="industry-grid" id="industryGrid"></div>
+    <div class="route-result" id="routeResult"></div>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ ══════════════ -->
+<div id="quiz" class="screen">
+  <div class="quiz-bar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="quiz-meta">
+      <div class="quiz-mode" id="qMode">順序練習</div>
+      <div class="quiz-ctr" id="qCtr">第 1 題 / 共 60 題</div>
+    </div>
+    <div class="quiz-right">
+      <div class="streak-badge" id="quizStreak">🔥0</div>
+      <div class="quiz-timer" id="qTimer">—</div>
+    </div>
+  </div>
+  <div class="qpb"><div class="qpb-fill" id="qPb"></div></div>
+  <div class="quiz-body" id="qBody"></div>
+  <div class="quiz-foot">
+    <button class="btn btn-ac" id="qBtn" onclick="handleBtn()" disabled>選擇答案</button>
+  </div>
+</div>
+
+<!-- ══════════════ EXAM INTRO ══════════════ -->
+<div id="examscreen" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">⏱️ 模擬考試</div>
+  </div>
+  <div class="exam-card">
+    <div class="exam-icon">📝</div>
+    <div class="exam-title">正式模擬考試</div>
+    <div style="font-size:13px;color:var(--tx2);text-align:center">模擬真實職安乙級考試環境</div>
+    <div class="exam-rules">
+      <div class="exam-rule"><span>📋</span><span>共 <b>60 題</b>（單選＋複選混合）</span></div>
+      <div class="exam-rule"><span>⏱️</span><span>限時 <b>100 分鐘</b>（正式考試標準）</span></div>
+      <div class="exam-rule"><span>🚫</span><span>作答中不顯示解析，交卷後才公布</span></div>
+      <div class="exam-rule"><span>📊</span><span>交卷後出具完整成績單＋類別分析</span></div>
+      <div class="exam-rule"><span>✅</span><span><b>60分</b>以上算及格</span></div>
+    </div>
+    <button class="btn btn-ac" onclick="launchExam()" style="margin-top:8px">🚀 開始考試</button>
+    <button class="btn btn-ghost" onclick="goHome()" style="margin-top:8px">先回首頁</button>
+  </div>
+</div>
+
+<!-- ══════════════ RESULT ══════════════ -->
+<div id="result" class="screen">
+  <div class="result-wrap">
+    <div class="score-ring">
+      <div class="score-n" id="rScore">0%</div>
+      <div class="score-l">答對率</div>
+    </div>
+    <h2 class="result-title" id="rTitle">練習完成！</h2>
+    <p class="result-sub" id="rSub"></p>
+    <div class="r-grid">
+      <div class="r-box"><div class="r-n g" id="rC">0</div><div class="r-l">答對</div></div>
+      <div class="r-box"><div class="r-n r" id="rW">0</div><div class="r-l">答錯</div></div>
+    </div>
+    <div class="r-acts">
+      <button class="btn btn-ac" onclick="retrySession()">再練一次</button>
+      <button class="btn btn-ghost" onclick="showReport()">查看弱點報告</button>
+      <button class="btn btn-ghost" onclick="showWrongList()">查看錯題</button>
+      <button class="btn btn-ghost" onclick="goHome()">回首頁</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ REPORT ══════════════ -->
+<div id="report" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">📊 學習進度報告</div>
+  </div>
+  <div class="report-body">
+    <div class="rep-hero">
+      <div class="rep-row">
+        <div><div class="rep-big" id="repTotal">0%</div><div class="rep-label">整體答對率</div></div>
+        <div style="text-align:right"><div class="rep-big" id="repAns" style="font-size:22px">0</div><div class="rep-label">已作答題數</div></div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="repProg" style="width:0%"></div></div>
+    </div>
+    <div class="sec-head"><div class="sec-label">各類別表現</div></div>
+    <div class="cat-list" id="catList"></div>
+  </div>
+</div>
+
+<!-- ══════════════ WRONG LIST ══════════════ -->
+<div id="wronglist" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">📌 錯題列表</div>
+    <div class="mono" style="font-size:12px;color:var(--tx2)" id="wCount">0題</div>
+  </div>
+  <div class="wlist-body" id="wBody"></div>
+</div>
+
+<!-- ══════════════ BOOKMARKS ══════════════ -->
+<div id="bookmarks" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">🔖 書籤收藏</div>
+    <div class="mono" style="font-size:12px;color:var(--tx2)" id="bmCount">0題</div>
+  </div>
+  <div class="wlist-body" id="bmBody"></div>
+</div>
+
+<!-- ══════════════ PAYWALL ══════════════ -->
+<div id="paywall" class="screen">
+  <div class="pw-top">
+    <div class="pw-ico">🔓</div>
+    <h2 class="pw-title">解鎖<span>完整題庫</span><br>一次考過</h2>
+    <p class="pw-sub">免費體驗已結束<br>解鎖後無廣告、完整練習功能全開</p>
+    <div class="pw-feats">
+      <div class="pw-feat"><span class="pw-check">✓</span><span>完整學科題庫（單選＋複選）</span></div>
+      <div class="pw-feat"><span class="pw-check">✓</span><span>模擬考試出完整成績單</span></div>
+      <div class="pw-feat"><span class="pw-check">✓</span><span>類別弱點分析報告</span></div>
+      <div class="pw-feat"><span class="pw-check">✓</span><span>錯題追蹤＋書籤收藏</span></div>
+      <div class="pw-feat"><span class="pw-check">✓</span><span>無廣告，買斷永久使用</span></div>
+    </div>
+    <div class="price-box">
+      <div class="price-lbl">職安乙級單科買斷</div>
+      <div class="price-big">$299</div>
+      <div class="price-note">永久使用 · 不需訂閱</div>
+    </div>
+  </div>
+  <div class="pw-foot">
+    <button class="btn btn-ac" onclick="simBuy()">立即解鎖 $299</button>
+    <button class="skip-btn" onclick="goHome()">先回首頁</button>
+  </div>
+</div>
+
+<!-- ══════════════ MEMBER ══════════════ -->
+<div id="memberscreen" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="topbar-title">👑 王者會員</div>
+  </div>
+  <div class="mb-body">
+    <div class="mb-hero">
+      <div style="font-size:38px;margin-bottom:10px">👑</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:900;margin-bottom:6px">成為<span style="color:var(--ac)">考試王者</span></div>
+      <div style="font-size:13px;color:var(--tx2);line-height:1.6">一次解鎖全平台所有科目<br>永久買斷 · 無廣告 · 新科目同步開放</div>
+    </div>
+    <div class="sec-head"><div class="sec-label">選擇方案</div></div>
+    <div class="plan" onclick="simBuy()">
+      <div class="plan-head"><div class="plan-name">🦺 職安乙級</div></div>
+      <div class="plan-price">$299</div>
+      <div class="plan-desc">單科買斷，永久使用</div>
+      <div class="plan-feats">
+        <div class="plan-feat"><span class="pf-check">✓</span><span>職安乙級完整學科題庫</span></div>
+        <div class="plan-feat"><span class="pf-check">✓</span><span>模擬考試 + 弱點報告</span></div>
+      </div>
+    </div>
+    <div class="plan rec" onclick="simMemberBuy()">
+      <div class="plan-head">
+        <div class="plan-name">👑 王者全科</div>
+        <span class="tag tag-ac">最超值</span>
+      </div>
+      <div class="plan-price">$699</div>
+      <div class="plan-desc">買斷全平台，未來新增科目同步開放</div>
+      <div class="plan-feats">
+        <div class="plan-feat"><span class="pf-check">✓</span><span>現有 + 未來所有科目</span></div>
+        <div class="plan-feat"><span class="pf-check">✓</span><span>永久使用，不需訂閱</span></div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--tx3);padding:16px 0;line-height:2">
+      付款後即刻解鎖<br><span style="color:var(--tx2)">examking.tw@gmail.com</span>
+    </div>
+  </div>
+</div>
+
+<!-- SUBJECT MODAL -->
+<div class="modal-overlay" id="subjModal" onclick="closeSubjModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="font-size:30px;text-align:center;margin-bottom:10px">🦺</div>
+    <div style="font-size:17px;font-weight:900;text-align:center;margin-bottom:4px">職安乙級</div>
+    <div style="font-size:12px;color:var(--tx2);text-align:center;margin-bottom:20px">60題精選高頻考題</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-ac" onclick="startMode('sequential');closeSubjModal()">📋 順序練習</button>
+      <button class="btn btn-ghost" onclick="startMode('random');closeSubjModal()">🎲 隨機練習</button>
+      <button class="btn btn-ghost" onclick="startMode('sprint');closeSubjModal()">⚡ 考前衝刺</button>
+      <button class="btn btn-ghost" onclick="startMode('wrong');closeSubjModal()">🔁 錯題複習</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════
+   INDUSTRY ROUTES DATA
+══════════════════════════════════ */
+const INDUSTRIES = [
+  {
+    id:'construction', name:'營造／工地', ico:'🏗️', sub:'工地、建築、土木',
+    salary:'月薪 4~8萬',
+    desc:'台灣缺工嚴重的高薪領域，取得職安乙級後可擔任工地安衛人員，加上操作類證照薪資更高。',
+    steps:[
+      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'工地安衛人員的入場券，取得後擔任職安管理員，月薪加給5,000~10,000元。',salary:'取得後加薪 5,000~10,000/月',available:true},
+      {name:'堆高機操作人員',diff:'easy',study:'18小時訓練',desc:'工地常見機具，訓練費約3,000~5,000元，取得後操作堆高機合法，時薪或月薪都能提升。',salary:'加給約 3,000~5,000/月'},
+      {name:'移動式起重機操作',diff:'mid',study:'35小時訓練',desc:'吊車操作人員，工地高需求職位，取得後薪資大幅提升。',salary:'月薪 5~8萬'},
+      {name:'職安甲級技術士',diff:'hard',study:'需乙級+實務經驗',desc:'甲級管理師，可擔任更高階安全衛生管理職位，大型工地必備。',salary:'月薪 6~10萬+'},
+    ]
+  },
+  {
+    id:'factory', name:'工廠製造業', ico:'🏭', sub:'製造、生產、機械',
+    salary:'月薪 3.5~6萬',
+    desc:'台灣製造業基礎人才需求穩定，取得相關證照可晉升幹部，薪資加給明顯。',
+    steps:[
+      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'工廠安衛人員基本資格，法規要求一定規模工廠需設置，有設置需求就有穩定職缺。',salary:'加給 3,000~8,000/月',available:true},
+      {name:'堆高機操作人員',diff:'easy',study:'18小時訓練',desc:'工廠倉儲必備，考取後合法操作堆高機，提升工作彈性。',salary:'加給 2,000~4,000/月'},
+      {name:'鍋爐操作人員',diff:'mid',study:'訓練+技能檢定',desc:'製程中有用到鍋爐的工廠必備，操作人員稀缺薪資高。',salary:'加給 5,000~10,000/月'},
+      {name:'職安甲級技術士',diff:'hard',study:'需乙級+實務經驗',desc:'工廠安全衛生最高級別，擔任管理師職位。',salary:'月薪 5~8萬'},
+    ]
+  },
+  {
+    id:'security', name:'保全／警衛', ico:'🛡️', sub:'保全、警衛、安全管理',
+    salary:'月薪 3~5萬',
+    desc:'保全業法規要求持照，取得證照是就業門檻也是加薪利器。',
+    steps:[
+      {name:'保全人員丙級技術士',diff:'easy',study:'自修+技能檢定',desc:'保全業基本入職資格，各保全公司優先錄用有照人員。',salary:'月薪 3~3.5萬'},
+      {name:'保全人員乙級技術士',diff:'mid',study:'丙級+實務+考試',desc:'保全隊長、主管級必備，薪資明顯提升。',salary:'月薪 3.5~5萬'},
+      {name:'消防安全管理人',diff:'mid',study:'指定訓練課程',desc:'大型建築、百貨均需設置，兼具消防資格薪資更好。',salary:'加給 3,000~6,000/月'},
+      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'若轉往工安方向，職安乙級是最有投資報酬率的選擇。',salary:'月薪 4~6萬',available:true},
+    ]
+  },
+  {
+    id:'food', name:'餐飲／廚房', ico:'🍳', sub:'廚師、烘焙、食品',
+    salary:'月薪 3~6萬',
+    desc:'餐飲業證照直接影響職位與薪資，烘焙乙級以上在精品餐廳有高薪機會。',
+    steps:[
+      {name:'中餐烹調丙級',diff:'easy',study:'術科練習+筆試',desc:'餐廳廚師基本門票，很多餐廳要求基本資格。',salary:'月薪 3~3.5萬'},
+      {name:'中餐烹調乙級',diff:'mid',study:'需丙級+考試',desc:'廚師長、主廚等級的資格，高級餐廳或飯店必備。',salary:'月薪 4~6萬'},
+      {name:'烘焙丙/乙級',diff:'mid',study:'術科練習+筆試',desc:'烘焙市場持續成長，乙級烘焙師在精品麵包店薪資不錯。',salary:'月薪 3.5~5萬'},
+      {name:'食品技師',diff:'hard',study:'食品相關科系+國考',desc:'食品工廠最高等級，轉往食品產業管理職。',salary:'月薪 5~8萬'},
+    ]
+  },
+  {
+    id:'logistics', name:'物流／倉儲', ico:'📦', sub:'倉儲、物流、配送',
+    salary:'月薪 3.5~5萬',
+    desc:'電商帶動物流業大幅成長，操作類證照是薪資加給的關鍵。',
+    steps:[
+      {name:'堆高機操作人員',diff:'easy',study:'18小時訓練',desc:'倉儲最基本的加薪工具，幾乎所有大型倉儲都需要，訓練費便宜效果好。',salary:'加給 3,000~5,000/月'},
+      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'倉儲規模超過一定人數需設置安衛人員，取得後可晉升管理職。',salary:'加給 5,000~10,000/月',available:true},
+      {name:'危險物品運送人員',diff:'mid',study:'指定訓練課程',desc:'化學品、特殊貨物運送合法資格，運送公司高薪需求。',salary:'加給 3,000~8,000/月'},
+      {name:'職安甲級技術士',diff:'hard',study:'需乙級+實務',desc:'大型物流中心安全管理最高職位。',salary:'月薪 6~9萬'},
+    ]
+  },
+  {
+    id:'electrical', name:'電氣／水電', ico:'⚡', sub:'水電、室內配線、弱電',
+    salary:'月薪 4~8萬',
+    desc:'台灣缺工嚴重的技術職，有照水電師傅時薪可達600~1000元。',
+    steps:[
+      {name:'室內配線丙級',diff:'easy',study:'術科練習+筆試',desc:'水電師傅入門資格，可獨立接案的基本門票。',salary:'月薪 4~5萬'},
+      {name:'室內配線乙級',diff:'mid',study:'需丙級+考試',desc:'承包工程、開業的重要資格，薪資大幅提升。',salary:'月薪 5~7萬'},
+      {name:'用電設備檢驗',diff:'mid',study:'訓練課程',desc:'工廠、大樓電氣設備定期檢驗資格，穩定收入來源。',salary:'加給 5,000~10,000/月'},
+      {name:'電匠執照（甲/乙種）',diff:'hard',study:'需相關經驗+考試',desc:'承包大型電氣工程的合法資格，業主要求的正式執照。',salary:'月薪 6~10萬+'},
+    ]
+  },
+  {
+    id:'fire', name:'消防設備', ico:'🚒', sub:'消防、防火、安全管理',
+    salary:'月薪 4~7萬',
+    desc:'消防法規日趨嚴格，消防設備士需求持續成長，考照路線清晰。',
+    steps:[
+      {name:'消防設備士',diff:'mid',study:'自修+國家考試',desc:'消防設備安裝、維護的執照，業界入門資格，考取後就業機會多。',salary:'月薪 4~5.5萬'},
+      {name:'消防設備師',diff:'hard',study:'需設備士+考試',desc:'消防工程設計、監督資格，是設備士的進階升級。',salary:'月薪 5~7萬'},
+      {name:'消防安全管理人',diff:'easy',study:'訓練課程',desc:'建築物消防安全管理負責人資格，各大樓、工廠都需要。',salary:'加給 3,000~6,000/月'},
+      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'與消防搭配，成為複合型安全管理人才，職缺更廣。',salary:'月薪 5~7萬',available:true},
+    ]
+  },
+  {
+    id:'care', name:'護理／長照', ico:'🏥', sub:'照顧服務、長照、護理',
+    salary:'月薪 3~5萬',
+    desc:'台灣高齡化社會，長照人才需求持續成長，政府補助訓練課程多。',
+    steps:[
+      {name:'照顧服務員丙級',diff:'easy',study:'90小時訓練（政府補助）',desc:'居家服務、照護機構的基本資格，政府補助訓練幾乎免費。',salary:'月薪 3~3.5萬'},
+      {name:'照顧服務員乙級',diff:'mid',study:'需丙級+實務+考試',desc:'機構主管、督導級資格，薪資加給明顯。',salary:'月薪 3.5~5萬'},
+      {name:'社會工作師',diff:'hard',study:'相關科系+國考',desc:'社福機構、長照機構的管理職，需要較長學習路徑。',salary:'月薪 4~6萬'},
+    ]
+  },
+  {
+    id:'auto', name:'汽車修護', ico:'🔧', sub:'汽修、車體板金、輪胎',
+    salary:'月薪 3.5~7萬',
+    desc:'汽車業技術職，有照師傅可自行接案，收入彈性大。',
+    steps:[
+      {name:'汽車修護丙級',diff:'easy',study:'術科練習+筆試',desc:'汽修廠基本資格，大多數汽修廠的就業門票。',salary:'月薪 3.5~4萬'},
+      {name:'汽車修護乙級',diff:'mid',study:'需丙級+考試',desc:'技術師傅等級，薪資明顯提升，可擔任技術主管。',salary:'月薪 4.5~6萬'},
+      {name:'汽車修護甲級',diff:'hard',study:'需乙級+豐富實務',desc:'最高等級，可開設修車廠、擔任技術顧問。',salary:'月薪 6~10萬+'},
+      {name:'堆高機操作人員',diff:'easy',study:'18小時訓練',desc:'汽車零件倉儲操作，擴展工作範圍。',salary:'加給 2,000~4,000/月'},
+    ]
+  },
+  {
+    id:'beauty', name:'美容美髮', ico:'✂️', sub:'美容、美髮、美甲',
+    salary:'月薪 3~6萬（含業績）',
+    desc:'美容美髮創業門檻低，有照可自行開業，業績好收入無上限。',
+    steps:[
+      {name:'美容丙級技術士',diff:'easy',study:'術科練習+筆試',desc:'美容從業基本資格，各美容院優先錄用。',salary:'月薪 3~3.5萬'},
+      {name:'美容乙級技術士',diff:'mid',study:'需丙級+考試',desc:'高級美容師、美容講師資格，可指導學員。',salary:'月薪 4~6萬'},
+      {name:'美髮丙/乙級',diff:'easy',study:'術科練習+筆試',desc:'複合型人才，美容美髮都會讓接客更多元。',salary:'加給 5,000~15,000/月'},
+      {name:'開業執照',diff:'easy',study:'衛生局申請',desc:'自行開業創業，收入取決於客源，有照才合法開店。',salary:'收入上不封頂'},
+    ]
+  },
+];
+
+/* ══════════════════════════════════
+   QUESTION BANK
+══════════════════════════════════ */
+const QS=[
+  {id:1,type:'single',cat:'法規',text:'依職業安全衛生法規定，事業單位勞工人數在幾人以上，應設置職業安全衛生管理單位？',opts:['50人','100人','200人','300人'],ans:[1],exp:'依職業安全衛生管理辦法，第一類事業勞工人數在100人以上者，應設置職業安全衛生管理單位。'},
+  {id:2,type:'single',cat:'法規',text:'職業安全衛生法所稱「雇主」，係指何者？',opts:['事業主或事業之經營負責人','人事主管','安全衛生管理人員','工地主任'],ans:[0],exp:'依職業安全衛生法第2條，雇主係指事業主或事業之經營負責人。'},
+  {id:3,type:'single',cat:'法規',text:'依職業安全衛生法，事業單位發生死亡職業災害，雇主應於幾小時內通報勞動檢查機構？',opts:['4小時','8小時','12小時','24小時'],ans:[1],exp:'依職業安全衛生法第37條，發生死亡職業災害，雇主應於8小時內通報勞動檢查機構。'},
+  {id:4,type:'single',cat:'法規',text:'依職業安全衛生設施規則，固定式梯子之踏板間距不得超過幾公分？',opts:['25公分','30公分','35公分','40公分'],ans:[1],exp:'依職業安全衛生設施規則第37條，固定式梯子踏板間距不得超過30公分。'},
+  {id:5,type:'single',cat:'法規',text:'依職業安全衛生教育訓練規則，新到職勞工一般安全衛生教育訓練至少應實施幾小時？',opts:['2小時','3小時','6小時','8小時'],ans:[1],exp:'依職業安全衛生教育訓練規則，新到職勞工應接受至少3小時之一般安全衛生教育訓練。'},
+  {id:6,type:'single',cat:'法規',text:'依勞動檢查法，下列何者非屬法定勞動檢查機構？',opts:['勞動部職業安全衛生署','直轄市政府','縣（市）政府','工業區管理機構'],ans:[3],exp:'依勞動檢查法，勞動檢查機構包含：勞動部職業安全衛生署、直轄市政府及縣（市）政府。工業區管理機構並非法定勞動檢查機構。'},
+  {id:7,type:'single',cat:'法規',text:'依職業安全衛生法，勞工有立即發生危險之虞時，得如何處置？',opts:['應繼續工作等待指示','可退避至安全場所並立即告知雇主','應通報警察機關','只能靜待救援'],ans:[1],exp:'依職業安全衛生法第18條，有立即危險之虞時，勞工得自行退避並即告知雇主。'},
+  {id:8,type:'single',cat:'法規',text:'依職業安全衛生管理辦法，第一類事業之職業安全衛生業務主管資格為何？',opts:['甲種訓練合格','乙種訓練合格','丙種訓練合格','8小時訓練即可'],ans:[0],exp:'第一類事業（高危險）之職業安全衛生業務主管，應接受甲種訓練合格。'},
+  {id:9,type:'single',cat:'法規',text:'依職業安全衛生管理辦法，安全衛生工作守則應由何者訂定？',opts:['政府主管機關','雇主會同勞工代表','管理員單獨訂定','委員會主席'],ans:[1],exp:'安全衛生工作守則應由雇主「會同」勞工代表共同訂定，反映勞資合作精神。'},
+  {id:10,type:'multi',cat:'法規',text:'依職業安全衛生法，下列哪些情形雇主不得讓勞工從事？（複選）',opts:['未成年人操作危險性機械','懷孕女工從事有害輻射作業','一般成年男性從事噪音作業','有機溶劑中毒者繼續從事有機溶劑作業'],ans:[0,1,3],exp:'職安法對特定族群有保護規定：未成年不可操作危險機械、懷孕女工不可從事有害輻射等特定作業、職業病者不可繼續從事同類有害作業。'},
+  {id:11,type:'single',cat:'計畫管理',text:'職業安全衛生管理系統（OSHMS）之基本架構為何？',opts:['PDCA循環','ISO 9001架構','SOP標準流程','FMEA失效模式'],ans:[0],exp:'OSHMS採用PDCA（Plan規劃、Do執行、Check查核、Act改善）循環管理架構，持續改善職業安全衛生績效。'},
+  {id:12,type:'single',cat:'計畫管理',text:'危害辨識及風險評估中，風險值（R）的計算公式為何？',opts:['R = 可能性 × 嚴重度','R = 嚴重度 ÷ 頻率','R = 頻率 + 嚴重度','R = 暴露頻率 × 危害數量'],ans:[0],exp:'風險值R = 發生可能性（L）× 嚴重度（S），用於判斷危害的風險等級。'},
+  {id:13,type:'single',cat:'計畫管理',text:'職業安全衛生委員會之會議，至少每隔幾個月舉行一次？',opts:['1個月','2個月','3個月','6個月'],ans:[2],exp:'依職業安全衛生管理辦法，職業安全衛生委員會至少每3個月召開一次會議。'},
+  {id:14,type:'single',cat:'計畫管理',text:'「5S」管理活動中，「整頓」係指下列何者？',opts:['清除不要的物品','必要物品定位放置並明確標示','清掃工作環境','養成良好習慣'],ans:[1],exp:'整理=去除不要物品，整頓=必要物品定位標示，清掃=清潔環境，清潔=維持，素養=養成習慣。'},
+  {id:15,type:'single',cat:'計畫管理',text:'「海因利希法則」中，1件重傷事故背後，約有幾件輕傷事故？',opts:['10件','29件','88件','300件'],ans:[1],exp:'海因利希1:29:300法則：1件重大傷亡背後有29件輕傷，及300件虛驚事故。'},
+  {id:16,type:'single',cat:'計畫管理',text:'職業災害統計中，「失能傷害頻率（FR）」的計算分母為何？',opts:['100萬工時','10萬工時','1萬工時','總作業人數'],ans:[0],exp:'失能傷害頻率（FR）= 失能傷害件數 × 1,000,000 ÷ 總經歷工時，分母為100萬工時。'},
+  {id:17,type:'single',cat:'計畫管理',text:'進行「工具箱會議」（Tool Box Meeting）的主要目的為何？',opts:['討論薪資待遇','作業前安全說明及危害確認','進行績效考核','清點工具數量'],ans:[1],exp:'工具箱會議（TBM）是每日作業前的短時間安全說明，討論當天作業危害、確認安全措施。'},
+  {id:18,type:'multi',cat:'計畫管理',text:'「職業災害調查」的目的，下列哪些正確？（複選）',opts:['找出事故原因','預防類似事故再發','追究法律責任','改善安全措施'],ans:[0,1,3],exp:'職業災害調查主要目的是找出原因、預防再發及改善安全，而非追究法律責任。'},
+  {id:19,type:'single',cat:'計畫管理',text:'緊急應變計畫（ERP）演練應至少每幾年辦理一次？',opts:['每年一次','每2年一次','每3年一次','每5年一次'],ans:[0],exp:'緊急應變計畫應至少每年辦理一次演練，以確保人員熟悉應變程序。'},
+  {id:20,type:'single',cat:'計畫管理',text:'「工作安全分析（JSA）」的執行步驟，正確順序為何？',opts:['選擇作業→辨識危害→評估風險→制定控制措施','辨識危害→選擇作業→制定控制措施→評估風險','評估風險→辨識危害→選擇作業→制定控制措施','制定控制措施→選擇作業→辨識危害→評估風險'],ans:[0],exp:'JSA正確步驟：①選擇作業 ②辨識危害 ③評估風險等級 ④制定控制措施。'},
+  {id:21,type:'single',cat:'專業課程',text:'依缺氧症預防規則，缺氧係指空氣中氧氣濃度未達百分之幾？',opts:['16%','18%','19.5%','21%'],ans:[1],exp:'依缺氧症預防規則第2條，缺氧係指空氣中氧氣濃度未達18%之狀態。'},
+  {id:22,type:'single',cat:'專業課程',text:'高架作業係指作業人員在距離基準面幾公尺以上有墜落之虞的作業？',opts:['1公尺','2公尺','3公尺','5公尺'],ans:[1],exp:'依職業安全衛生設施規則，高架作業係指站立面距基準面2公尺以上，有墜落之虞之作業。'},
+  {id:23,type:'single',cat:'專業課程',text:'依有機溶劑中毒預防規則，有機溶劑可分為幾種？',opts:['二種','三種','四種','五種'],ans:[1],exp:'依有機溶劑中毒預防規則，有機溶劑依危害程度分為三種：第一種（毒性最強）、第二種、第三種。'},
+  {id:24,type:'single',cat:'專業課程',text:'火災燃燒三要素（火三角）為下列何者？',opts:['可燃物、助燃物、活化能','可燃物、氧氣、點火源','燃料、壓力、溫度','碳、氫、氧'],ans:[1],exp:'火三角三要素：可燃物（燃料）、氧氣（助燃物）、點火源（熱能），三者缺一則火無法持續燃燒。'},
+  {id:25,type:'single',cat:'專業課程',text:'作業場所噪音管理中，8小時TWA達幾分貝，雇主應採取聽力保護措施？',opts:['80 dB','85 dB','90 dB','95 dB'],ans:[1],exp:'8小時時量平均音壓級達85分貝以上，雇主應採取聽力保護措施。'},
+  {id:26,type:'single',cat:'專業課程',text:'使用「梯子」作業時，梯腳與地面所成角度以幾度為宜？',opts:['60度','75度','80度','90度'],ans:[1],exp:'使用移動梯時，梯子與地面夾角以75度為宜，過大易後倒，過小易前滑。'},
+  {id:27,type:'single',cat:'專業課程',text:'依營造安全衛生設施標準，高度幾公尺以上之工作台邊緣應設置護欄？',opts:['1公尺','1.5公尺','2公尺','3公尺'],ans:[2],exp:'依營造安全衛生設施標準第17條，高度在2公尺以上之工作台，應設置護欄、護蓋或安全網等防墜措施。'},
+  {id:28,type:'single',cat:'專業課程',text:'電氣「停電作業」的正確步驟為何？',opts:['停電→掛鎖→測電→驗電→接地','停電→驗電→掛鎖→接地→測電','停電→驗電→接地→掛鎖→作業','驗電→停電→接地→掛鎖→作業'],ans:[2],exp:'停電作業標準程序：停電→驗電（確認無電）→接地（放殘餘電荷）→掛鎖掛牌（防誤送電）→開始作業。'},
+  {id:29,type:'single',cat:'專業課程',text:'在粉塵作業中，「呼吸性粉塵」是指能進入人體何處之粉塵？',opts:['鼻腔','咽喉','氣管','肺泡'],ans:[3],exp:'呼吸性粉塵指可進入肺泡的細小粒子（粒徑約10微米以下），是造成塵肺症的主因。'},
+  {id:30,type:'single',cat:'專業課程',text:'局限空間作業前，應先確認何者才可進入？',opts:['氧氣濃度≥18%且有害氣體在安全範圍內','作業人員體力狀況','工具是否備齊','主管是否在場'],ans:[0],exp:'局限空間進入前，必須確認：氧氣濃度≥18%，有害氣體濃度在安全容許值以下，並應持續監測通風。'},
+  {id:31,type:'single',cat:'專業課程',text:'搬運物料時，男性勞工人工搬運單次重量原則上不應超過幾公斤？',opts:['20公斤','25公斤','40公斤','55公斤'],ans:[2],exp:'依職業安全衛生設施規則，男性勞工人工搬運重量原則上以40公斤為限。'},
+  {id:32,type:'single',cat:'專業課程',text:'起重機吊掛作業，「禁止站在吊掛物下方」主要預防什麼危害？',opts:['感電','物體飛落','被夾壓','火災'],ans:[1],exp:'禁止站在吊掛物下方，主要預防吊掛物或索具斷裂造成物體飛落傷害人員。'},
+  {id:33,type:'single',cat:'專業課程',text:'電焊弧光主要對人體哪個部位造成危害？',opts:['皮膚和眼睛','肺部','聽力','神經系統'],ans:[0],exp:'電焊弧光產生強烈紫外線，主要對皮膚造成灼傷，對眼睛造成電光性眼炎。'},
+  {id:34,type:'single',cat:'專業課程',text:'在施工架作業中，工作台的寬度不得小於幾公分？',opts:['30公分','40公分','50公分','60公分'],ans:[1],exp:'依營造安全衛生設施標準，施工架工作台寬度不得小於40公分。'},
+  {id:35,type:'single',cat:'專業課程',text:'「全身振動」主要對人體哪個系統造成危害？',opts:['呼吸系統','脊椎及消化系統','視覺系統','皮膚系統'],ans:[1],exp:'全身振動長期暴露主要危害：脊椎（腰椎病變）、消化系統、及心血管系統。'},
+  {id:36,type:'multi',cat:'專業課程',text:'下列哪些屬於「物理性危害因子」？（複選）',opts:['噪音','振動','苯（有機溶劑）','游離輻射'],ans:[0,1,3],exp:'物理性危害因子包含：噪音、振動、極端溫度、游離輻射等。苯屬化學性危害因子。'},
+  {id:37,type:'single',cat:'專業課程',text:'個人防護具使用的「最後手段」原則意涵為何？',opts:['個人防護具應優先使用','在工程控制和管理控制均無法完全消除危害時才使用','可取代所有工程控制','只需在高危險區域使用'],ans:[1],exp:'依危害控制層級，個人防護具位階最低，應在工程控制、行政管理等措施仍不足時作為補充。'},
+  {id:38,type:'single',cat:'專業課程',text:'下列何者為電氣火災（C類）適用之滅火器？',opts:['泡沫滅火器','乾粉滅火器','水滅火器','強化液滅火器'],ans:[1],exp:'電氣火災應使用不導電的滅火劑，乾粉滅火器、CO₂滅火器均適用。水或泡沫具有導電性有感電危險。'},
+  {id:39,type:'single',cat:'專業課程',text:'依化學品危害通識規則，化學品容器標示應包含的項目為？',opts:['製造日期','危害圖示','採購單號','保存期限'],ans:[1],exp:'化學品容器標示應包含：危害圖示、名稱、危害警告訊息、危害防範措施、廠商資訊等。'},
+  {id:40,type:'multi',cat:'專業課程',text:'依職業安全衛生設施規則，對高壓氣體容器管理有特別規定的項目？（複選）',opts:['應有防止傾倒之固定措施','充填閥應保持關閉狀態','儲存時應直立存放','閥件應加護蓋保護'],ans:[0,3],exp:'高壓氣體容器應有防止傾倒的固定措施，且容器閥件應有護蓋保護。'},
+  {id:41,type:'single',cat:'法規',text:'依職業安全衛生法，下列何者不屬於「特別危害健康作業」？',opts:['噪音作業','游離輻射作業','一般文書作業','有機溶劑作業'],ans:[2],exp:'特別危害健康作業包含高溫、噪音、粉塵、有機溶劑、特定化學物質、游離輻射等，一般文書作業不在其中。'},
+  {id:42,type:'single',cat:'法規',text:'依職業安全衛生法，勞工人數在幾人以上應設置職業安全衛生委員會？',opts:['30人','50人','100人','200人'],ans:[1],exp:'依職業安全衛生管理辦法第11條，勞工人數在50人以上者，應設置職業安全衛生委員會。'},
+  {id:43,type:'single',cat:'法規',text:'依職業安全衛生法，「安全資料表（SDS）」應使用何種語文？',opts:['英文','中文','任何語文','廠商原語文'],ans:[1],exp:'依化學品危害通識規則，安全資料表（SDS）應以中文書寫。'},
+  {id:44,type:'single',cat:'法規',text:'具有危險性之機械設備，其操作人員應取得何種資格？',opts:['完成一般安全衛生訓練即可','取得技術士技能檢定合格或接受認可訓練','由雇主自行認定資格','通過公司內部考核即可'],ans:[1],exp:'依職業安全衛生法第24條，危險性機械設備操作人員應經技能檢定合格或接受認可訓練後方可操作。'},
+  {id:45,type:'multi',cat:'法規',text:'依職業安全衛生法，下列哪些屬於「職業病」認定之考量因素？（複選）',opts:['工作場所有害物質暴露','疾病與工作具有相當因果關係','醫師診斷意見','勞工年齡'],ans:[0,1,2],exp:'職業病認定需考量：工作環境暴露、疾病與工作的因果關係、醫師診斷意見等，勞工年齡並非直接認定因素。'},
+  {id:46,type:'single',cat:'計畫管理',text:'「本質安全化」措施是下列何者？',opts:['配戴防護具','設置安全護欄','消除危害源頭','張貼警告標示'],ans:[2],exp:'本質安全化（Inherent Safety）指從根本上消除或取代危害源，是最高層次的安全措施。'},
+  {id:47,type:'single',cat:'計畫管理',text:'事業單位實施承攬管理時，原事業單位應採取哪項措施？',opts:['不干涉承攬商自行管理','與承攬商共同訂定安全衛生管理計畫','由承攬商自行負責','僅需提供安全設備'],ans:[1],exp:'依職業安全衛生法第26條，原事業單位應與承攬人共同訂定安全衛生管理計畫，採必要措施防止職業災害。'},
+  {id:48,type:'multi',cat:'計畫管理',text:'「安全觀察」的目的，下列哪些正確？（複選）',opts:['找出不安全行為及環境','即時改善危害','記錄事故統計','促進安全文化'],ans:[0,1,3],exp:'安全觀察目的：辨識不安全行為/環境、即時改善、建立正向安全文化。事故統計另有獨立程序。'},
+  {id:49,type:'single',cat:'計畫管理',text:'下列何者非「安全文化」的核心要素？',opts:['領導層的承諾與示範','全員參與安全活動','安全規定形式化應付檢查','公開報告虛驚事故'],ans:[2],exp:'「形式化應付檢查」是安全文化不健全的特徵，而非核心要素。'},
+  {id:50,type:'multi',cat:'計畫管理',text:'下列哪些屬於職業安全衛生管理計畫應涵蓋的事項？（複選）',opts:['工作環境或作業危害之辨識、評估及控制','機械、設備或器具之管理','勞工健康管理','員工薪資福利制度'],ans:[0,1,2],exp:'職業安全衛生管理計畫應涵蓋危害辨識評估、設備管理、健康管理等職安事項，薪資福利不在其中。'},
+  {id:51,type:'single',cat:'專業課程',text:'下列何種氣體屬於「窒息性氣體」？',opts:['氯氣','氨氣','氮氣','氟化氫'],ans:[2],exp:'氮氣（N₂）屬單純窒息性氣體，本身無毒，但高濃度時會取代空氣中氧氣，導致缺氧窒息。'},
+  {id:52,type:'single',cat:'專業課程',text:'以下何種情形應實施「特殊健康檢查」？',opts:['一般辦公室人員年度檢查','從事特別危害健康作業之勞工','新進人員入職前','年滿65歲之勞工'],ans:[1],exp:'依職業安全衛生法第20條，特殊健康檢查針對從事「特別危害健康作業」的勞工。'},
+  {id:53,type:'single',cat:'專業課程',text:'「作業標準書（SOP）」的主要功能為何？',opts:['記錄設備維修歷程','提供標準化作業方法以確保安全品質','用於績效考核','作為設計圖說參考'],ans:[1],exp:'SOP提供標準化作業步驟、安全注意事項，使人員依循一致程序作業，降低傷害或品質問題。'},
+  {id:54,type:'single',cat:'專業課程',text:'危險性工作場所審查辦法中，甲類工作場所係指下列何者？',opts:['爆竹煙火製造場所','農藥製造場所','火藥類製造工廠','石化製程工廠'],ans:[2],exp:'甲類工作場所係指火藥類（含爆炸物）製造工廠，屬最高危險等級。'},
+  {id:55,type:'single',cat:'法規',text:'依職業安全衛生法，雇主使勞工從事工作應採取必要預防措施，此為何種原則？',opts:['雇主責任原則','安全預防原則','危害預防原則','先行防護原則'],ans:[2],exp:'職業安全衛生法第5條明定危害預防原則，雇主對工作場所安全負有主動預防義務。'},
+  {id:56,type:'single',cat:'法規',text:'事業單位訂定之職業安全衛生管理計畫，應由何人核定？',opts:['職業安全衛生管理員','職業安全衛生委員會','雇主或其代理人','勞工代表'],ans:[2],exp:'職業安全衛生管理計畫應由雇主或其代理人核定，並公告實施。'},
+  {id:57,type:'single',cat:'職業道德',text:'職業安全衛生管理員在執行職務時，應以何為最高原則？',opts:['配合雇主要求維護公司利益','以勞工安全健康為優先','以最低成本達到合規要求','配合工程進度優先'],ans:[1],exp:'職業安全衛生管理員的核心職責是保護勞工的安全與健康，應以勞工安全健康為最高原則。'},
+  {id:58,type:'single',cat:'職業道德',text:'職業安全衛生管理員發現事業單位有違反職安法規之情形，應如何處理？',opts:['為維護關係而隱瞞','立即向媒體舉發','依法提出改善建議並通報主管人員','自行停工處理'],ans:[2],exp:'職安管理員應據實提出改善建議並向主管人員報告，不可因私人關係而隱匿危害。'},
+  {id:59,type:'single',cat:'計畫管理',text:'PDCA循環中，「Check」查核階段的主要工作為何？',opts:['制定目標與計畫','執行安全衛生活動','監測績效並與目標比較','採取矯正措施'],ans:[2],exp:'PDCA中Check查核階段，主要是監測、測量、分析實際績效，並與預定目標或標準進行比較。'},
+  {id:60,type:'single',cat:'計畫管理',text:'「型式檢定」之申請，應向哪個機關為之？',opts:['縣市政府勞工局','勞動部職業安全衛生署','中央主管機關認可之驗證機構','勞動檢查機構'],ans:[2],exp:'機械設備器具型式檢定，應向中央主管機關認可之驗證機構申請，取得型式驗證合格證書後，方可販售或使用。'},
+];
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+const FREE_LIMIT = 20;
+const SHARE_BONUS = 20;
+let S = {
+  unlocked:false, memberOK:false, shareUnlocked:false,
+  answered:{}, wrongIds:new Set(), bookmarks:new Set(),
+  streak:0, bestStreak:0, dailyDone:false, dailyDate:'',
+  sess:{mode:'sequential',queue:[],idx:0,correct:0,wrong:0,examMode:false,examAnswers:{}}
+};
+let timerInterval=null, examSecs=6000;
+
+function loadS(){
+  try{
+    const p=JSON.parse(localStorage.getItem('ekV4')||'{}');
+    S.unlocked=p.unlocked||false; S.memberOK=p.memberOK||false;
+    S.shareUnlocked=p.shareUnlocked||false;
+    S.answered=p.answered||{}; S.wrongIds=new Set(p.wrongIds||[]);
+    S.bookmarks=new Set(p.bookmarks||[]);
+    S.streak=p.streak||0; S.bestStreak=p.bestStreak||0;
+    S.dailyDone=p.dailyDone||false; S.dailyDate=p.dailyDate||'';
+    const t=localStorage.getItem('ekT');
+    if(t) setT(t,true);
+  }catch(e){}
+}
+function saveS(){
+  try{
+    localStorage.setItem('ekV4',JSON.stringify({
+      unlocked:S.unlocked, memberOK:S.memberOK, shareUnlocked:S.shareUnlocked,
+      answered:S.answered, wrongIds:[...S.wrongIds], bookmarks:[...S.bookmarks],
+      streak:S.streak, bestStreak:S.bestStreak,
+      dailyDone:S.dailyDone, dailyDate:S.dailyDate
+    }));
+  }catch(e){}
+}
+
+/* ══ THEME ══ */
+function setT(t,silent){
+  document.body.setAttribute('data-theme',t);
+  document.querySelectorAll('.tp-dot').forEach(d=>d.classList.toggle('active',d.dataset.t===t));
+  try{localStorage.setItem('ekT',t);}catch(e){}
+  if(!silent) closeTP();
+}
+function toggleTP(){document.getElementById('themePanel').classList.toggle('open')}
+function closeTP(){document.getElementById('themePanel').classList.remove('open')}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#themeFab')&&!e.target.closest('#themePanel')) closeTP();
+});
+
+/* ══ NAV ══ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){stopTimer();updateHome();showScreen('home')}
+
+/* ══ HOME ══ */
+function updateHome(){
+  const ids=Object.keys(S.answered), total=ids.length;
+  const cor=ids.filter(id=>S.answered[id].correct).length;
+  document.getElementById('sTotal').textContent=total;
+  document.getElementById('sRate').textContent=total>0?Math.round(cor/total*100)+'%':'—';
+  document.getElementById('sWrong').textContent=S.wrongIds.size;
+  document.getElementById('sBook').textContent=S.bookmarks.size;
+  const pct=Math.round(total/QS.length*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=total+' / '+QS.length;
+  document.getElementById('streakNum').textContent=S.streak;
+  document.getElementById('streakBest').textContent='最高 '+S.bestStreak;
+  // share
+  if(S.shareUnlocked){
+    document.getElementById('shareUnlocked').style.display='block';
+    document.getElementById('shareBtn').style.display='none';
+  }
+  // countdown
+  calcCountdown();
+  // daily
+  initDaily();
+}
+
+/* ══ COUNTDOWN ══ */
+function calcCountdown(){
+  // 職安乙級每年約2梯次，通常3月和9月
+  const now=new Date();
+  const year=now.getFullYear();
+  const exams=[
+    new Date(year,2,15), // 3月
+    new Date(year,8,20), // 9月
+    new Date(year+1,2,15),
+    new Date(year+1,8,20),
+  ];
+  const next=exams.find(d=>d>now)||exams[exams.length-1];
+  const diff=Math.ceil((next-now)/(1000*60*60*24));
+  document.getElementById('countdownDays').textContent=diff+' 天';
+  document.getElementById('countdownDate').textContent=
+    next.getFullYear()+'/'+(next.getMonth()+1)+'/'+next.getDate()+' 預估考試日';
+}
+
+/* ══ DAILY QUESTION ══ */
+function initDaily(){
+  const today=new Date().toDateString();
+  if(S.dailyDate!==today){S.dailyDone=false;S.dailyDate=today;saveS();}
+  const idx=new Date().getDate()%QS.length;
+  const q=QS[idx];
+  document.getElementById('dailyQ').textContent=q.text;
+  if(S.dailyDone){
+    document.getElementById('dailyDone').style.display='block';
+  }
+}
+function startDaily(){
+  const today=new Date().toDateString();
+  const idx=new Date().getDate()%QS.length;
+  const q=QS[idx];
+  S.sess={mode:'daily',queue:[q.id],idx:0,correct:0,wrong:0,examMode:false,examAnswers:{}};
+  document.getElementById('qMode').textContent='今日一題';
+  document.getElementById('qTimer').style.display='none';
+  showScreen('quiz');
+  renderQ();
+}
+
+/* ══ INDUSTRY ROUTES ══ */
+function initRoutes(){
+  const grid=document.getElementById('industryGrid');
+  grid.innerHTML=INDUSTRIES.map(ind=>`
+    <div class="ind-card" id="ind-${ind.id}" onclick="selectIndustry('${ind.id}')">
+      <div class="ind-ico">${ind.ico}</div>
+      <div class="ind-name">${ind.name}</div>
+      <div class="ind-sub">${ind.sub}</div>
+    </div>`).join('');
+}
+function selectIndustry(id){
+  document.querySelectorAll('.ind-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('ind-'+id).classList.add('selected');
+  const ind=INDUSTRIES.find(x=>x.id===id);
+  showRoute(ind);
+}
+function showRoute(ind){
+  const diffMap={easy:'<span class="diff-tag diff-easy">入門</span>',mid:'<span class="diff-tag diff-mid">中等</span>',hard:'<span class="diff-tag diff-hard">進階</span>'};
+  const circleClass=['s1','s2','s3','s4','s5'];
+  const stepsHtml=ind.steps.map((s,i)=>`
+    <div class="route-step">
+      <div class="step-circle ${circleClass[i]}">${i+1}</div>
+      <div class="step-body">
+        <div class="step-name">${s.name}</div>
+        <div class="step-meta">
+          ${diffMap[s.diff]}
+          <span class="study-tag">📚 ${s.study}</span>
+        </div>
+        <div class="step-desc">${s.desc}</div>
+        <div class="step-salary">💰 ${s.salary}</div>
+        ${s.available?`<button class="route-practice-btn" onclick="startMode('sequential');showScreen('quiz')">開始練題 →</button>`:''}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('routeResult').innerHTML=`
+    <div class="route-header">
+      <div style="font-size:32px;margin-bottom:6px">${ind.ico}</div>
+      <div class="route-industry">${ind.name} 考照路線</div>
+      <div class="route-salary">${ind.salary}</div>
+      <div class="route-desc">${ind.desc}</div>
+    </div>
+    <div class="sec-head"><div class="sec-label">建議考照順序</div></div>
+    <div class="route-steps">${stepsHtml}</div>
+    <div style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-top:10px;font-size:12px;color:var(--tx2);line-height:1.7;box-shadow:var(--sh)">
+      💡 <strong style="color:var(--tx)">考試王者提示：</strong>從第1步開始，職安乙級是很多行業的通用加薪工具，建議優先取得。本平台目前已有職安乙級完整題庫可以練習！
+    </div>`;
+  document.getElementById('routeResult').classList.add('show');
+  setTimeout(()=>document.getElementById('routeResult').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+/* ══ SUBJECT MODAL ══ */
+function openSubjModal(){document.getElementById('subjModal').style.display='flex'}
+function closeSubjModal(e){
+  if(!e||e.target===document.getElementById('subjModal'))
+    document.getElementById('subjModal').style.display='none';
+}
+function comingSoon(n){alert(`「${n}」即將上線！\n\n成為王者會員後可第一時間解鎖。`)}
+
+/* ══ QUIZ ══ */
+function isUnlocked(){return S.unlocked||S.memberOK}
+function effectiveLimit(){return isUnlocked()?9999:FREE_LIMIT+(S.shareUnlocked?SHARE_BONUS:0)}
+
+function startMode(mode){
+  let queue=[];
+  if(mode==='sequential') queue=QS.map(q=>q.id);
+  else if(mode==='random') queue=[...QS.map(q=>q.id)].sort(()=>Math.random()-.5);
+  else if(mode==='wrong'){
+    if(S.wrongIds.size===0){alert('目前沒有錯題！');return;}
+    queue=[...S.wrongIds].sort(()=>Math.random()-.5);
+  } else if(mode==='sprint'){
+    const done=new Set(Object.keys(S.answered).map(Number));
+    queue=QS.filter(q=>!done.has(q.id)).map(q=>q.id);
+    if(queue.length===0){alert('你已經作答過所有題目了！\n\n建議用隨機練習或錯題複習繼續加強。');return;}
+  }
+  const lbl={sequential:'順序練習',random:'隨機練習',wrong:'錯題複習',sprint:'考前衝刺',daily:'今日一題'};
+  S.sess={mode,queue,idx:0,correct:0,wrong:0,examMode:false,examAnswers:{}};
+  document.getElementById('qMode').textContent=lbl[mode]||mode;
+  document.getElementById('qTimer').style.display='none';
+  document.getElementById('quizStreak').style.display='none';
+  showScreen('quiz'); renderQ();
+}
+
+function startExam(){
+  if(!isUnlocked()){showScreen('paywall');return;}
+  showScreen('examscreen');
+}
+function launchExam(){
+  const queue=[...QS.map(q=>q.id)].sort(()=>Math.random()-.5);
+  S.sess={mode:'exam',queue,idx:0,correct:0,wrong:0,examMode:true,examAnswers:{}};
+  examSecs=6000;
+  document.getElementById('qMode').textContent='模擬考試';
+  document.getElementById('qTimer').style.display='block';
+  document.getElementById('quizStreak').style.display='none';
+  showScreen('quiz'); startTimer(); renderQ();
+}
+function startTimer(){
+  stopTimer(); updateTimer();
+  timerInterval=setInterval(()=>{examSecs--;updateTimer();if(examSecs<=0){stopTimer();submitExam();}},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null}
+function updateTimer(){
+  const el=document.getElementById('qTimer');
+  const m=Math.floor(examSecs/60),s=examSecs%60;
+  el.textContent=m+':'+(s<10?'0':'')+s;
+  el.classList.toggle('warn',examSecs<=300);
+}
+
+function renderQ(){
+  const sess=S.sess;
+  const qId=sess.queue[sess.idx];
+  const q=QS.find(x=>x.id===qId);
+  if(!q){sess.examMode?submitExam():showResult();return;}
+
+  const limit=effectiveLimit();
+  if(!isUnlocked()&&qId>limit&&sess.mode!=='wrong'&&!sess.examMode&&sess.mode!=='daily'){
+    showScreen('paywall');return;
+  }
+
+  document.getElementById('qCtr').textContent=`第 ${sess.idx+1} 題 / 共 ${sess.queue.length} 題`;
+  document.getElementById('qPb').style.width=(sess.idx/sess.queue.length*100)+'%';
+
+  // streak badge
+  const sb=document.getElementById('quizStreak');
+  if(S.streak>=3&&!sess.examMode){sb.style.display='block';sb.textContent='🔥'+S.streak;}
+  else{sb.style.display='none';}
+
+  const isBookmarked=S.bookmarks.has(qId);
+  const hint=q.type==='multi'?'複選題：請選出所有正確答案':'單選題：請選出正確答案';
+
+  document.getElementById('qBody').innerHTML=`
+    <div class="q-badge" style="display:flex;align-items:center;width:100%">
+      <span class="tag ${q.type==='single'?'tag-ac':'tag-hot'}">${q.type==='single'?'單選':'複選'}</span>
+      <span class="tag tag-dim">${q.cat}</span>
+      <span class="q-num mono">Q${String(sess.idx+1).padStart(2,'0')}</span>
+      <button class="q-bookmark" id="bmBtn" onclick="toggleBookmark(${qId})" title="書籤">${isBookmarked?'🔖':'🏷️'}</button>
+    </div>
+    <div class="q-text">${q.text}</div>
+    <div class="q-hint">${hint}</div>
+    <div class="opts">${q.opts.map((o,i)=>`
+      <div class="opt" id="o${i}" onclick="selOpt(${i})">
+        <span class="ok-key">${String.fromCharCode(65+i)}</span><span>${o}</span>
+      </div>`).join('')}</div>
+    <div class="exp-card" id="expCard">
+      <div class="exp-icon" id="expIco"></div>
+      <div class="exp-title" id="expTitle"></div>
+      <div class="exp-body" id="expBody"></div>
+    </div>`;
+
+  const btn=document.getElementById('qBtn');
+  btn.textContent=sess.examMode?'下一題（未選跳過）':'確認答案';
+  btn.disabled=!sess.examMode;
+  btn.onclick=handleBtn;
+  window._qs={q,sel:[],submitted:false};
+}
+
+function toggleBookmark(id){
+  if(S.bookmarks.has(id)){S.bookmarks.delete(id);document.getElementById('bmBtn').textContent='🏷️';}
+  else{S.bookmarks.add(id);document.getElementById('bmBtn').textContent='🔖';}
+  saveS(); updateHome();
+}
+
+function selOpt(i){
+  const qs=window._qs;
+  if(qs.submitted) return;
+  const el=document.getElementById('o'+i);
+  if(qs.q.type==='single'){
+    qs.q.opts.forEach((_,j)=>document.getElementById('o'+j).classList.remove('sel'));
+    qs.sel=[i]; el.classList.add('sel');
+  } else {
+    if(qs.sel.includes(i)){qs.sel=qs.sel.filter(x=>x!==i);el.classList.remove('sel');}
+    else{qs.sel.push(i);el.classList.add('sel');}
+  }
+  if(!S.sess.examMode) document.getElementById('qBtn').disabled=qs.sel.length===0;
+  else S.sess.examAnswers[qs.q.id]=[...qs.sel];
+}
+
+function handleBtn(){window._qs.submitted?nextQ():submitAns()}
+
+function submitAns(){
+  const qs=window._qs; qs.submitted=true;
+  const q=qs.q, sel=qs.sel.slice().sort(), ans=q.ans.slice().sort();
+  const correct=JSON.stringify(sel)===JSON.stringify(ans);
+
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById('o'+i); el.style.cursor='default';
+    if(ans.includes(i)&&sel.includes(i)){el.classList.remove('sel');el.classList.add('ok');}
+    else if(!ans.includes(i)&&sel.includes(i)){el.classList.remove('sel');el.classList.add('bad');}
+    else if(ans.includes(i)&&!sel.includes(i)){el.classList.add('hint');}
+  });
+
+  const card=document.getElementById('expCard'); card.classList.add('show');
+  if(correct){
+    card.classList.add('exp-ok');
+    document.getElementById('expIco').textContent='✓';
+    document.getElementById('expTitle').textContent='答對了！';
+    S.sess.correct++; S.wrongIds.delete(q.id);
+    S.streak++; if(S.streak>S.bestStreak) S.bestStreak=S.streak;
+    // Show streak popup at milestones
+    if([5,10,15,20,30].includes(S.streak)) showStreakPopup(S.streak);
+    // Update streak badge
+    const sb=document.getElementById('quizStreak');
+    if(S.streak>=3){sb.style.display='block';sb.textContent='🔥'+S.streak;}
+  } else {
+    card.classList.add('exp-bad');
+    document.getElementById('expIco').textContent='✗';
+    document.getElementById('expTitle').textContent=`正確答案：${ans.map(a=>String.fromCharCode(65+a)).join('、')}`;
+    S.sess.wrong++; S.wrongIds.add(q.id); S.streak=0;
+    document.getElementById('quizStreak').style.display='none';
+  }
+  document.getElementById('expBody').textContent=q.exp;
+
+  if(S.sess.mode==='daily'){S.dailyDone=true;}
+  S.answered[q.id]={correct,chosen:sel}; saveS();
+
+  const btn=document.getElementById('qBtn');
+  btn.textContent=S.sess.idx>=S.sess.queue.length-1?'查看結果':'下一題';
+  btn.disabled=false;
+}
+
+function showStreakPopup(n){
+  const el=document.getElementById('streakPopup');
+  document.getElementById('spTitle').textContent='連勝 '+n+'！';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+
+function nextQ(){
+  S.sess.idx++;
+  S.sess.idx>=S.sess.queue.length?(S.sess.examMode?submitExam():showResult()):renderQ();
+}
+
+/* ══ EXAM SUBMIT ══ */
+function submitExam(){
+  stopTimer(); let cor=0,wrong=0;
+  QS.forEach(q=>{
+    const a=S.sess.examAnswers[q.id];
+    if(a){
+      const ok=JSON.stringify([...a].sort())===JSON.stringify([...q.ans].sort());
+      S.answered[q.id]={correct:ok,chosen:a};
+      if(ok){cor++;S.wrongIds.delete(q.id);}else{wrong++;S.wrongIds.add(q.id);}
+    } else {wrong++;S.wrongIds.add(q.id);S.answered[q.id]={correct:false,chosen:[]};}
+  });
+  S.sess.correct=cor; S.sess.wrong=wrong; saveS(); showResult();
+}
+
+/* ══ RESULT ══ */
+function showResult(){
+  stopTimer();
+  const s=S.sess, total=s.correct+s.wrong;
+  const pct=total>0?Math.round(s.correct/total*100):0;
+  document.getElementById('rScore').textContent=pct+'%';
+  document.getElementById('rC').textContent=s.correct;
+  document.getElementById('rW').textContent=s.wrong;
+  const [t,sub]=pct>=80?['🎉 王者實力！','答對率超過80%，考試通過不成問題！繼續保持！']:
+    pct>=60?['👍 及格！繼續衝','正式考試需60分，你已達標！把錯題再複習幾遍更穩。']:
+    ['💪 繼續加油！','建議用「考前衝刺」或「錯題複習」模式針對弱點集中訓練。'];
+  document.getElementById('rTitle').textContent=t;
+  document.getElementById('rSub').textContent=sub;
+  showScreen('result'); updateHome();
+}
+function retrySession(){startMode(S.sess.mode)}
+
+/* ══ REPORT ══ */
+function showReport(){
+  const ids=Object.keys(S.answered), total=ids.length;
+  const cor=ids.filter(id=>S.answered[id].correct).length;
+  const rate=total>0?Math.round(cor/total*100):0;
+  document.getElementById('repTotal').textContent=rate+'%';
+  document.getElementById('repAns').textContent=total;
+  document.getElementById('repProg').style.width=rate+'%';
+  const cats={};
+  QS.forEach(q=>{
+    if(!cats[q.cat]) cats[q.cat]={total:0,correct:0};
+    cats[q.cat].total++;
+    if(S.answered[q.id]?.correct) cats[q.cat].correct++;
+  });
+  const colors={'法規':'#60a5fa','計畫管理':'#4ade80','專業課程':'#f5c542','職業道德':'#f87171'};
+  document.getElementById('catList').innerHTML=Object.entries(cats).map(([cat,d])=>{
+    const ans=Object.keys(S.answered).filter(id=>{const q=QS.find(x=>x.id==id);return q&&q.cat===cat;}).length;
+    const r=ans>0?Math.round(d.correct/ans*100):0;
+    const col=colors[cat]||'var(--ac)';
+    return `<div class="cat-item">
+      <div class="cat-header"><div class="cat-name">${cat}</div><div class="cat-rate" style="color:${col}">${ans>0?r+'%':'未作答'}</div></div>
+      <div class="cat-bar"><div class="cat-fill" style="width:${r}%;background:${col}"></div></div>
+      <div class="cat-detail">已答 ${ans} / ${d.total} 題${ans>0?'　答對 '+d.correct+'題':''}</div>
+    </div>`;
+  }).join('');
+  showScreen('report');
+}
+
+/* ══ WRONG LIST ══ */
+function showWrongList(){
+  document.getElementById('wCount').textContent=S.wrongIds.size+'題';
+  document.getElementById('wBody').innerHTML=S.wrongIds.size===0
+    ?'<div class="empty"><div class="empty-ico">🎯</div>目前沒有錯題<br>繼續練習後錯過的題目會出現在這裡</div>'
+    :[...S.wrongIds].map(id=>{const q=QS.find(x=>x.id===id);return `<div class="wi" onclick="reviewOne(${id},'wrong')"><div class="wi-q">${q.text}</div><div class="wi-meta">${q.cat} · ${q.type==='single'?'單選':'複選'} · 點擊複習</div></div>`;}).join('');
+  showScreen('wronglist');
+}
+
+/* ══ BOOKMARKS ══ */
+function showBookmarks(){
+  document.getElementById('bmCount').textContent=S.bookmarks.size+'題';
+  document.getElementById('bmBody').innerHTML=S.bookmarks.size===0
+    ?'<div class="empty"><div class="empty-ico">🔖</div>還沒有書籤<br>在作答時按書籤圖示來收藏題目</div>'
+    :[...S.bookmarks].map(id=>{const q=QS.find(x=>x.id===id);return `<div class="wi" onclick="reviewOne(${id},'bookmark')"><div class="wi-q">${q.text}</div><div class="wi-meta">${q.cat} · ${q.type==='single'?'單選':'複選'} · 點擊複習</div></div>`;}).join('');
+  showScreen('bookmarks');
+}
+
+function reviewOne(id,from){
+  S.sess={mode:from==='bookmark'?'bookmark':'wrong',queue:[id],idx:0,correct:0,wrong:0,examMode:false,examAnswers:{}};
+  document.getElementById('qMode').textContent=from==='bookmark'?'書籤複習':'錯題複習';
+  document.getElementById('qTimer').style.display='none';
+  showScreen('quiz'); renderQ();
+}
+
+/* ══ SHARE ══ */
+function doShare(){
+  const text='📱 推薦「考試王者 背多分」— 職安乙級等證照考題練習，無廣告買斷制，比那個廣告APP好用多了！';
+  if(navigator.share){
+    navigator.share({title:'考試王者 背多分',text,url:window.location.href})
+      .then(()=>unlockShare()).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text+'\n'+window.location.href)
+      .then(()=>{alert('✓ 已複製分享文字！\n\n貼到社群媒體或傳給朋友後，點確定解鎖+20題。');unlockShare();})
+      .catch(()=>{alert('請手動複製網址分享給朋友！\n\n分享後即可解鎖+20題練習。');unlockShare();});
+  }
+}
+function unlockShare(){
+  S.shareUnlocked=true; saveS(); updateHome();
+  document.getElementById('shareUnlocked').style.display='block';
+  document.getElementById('shareBtn').style.display='none';
+  alert('🎉 感謝分享！\n\n已為你解鎖額外 20 題練習！\n現在免費可練前 40 題。');
+}
+
+/* ══ PURCHASE ══ */
+function simBuy(){
+  if(confirm('正式上線後將串接金流付款\n\n按確定解鎖職安乙級（測試模式）')){
+    S.unlocked=true; saveS(); alert('✓ 解鎖成功！職安乙級全部60題已開放。'); goHome();
+  }
+}
+function simMemberBuy(){
+  if(confirm('正式上線後將串接金流付款\n\n按確定解鎖王者全科會員（測試模式）')){
+    S.memberOK=true; S.unlocked=true; saveS(); alert('👑 恭喜成為考試王者！\n\n所有科目已永久解鎖。'); goHome();
+  }
+}
+
+/* ══ INIT ══ */
+loadS(); updateHome(); initRoutes();
+</script>
+</body>
+</html>
