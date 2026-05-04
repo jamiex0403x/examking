@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>考試王者 背多分</title>
+<title>考試王者</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="台灣最強證照考題練習平台，含考照路線圖推薦">
@@ -80,7 +80,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 .daily-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);letter-spacing:1px;text-transform:uppercase}
 .daily-done{font-size:11px;color:var(--ok)}
 .daily-q{font-size:13px;font-weight:700;line-height:1.5;color:var(--tx)}
-.daily-tap{font-size:11px;color:var(--tx2);margin-top:6px}
+.daily-tap{font-size:11px;color:var(--tx2);margin-top:6px;transition:all .2s}
 
 /* Countdown */
 .countdown-wrap{margin:0 18px 16px}
@@ -161,6 +161,20 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 .cta-sub{font-size:12px;color:var(--tx2);line-height:1.6}
 .cta-price{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--ac);margin-top:6px}
 .home-pad{height:90px}
+.drawer-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;font-size:14px;color:var(--tx);transition:background .15s}
+.toggle-sw{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--bd);border-radius:12px;cursor:pointer;transition:background .2s}
+.toggle-track::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle-sw input:checked+.toggle-track{background:var(--ac)}
+.toggle-sw input:checked+.toggle-track::before{transform:translateX(20px)}
+.cz-row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--bd);user-select:none;-webkit-user-select:none;background:var(--bg);transition:opacity .15s}
+.cz-drag{font-size:18px;color:var(--tx2);cursor:grab;padding:4px 8px;letter-spacing:-2px;flex-shrink:0;touch-action:none;font-size:20px}
+.cz-drag:active{cursor:grabbing}
+.cz-ico{font-size:20px;flex-shrink:0}
+.cz-label{flex:1;font-size:14px;font-weight:600}
+.drawer-item:active{background:var(--s1)}
+.drawer-item span:first-child{font-size:16px}
 
 /* ══════════════ ROUTE FINDER ══════════════ */
 #routefinder{background:var(--bg)}
@@ -365,173 +379,211 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 
 <!-- ══════════════ HOME ══════════════ -->
 <div id="home" class="screen active">
-  <div class="home-hero">
-    <div class="eyebrow">Taiwan Exam King Platform</div>
-    <h1 class="hero-title"><span class="gold">👑</span> 考試王者</h1>
-    <div class="hero-italic">背多分 · BeiDuoFen</div>
-    <p class="hero-tag">精選高頻考題 · 錯題追蹤 · 模擬考試<br>考照路線圖 · 無廣告買斷制</p>
-  </div>
 
-  <!-- Countdown -->
-  <div class="countdown-wrap">
-    <div class="countdown-card card">
-      <div class="countdown-ico">📅</div>
-      <div class="countdown-info">
-        <div class="countdown-label">下次職安乙級考試</div>
-        <div class="countdown-days" id="countdownDays">計算中...</div>
-        <div class="countdown-sub" id="countdownDate">勞動部技能檢定中心</div>
-      </div>
-      <span class="tag tag-hot">倒數</span>
+  <!-- ══ TOPBAR ══ -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0">
+    <!-- 左上：漢堡選單 -->
+    <button id="menuBtn" onclick="toggleDrawer()" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;display:flex;flex-direction:column;gap:4px">
+      <span style="display:block;width:20px;height:2px;background:var(--tx);border-radius:2px"></span>
+      <span style="display:block;width:20px;height:2px;background:var(--tx);border-radius:2px"></span>
+      <span style="display:block;width:20px;height:2px;background:var(--tx);border-radius:2px"></span>
+    </button>
+    <!-- 中：Logo -->
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:20px">👑</span>
+      <span style="font-size:17px;font-weight:900;letter-spacing:.5px">考試王者</span>
     </div>
+    <!-- 右：主題切換 -->
+    <button onclick="cycleTheme()" style="background:none;border:none;cursor:pointer;font-size:18px;padding:6px">🎨</button>
   </div>
 
-  <!-- Daily Question -->
-  <div class="daily-wrap">
-    <div class="daily-card" onclick="startDaily()">
+  <!-- ══ 冷知識 ══ -->
+  <div id="block-trivia" class="daily-wrap" style="margin-top:14px">
+    <div class="daily-card" id="triviaCard" onclick="expandTrivia()">
       <div class="daily-header">
-        <div class="daily-label">📆 今日一題</div>
-        <div class="daily-done" id="dailyDone" style="display:none">✓ 已完成</div>
+        <div class="daily-label" id="triviaLabel">🧠 今日冷知識</div>
+        <div class="daily-done" id="dailyDone" style="display:none">✓ 已學起來</div>
       </div>
       <div class="daily-q" id="dailyQ">載入中...</div>
-      <div class="daily-tap">點擊作答 →</div>
-    </div>
-  </div>
-
-  <!-- Streak -->
-  <div class="streak-bar card" style="margin:0 18px 16px">
-    <div class="streak-fire">🔥</div>
-    <div class="streak-info">
-      <div class="streak-num" id="streakNum">0</div>
-      <div class="streak-label">當前連勝</div>
-    </div>
-    <div class="streak-best mono" id="streakBest">最高 0</div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-strip">
-    <div class="stat-box"><div class="stat-n" id="sTotal">0</div><div class="stat-l">已作答</div></div>
-    <div class="stat-box"><div class="stat-n" id="sRate">—</div><div class="stat-l">答對率</div></div>
-    <div class="stat-box"><div class="stat-n" id="sWrong">0</div><div class="stat-l">錯題數</div></div>
-    <div class="stat-box"><div class="stat-n" id="sBook">0</div><div class="stat-l">書籤</div></div>
-  </div>
-
-  <!-- Progress -->
-  <div class="prog-wrap">
-    <div class="prog-row"><span>職安乙級進度</span><span id="progTxt">0 / 60</span></div>
-    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-  </div>
-
-  <!-- Route Finder CTA -->
-  <div class="route-cta" onclick="showScreen('routefinder')">
-    <div class="route-cta-top">
-      <div class="route-cta-ico">🗺️</div>
-      <div>
-        <div class="route-cta-title">找我的考照路線</div>
-        <div style="font-size:11px;color:var(--tx2)">依你的行業推薦最有效的證照順序</div>
+      <div id="triviaAns" style="display:none;margin-top:10px;padding:10px 12px;background:var(--s2);border-radius:8px;border-left:3px solid var(--ac)">
+        <div style="font-size:12px;color:var(--ac);font-weight:700;margin-bottom:4px">答案</div>
+        <div id="triviaAnsText" style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px"></div>
+        <div style="font-size:11px;color:var(--tx2);font-weight:400;margin-bottom:8px" id="triviaDetail"></div>
+        <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+          <button onclick="event.stopPropagation();markTriviaLearned()" style="flex:1;min-width:80px;padding:8px;background:var(--ac);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">✓ 學起來！</button>
+          <button onclick="event.stopPropagation();nextTrivia()" style="flex:1;min-width:80px;padding:8px;background:var(--s2);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">下一則 ▶</button>
+          <button onclick="event.stopPropagation();shareTrivia()" style="flex:1;min-width:80px;padding:8px;background:var(--s2);color:var(--tx);border:1px solid var(--bd);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">分享 📤</button>
+        </div>
       </div>
+      <div class="daily-tap" id="triviaTap">點擊看答案 ▾</div>
     </div>
-    <div class="route-cta-sub">告訴我你的職業，我幫你規劃從入門到高薪的完整考照路線圖 📈</div>
-    <div class="route-cta-btn">開始規劃 →</div>
   </div>
 
-  <!-- Modes -->
-  <div class="sec-head"><div class="sec-label">練習模式</div></div>
+  <!-- ══ 練習模式 ══ -->
+  <div id="block-modes">
+  <div class="sec-head"><div class="sec-label">開始練習</div></div>
   <div class="mode-list">
-    <div class="mode-card star" onclick="openSubjModal()">
-      <div class="mode-ico">📋</div>
-      <div class="mode-info"><div class="mode-name">順序 / 隨機練習</div><div class="mode-sub">逐題作答，即時解析</div></div>
-      <div class="mode-arrow">›</div>
-    </div>
     <div class="mode-card star" onclick="startExam()">
       <div class="mode-ico">⏱️</div>
-      <div class="mode-info"><div class="mode-name">模擬考試</div><div class="mode-sub">限時100分鐘，出完整成績單</div></div>
-      <span class="tag tag-hot" style="flex-shrink:0">NEW</span>
+      <div class="mode-info"><div class="mode-name">模擬考試</div><div class="mode-sub">限時，出完整成績單</div></div>
+      <div class="mode-arrow">›</div>
     </div>
-    <div class="mode-card" onclick="startMode('sprint')">
+    <div class="mode-card star" onclick="startMode('sprint')">
       <div class="mode-ico">⚡</div>
-      <div class="mode-info"><div class="mode-name">考前衝刺</div><div class="mode-sub">只練從未作答過的題目</div></div>
-      <span class="tag tag-new" style="flex-shrink:0">NEW</span>
+      <div class="mode-info"><div class="mode-name">考前衝刺</div><div class="mode-sub">只練從未作答的新題目</div></div>
+      <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card" onclick="startMode('wrong')">
       <div class="mode-ico">🔁</div>
       <div class="mode-info"><div class="mode-name">錯題複習</div><div class="mode-sub">針對弱點集中練習</div></div>
       <div class="mode-arrow">›</div>
     </div>
-    <div class="mode-card" onclick="showWrongList()">
-      <div class="mode-ico">📌</div>
-      <div class="mode-info"><div class="mode-name">錯題列表</div><div class="mode-sub">查看所有錯過的題目</div></div>
-      <div class="mode-arrow">›</div>
-    </div>
-    <div class="mode-card" onclick="showBookmarks()">
-      <div class="mode-ico">🔖</div>
-      <div class="mode-info"><div class="mode-name">書籤收藏</div><div class="mode-sub">我主動標記想複習的題目</div></div>
-      <div class="mode-arrow">›</div>
-    </div>
-    <div class="mode-card" onclick="showReport()">
-      <div class="mode-ico">📊</div>
-      <div class="mode-info"><div class="mode-name">學習進度報告</div><div class="mode-sub">哪個類別最弱一目了然</div></div>
-      <div class="mode-arrow">›</div>
+  </div>
+  </div><!-- /block-modes -->
+
+  <!-- ══ 可選區塊 ══ -->
+  <div id="block-streak" style="display:none;margin:0 18px 16px">
+    <div style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh)">
+      <div style="font-size:22px">🔥</div>
+      <div style="flex:1">
+        <div style="font-size:22px;font-weight:900;line-height:1" id="streakNum">0</div>
+        <div style="font-size:11px;color:var(--tx2)">當前連勝</div>
+      </div>
+      <div style="font-size:12px;color:var(--tx2);font-family:monospace" id="streakBest">最高 0</div>
     </div>
   </div>
 
-  <!-- Subjects -->
-  <div class="sec-head" style="margin-top:16px"><div class="sec-label">題庫科目</div></div>
-  <div class="subj-list">
-    <div class="subj-card live" onclick="openSubjModal()">
-      <div class="subj-ico">🦺</div>
-      <div class="subj-info"><div class="subj-name">職業安全衛生管理員 乙級</div><div class="subj-meta">60題 · 學科 · 含模擬考試</div></div>
-      <span class="tag tag-ok">開放中</span>
-    </div>
-    <div class="subj-card" onclick="comingSoon('就業服務乙級')">
-      <div class="subj-ico">💼</div>
-      <div class="subj-info"><div class="subj-name">就業服務乙級技術士</div><div class="subj-meta">即將上線</div></div>
-      <span class="tag tag-dim">即將上線</span>
-    </div>
-    <div class="subj-card" onclick="comingSoon('消防設備士')">
-      <div class="subj-ico">🔥</div>
-      <div class="subj-info"><div class="subj-name">消防設備士</div><div class="subj-meta">即將上線</div></div>
-      <span class="tag tag-dim">即將上線</span>
-    </div>
-    <div class="subj-card" onclick="comingSoon('職安甲級')">
-      <div class="subj-ico">⛑️</div>
-      <div class="subj-info"><div class="subj-name">職業安全管理師 甲級</div><div class="subj-meta">即將上線</div></div>
-      <span class="tag tag-dim">即將上線</span>
-    </div>
-    <div class="subj-card" onclick="comingSoon('保全丙級')">
-      <div class="subj-ico">🛡️</div>
-      <div class="subj-info"><div class="subj-name">保全人員丙/乙級</div><div class="subj-meta">即將上線</div></div>
-      <span class="tag tag-dim">即將上線</span>
-    </div>
-    <div class="subj-card" onclick="comingSoon('堆高機')">
-      <div class="subj-ico">🚜</div>
-      <div class="subj-info"><div class="subj-name">堆高機操作人員</div><div class="subj-meta">即將上線</div></div>
-      <span class="tag tag-dim">即將上線</span>
+  <div id="block-stats" style="display:none">
+    <div class="stats-strip">
+      <div class="stat-box"><div class="stat-n" id="sTotal">0</div><div class="stat-l">已作答</div></div>
+      <div class="stat-box"><div class="stat-n" id="sRate">—</div><div class="stat-l">答對率</div></div>
+      <div class="stat-box"><div class="stat-n" id="sWrong">0</div><div class="stat-l">錯題數</div></div>
+      <div class="stat-box"><div class="stat-n" id="sBook">0</div><div class="stat-l">書籤</div></div>
     </div>
   </div>
 
-  <!-- Share Unlock -->
-  <div class="share-wrap">
+  <div id="block-countdown" style="display:none;margin:0 18px 16px">
+    <div style="background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh);cursor:pointer" onclick="showScreen('countdown')">
+      <div style="font-size:22px">📅</div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:2px" id="countdownDate">職安乙級考試倒數</div>
+        <div style="font-size:20px;font-weight:900;color:var(--ac)" id="countdownDays">計算中...</div>
+      </div>
+      <span style="font-size:11px;background:rgba(245,197,66,.15);color:var(--ac);padding:3px 8px;border-radius:20px;font-weight:700">倒數</span>
+    </div>
+  </div>
+
+  <div id="block-route" style="display:none;margin:0 18px 16px">
+    <div class="route-cta" onclick="showScreen('routefinder')" style="margin:0">
+      <div class="route-cta-top">
+        <div class="route-cta-ico">🗺️</div>
+        <div>
+          <div class="route-cta-title">找我的考照路線</div>
+          <div style="font-size:11px;color:var(--tx2)">依你的行業推薦最有效的證照順序</div>
+        </div>
+      </div>
+      <div class="route-cta-btn">開始規劃 →</div>
+    </div>
+  </div>
+
+  <div id="block-share" style="display:none;margin:0 18px 16px">
     <div class="share-card">
       <div class="share-header">
         <div class="share-ico">🎁</div>
-        <div class="share-title">分享給朋友，解鎖更多題目</div>
+        <div class="share-title">分享，解鎖更多題目</div>
       </div>
-      <div class="share-sub">把考試王者分享給一位朋友，免費解鎖額外 <strong>20題</strong> 練習，不需付費！</div>
+      <div class="share-sub">分享給朋友，免費解鎖 <strong>+20題</strong>！</div>
       <button class="share-btn" onclick="doShare()" id="shareBtn">📤 分享考試王者</button>
-      <div class="share-unlocked" id="shareUnlocked" style="display:none">✓ 已解鎖 +20題 分享獎勵！</div>
+      <div class="share-unlocked" id="shareUnlocked" style="display:none">✓ 已解鎖 +20題！</div>
     </div>
   </div>
 
-  <!-- Member CTA -->
-  <div class="cta-wrap" onclick="showScreen('memberscreen')">
-    <div class="cta-card">
-      <div class="cta-crown">👑</div>
-      <div class="cta-title">成為<span style="color:var(--ac)">王者會員</span></div>
-      <div class="cta-sub">解鎖全部科目 · 買斷永久使用 · 無廣告</div>
-      <div class="cta-price">$699</div>
+  <div class="home-pad"></div>
+</div>
+
+<!-- ══ 自訂首頁 Modal ══ -->
+<div id="customizeModal" onclick="closeCustomizeModal(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:flex-end;justify-content:center">
+  <div onclick="event.stopPropagation()" style="background:var(--bg);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:0 0 32px;max-height:85vh;overflow-y:auto;overflow-x:hidden;touch-action:pan-x">
+    <div style="padding:16px 18px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:16px;font-weight:900">自訂首頁</div>
+        <div style="font-size:11px;color:var(--tx2)">開關顯示 · 長按 ⠿ 拖曳調整順序</div>
+      </div>
+      <button onclick="closeCustomizeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx2)">✕</button>
+    </div>
+    <div style="padding:12px 0" id="customizeList"></div>
+  </div>
+</div>
+
+<!-- ══ 側邊抽屜 ══ -->
+<div id="drawerOverlay" onclick="toggleDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;transition:opacity .2s"></div>
+<div id="drawer" style="position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--bg);z-index:201;transition:left .25s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:4px 0 20px rgba(0,0,0,.3)">
+  <div style="padding:20px 18px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">
+    <span style="font-size:22px">👑</span>
+    <div>
+      <div style="font-size:16px;font-weight:900">考試王者</div>
+      <div style="font-size:11px;color:var(--tx2)">Taiwan Exam Platform</div>
+    </div>
+    <button onclick="toggleDrawer()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx2)">✕</button>
+  </div>
+
+  <!-- 進度摘要 -->
+  <div style="padding:14px 18px;border-bottom:1px solid var(--bd)">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px;color:var(--tx2)">今日學習</span>
+      <span style="font-size:12px;font-weight:700;color:var(--ac)" id="drawerStreak">🔥 0 連勝</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+      <div style="background:var(--s1);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:900" id="drawerTotal">0</div>
+        <div style="font-size:10px;color:var(--tx2)">已作答</div>
+      </div>
+      <div style="background:var(--s1);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:900" id="drawerRate">—</div>
+        <div style="font-size:10px;color:var(--tx2)">答對率</div>
+      </div>
+      <div style="background:var(--s1);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:900" id="drawerWrong">0</div>
+        <div style="font-size:10px;color:var(--tx2)">錯題</div>
+      </div>
     </div>
   </div>
-  <div class="home-pad"></div>
+
+  <!-- 功能選單 -->
+  <div style="padding:8px 0">
+    <div style="padding:4px 18px;font-size:10px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase;font-weight:700">練習工具</div>
+    <div class="drawer-item" onclick="openSubjModal();toggleDrawer()">📋 <span>選科目練習</span></div>
+    <div class="drawer-item" onclick="startMode('sprint');toggleDrawer()">⚡ <span>考前衝刺</span></div>
+    <div class="drawer-item" onclick="startMode('wrong');toggleDrawer()">🔁 <span>錯題複習</span></div>
+    <div class="drawer-item" onclick="showWrongList();toggleDrawer()">📌 <span>錯題列表</span></div>
+    <div class="drawer-item" onclick="showBookmarks();toggleDrawer()">🔖 <span>書籤收藏</span></div>
+    <div class="drawer-item" onclick="showReport();toggleDrawer()">📊 <span>學習進度報告</span></div>
+  </div>
+
+  <div style="padding:8px 0;border-top:1px solid var(--bd)">
+    <div style="padding:4px 18px;font-size:10px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase;font-weight:700">題庫科目</div>
+    <div class="drawer-item" onclick="openSubjModal();toggleDrawer()">🦺 <span>職安乙級</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('08000');toggleDrawer()">🧋 <span>飲料調製丙級</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('14100');toggleDrawer()">💻 <span>電腦軟體應用</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('09500');toggleDrawer()">🍞 <span>烘焙食品丙級</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('C0100');toggleDrawer()">🏗️ <span>營造甲種業務主管</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('C0200');toggleDrawer()">📋 <span>品管人員</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="openSubjModal('C0300');toggleDrawer()">👷 <span>工地主任</span> <span class="tag tag-ok" style="margin-left:auto;font-size:9px">開放</span></div>
+    <div class="drawer-item" onclick="comingSoon('中餐烹調')">🍳 <span>中餐烹調丙級</span> <span class="tag tag-dim" style="margin-left:auto;font-size:9px">即將</span></div>
+  </div>
+
+  <div style="padding:8px 0;border-top:1px solid var(--bd)">
+    <div style="padding:4px 18px;font-size:10px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase;font-weight:700">更多</div>
+    <div class="drawer-item" onclick="showScreen('routefinder');toggleDrawer()">🗺️ <span>考照路線圖</span></div>
+    <div class="drawer-item" onclick="showScreen('memberscreen');toggleDrawer()">👑 <span>王者會員</span> <span style="margin-left:auto;font-size:11px;color:var(--ac);font-weight:700">$699</span></div>
+    <div class="drawer-item" onclick="doShare();toggleDrawer()">🎁 <span>分享解鎖+20題</span></div>
+    <div class="drawer-item" onclick="showScreen('countdown');toggleDrawer()">📅 <span>考試倒數</span></div>
+    <div class="drawer-item" onclick="openCustomizeModal();toggleDrawer()">✏️ <span>自訂首頁</span></div>
+  </div>
+
+  <div style="padding:18px;margin-top:auto">
+    <div style="font-size:10px;color:var(--tx2);text-align:center">考試王者 v8 · Taiwan Exam Platform<br>每次更新都加入新題目 💪</div>
+  </div>
 </div>
 
 <!-- ══════════════ ROUTE FINDER ══════════════ -->
@@ -582,7 +634,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
     <div class="exam-title">正式模擬考試</div>
     <div style="font-size:13px;color:var(--tx2);text-align:center">模擬真實職安乙級考試環境</div>
     <div class="exam-rules">
-      <div class="exam-rule"><span>📋</span><span>共 <b>60 題</b>（單選＋複選混合）</span></div>
+      <div class="exam-rule"><span>📋</span><span>共 <b>80 題</b>（單選＋複選混合）</span></div>
       <div class="exam-rule"><span>⏱️</span><span>限時 <b>100 分鐘</b>（正式考試標準）</span></div>
       <div class="exam-rule"><span>🚫</span><span>作答中不顯示解析，交卷後才公布</span></div>
       <div class="exam-rule"><span>📊</span><span>交卷後出具完整成績單＋類別分析</span></div>
@@ -723,9 +775,9 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 <div class="modal-overlay" id="subjModal" onclick="closeSubjModal(event)">
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div style="font-size:30px;text-align:center;margin-bottom:10px">🦺</div>
-    <div style="font-size:17px;font-weight:900;text-align:center;margin-bottom:4px">職安乙級</div>
-    <div style="font-size:12px;color:var(--tx2);text-align:center;margin-bottom:20px">60題精選高頻考題</div>
+    <div id="modalIco" style="font-size:30px;text-align:center;margin-bottom:10px">🦺</div>
+    <div id="modalName" style="font-size:17px;font-weight:900;text-align:center;margin-bottom:4px">職安乙級</div>
+    <div id="modalDesc" style="font-size:12px;color:var(--tx2);text-align:center;margin-bottom:20px">298題完整題庫 · 22200+共用科目</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <button class="btn btn-ac" onclick="startMode('sequential');closeSubjModal()">📋 順序練習</button>
       <button class="btn btn-ghost" onclick="startMode('random');closeSubjModal()">🎲 隨機練習</button>
@@ -741,14 +793,16 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 ══════════════════════════════════ */
 const INDUSTRIES = [
   {
-    id:'construction', name:'營造／工地', ico:'🏗️', sub:'工地、建築、土木',
-    salary:'月薪 4~8萬',
-    desc:'台灣缺工嚴重的高薪領域，取得職安乙級後可擔任工地安衛人員，加上操作類證照薪資更高。',
+    id:'construction', name:'營造／工地', ico:'🏗️', sub:'工地、建築、土木、安衛',
+    salary:'月薪 5~12萬',
+    desc:'台灣缺工嚴重的高需求領域。從基層安衛人員到工地主任，每張證照都是加薪籌碼。以下是工地人員最常考的完整路線。',
     steps:[
-      {name:'職安乙級技術士',diff:'mid',study:'115小時訓練+考試',desc:'工地安衛人員的入場券，取得後擔任職安管理員，月薪加給5,000~10,000元。',salary:'取得後加薪 5,000~10,000/月',available:true},
-      {name:'堆高機操作人員',diff:'easy',study:'18小時訓練',desc:'工地常見機具，訓練費約3,000~5,000元，取得後操作堆高機合法，時薪或月薪都能提升。',salary:'加給約 3,000~5,000/月'},
-      {name:'移動式起重機操作',diff:'mid',study:'35小時訓練',desc:'吊車操作人員，工地高需求職位，取得後薪資大幅提升。',salary:'月薪 5~8萬'},
-      {name:'職安甲級技術士',diff:'hard',study:'需乙級+實務經驗',desc:'甲級管理師，可擔任更高階安全衛生管理職位，大型工地必備。',salary:'月薪 6~10萬+'},
+      {name:'營造業丙種職安業務主管',diff:'easy',study:'12小時訓練+電腦測驗',desc:'工地最基礎的安衛資格。勞工人數未滿30人的工地需設置，訓練費約2,000~3,000元，當天受訓當天或隔天即可測驗通過。',salary:'擔任丙主管職位'},
+      {name:'營造業乙種職安業務主管',diff:'easy',study:'16小時訓練+電腦測驗',desc:'勞工人數30~99人的工地需設置乙種主管。訓練後參加電腦測驗，及格率高。甲種可取代乙種和丙種，若直接考甲種更划算。',salary:'加給約 3,000~6,000/月'},
+      {name:'營造業甲種職安業務主管',diff:'mid',study:'24小時訓練+電腦測驗',desc:'100人以上工地必備，是工地安衛人員最常考的目標。訓練費約4,000~6,000元，電腦測驗50題，須達70分及格。甲種效力涵蓋乙、丙種。',salary:'加給約 5,000~10,000/月',available:true},
+      {name:'職安衛管理員（乙級技術士）',diff:'mid',study:'115小時訓練+技能檢定考試',desc:'正式技術士證照，與甲種主管不同。需透過勞動部技能檢定，考學科80題（單選+複選）。取得後可掛牌擔任管理員，是履歷加分的正式證照。',salary:'加給約 5,000~10,000/月',available:true},
+      {name:'公共工程品管人員',diff:'mid',study:'84小時訓練+考試（100題）',desc:'行政院公共工程委員會委辦，承包公共工程必備。84小時課程（含品質計畫習作），期末測驗100題選擇題，及格門檻60分。每4年需回訓36小時，費用約17,000元，中部可找逢甲、中興大學。',salary:'擔任品管工程師職位，月薪加 5,000~15,000'},
+      {name:'工地主任',diff:'hard',study:'220小時訓練+考試（及格率約25~30%）',desc:'內政部國土管理署管轄。須先完成220小時研習（費用約4萬），考試難度高，及格率僅25~30%，不再公布考古題。重點在熟讀營造業法、勞基法、政府採購法等法規。每4年回訓32小時。',salary:'月薪 6~12萬，稀缺人才'},
     ]
   },
   {
@@ -854,6 +908,709 @@ const INDUSTRIES = [
 /* ══════════════════════════════════
    QUESTION BANK
 ══════════════════════════════════ */
+const TRIVIA = [
+  {
+    "id": 1,
+    "cat": "🐝 動物",
+    "q": "蜜蜂一生能產多少蜂蜜？",
+    "a": "只有約1/12茶匙",
+    "detail": "一隻工蜂一生（約6週）只能採集到約1/12茶匙的蜂蜜。為了釀一公斤蜂蜜，蜜蜂需要飛行約40萬公里——相當於繞地球10圈。"
+  },
+  {
+    "id": 2,
+    "cat": "🌊 地球",
+    "q": "地球上最深的地方有多深？",
+    "a": "馬里亞納海溝約11,034公尺",
+    "detail": "馬里亞納海溝的挑戰者深淵約11,034公尺，比聖母峰（8,849公尺）還要深2,000多公尺。水壓是海平面的1,100倍以上。"
+  },
+  {
+    "id": 3,
+    "cat": "⚡ 科學",
+    "q": "閃電的溫度有多高？",
+    "a": "約30,000°C，是太陽表面的5倍",
+    "detail": "一道閃電的溫度約30,000°C，而太陽表面溫度約5,500°C。閃電持續時間只有0.2秒，但能量足以讓60個100W燈泡亮一天。"
+  },
+  {
+    "id": 4,
+    "cat": "🧠 人體",
+    "q": "人腦有多少個神經元？",
+    "a": "約860億個，每個連結高達7,000條",
+    "detail": "人腦約有860億個神經元，每個神經元平均與其他神經元形成7,000條突觸連結，總連結數超過100兆個，比宇宙中可觀測的星星還多。"
+  },
+  {
+    "id": 5,
+    "cat": "🌿 植物",
+    "q": "竹子是草還是樹？",
+    "a": "竹子是草，屬禾本科",
+    "detail": "竹子在植物學上屬於禾本科，是草而非樹木。某些種類的竹子每天可生長90公分，是世界上生長最快的植物。"
+  },
+  {
+    "id": 6,
+    "cat": "🐙 動物",
+    "q": "章魚有幾個心臟？",
+    "a": "3個心臟，2個負責鰓，1個負責全身",
+    "detail": "章魚有三個心臟：兩個鰓心臟把血液泵送到鰓部進行氣體交換，一個主心臟把含氧血液輸送到全身。章魚的血液是藍色的，因為含有血藍蛋白而非血紅素。"
+  },
+  {
+    "id": 7,
+    "cat": "🌍 地球",
+    "q": "地球上所有螞蟻的總重量是否超過所有人類？",
+    "a": "是的，螞蟻總重量大約等於人類",
+    "detail": "科學家估計地球上約有2京（20,000兆）隻螞蟻，總重量約1.2億公噸，與全人類的總重量相當。螞蟻能搬運自身體重50倍的物體。"
+  },
+  {
+    "id": 8,
+    "cat": "💧 科學",
+    "q": "一個成年人一天呼出多少水分？",
+    "a": "約300-400毫升，相當於一罐飲料",
+    "detail": "每次呼吸都會帶走水分，一個成年人每天透過呼吸散失約300-400ml的水。這就是為什麼冬天在戶外說話會看到白霧。"
+  },
+  {
+    "id": 9,
+    "cat": "🌙 宇宙",
+    "q": "月球正在以每年多少速度遠離地球？",
+    "a": "每年約3.8公分",
+    "detail": "月球每年以約3.8公分的速度遠離地球。科學家透過雷射測距技術精確測量。45億年後，月球將遠到無法再遮住太陽，日全食將成為絕響。"
+  },
+  {
+    "id": 10,
+    "cat": "🐬 動物",
+    "q": "海豚睡覺時會怎樣？",
+    "a": "只讓半個大腦睡覺，另一半保持清醒",
+    "detail": "海豚採用「單半球慢波睡眠」，讓左右腦輪流休息，這樣一半的大腦隨時保持清醒，可以繼續游泳、呼吸並警戒危險。"
+  },
+  {
+    "id": 11,
+    "cat": "☕ 咖啡",
+    "q": "世界上最貴的咖啡是哪種？為何如此昂貴？",
+    "a": "麝香貓咖啡（Kopi Luwak），因為需要麝香貓的消化道處理",
+    "detail": "麝香貓吃下咖啡果實後，咖啡豆在消化道中被消化酵素改變風味，排出後收集、清洗、烘焙。每公斤售價可高達1,000-1,300美元，不過動物福利問題讓許多咖啡愛好者選擇拒絕購買。"
+  },
+  {
+    "id": 12,
+    "cat": "🍫 食物",
+    "q": "巧克力在中世紀歐洲以什麼形式出現？",
+    "a": "液態苦飲料，不加糖",
+    "detail": "可可豆最初由阿茲提克人製成苦澀的冷飲「xocolatl」（加辣椒）。16世紀傳入歐洲後仍是熱的苦飲料。固體巧克力直到1847年才被英國Fry公司首先製造出來。"
+  },
+  {
+    "id": 13,
+    "cat": "🍕 食物",
+    "q": "番茄是蔬菜還是水果？美國最高法院曾裁定過！",
+    "a": "植物學上是水果，但美國最高法院1893年裁定為蔬菜",
+    "detail": "1893年美國最高法院在Nix v. Hedden案中，以課稅為由，裁定番茄在商業上應歸類為蔬菜，因為它是正餐食用而非甜點。這個裁決至今仍有效力。"
+  },
+  {
+    "id": 14,
+    "cat": "🧀 食物",
+    "q": "為什麼有些起司有洞？",
+    "a": "細菌消化乳糖產生二氧化碳，形成氣泡",
+    "detail": "瑞士起司的洞（稱為eye）是由特定細菌（Propionibacterium freudenreichii）消化乳酸後產生的二氧化碳氣泡所形成。2015年科學家發現乾草粉塵落入牛奶也是洞的成因之一。"
+  },
+  {
+    "id": 15,
+    "cat": "🍺 飲料",
+    "q": "啤酒花（啤酒苦味來源）在啤酒中除了苦味還有什麼功用？",
+    "a": "天然防腐劑，延長保存期",
+    "detail": "啤酒花（Humulus lupulus）含有α酸，不僅賦予啤酒苦味和香氣，還具有抗菌作用，可抑制乳酸菌等細菌生長，讓啤酒在常溫下保存更久。這就是18世紀英國製造高啤酒花含量的India Pale Ale（IPA）以便長途運送到印度的原因。"
+  },
+  {
+    "id": 16,
+    "cat": "🍰 烘焙",
+    "q": "為什麼麵包烤出來是棕色的？",
+    "a": "梅納反應：胺基酸和糖在高溫下反應",
+    "detail": "麵包上色是「梅納反應」（Maillard Reaction）——胺基酸與還原糖在140°C以上反應，產生數百種風味化合物和棕色物質。法國化學家路易斯·卡米拉·梅納在1912年首先描述這個反應，它也是牛排、咖啡、烤肉美味的原因。"
+  },
+  {
+    "id": 17,
+    "cat": "🍵 茶",
+    "q": "世界上最貴的茶葉是哪種？",
+    "a": "大紅袍母樹茶葉，僅存6棵",
+    "detail": "武夷山大紅袍的母樹只剩6棵，被列為文化遺產禁止採摘。2002年最後一次拍賣的20克茶葉售價高達15萬人民幣。現在市場上的大紅袍都是無性繁殖的後代茶樹。"
+  },
+  {
+    "id": 18,
+    "cat": "🍊 水果",
+    "q": "香蕉是草本植物還是樹？",
+    "a": "草本植物，香蕉「樹幹」其實是葉柄",
+    "detail": "香蕉沒有木質莖，它的「樹幹」是由葉鞘緊密堆疊而成，植物學上稱為「假莖」。香蕉在植物學上屬於大型草本植物。有趣的是，香蕉含有微量的天然放射性物質鉀-40。"
+  },
+  {
+    "id": 19,
+    "cat": "🥚 食物",
+    "q": "雞蛋放在水中，浮起來代表什麼？",
+    "a": "雞蛋已經不新鮮，氣室變大",
+    "detail": "新鮮雞蛋密度大會沉底；隨著時間，蛋白質分解產生氣體，氣室擴大使雞蛋密度降低。浮起來的雞蛋通常已存放超過3週，建議不要食用。"
+  },
+  {
+    "id": 20,
+    "cat": "☕ 咖啡",
+    "q": "咖啡豆其實不是豆子？",
+    "a": "它是咖啡果實的種子",
+    "detail": "咖啡「豆」是咖啡樹（Coffea）果實（咖啡櫻桃）內部的種子。每顆果實通常含有兩顆種子，只含一顆的稱為「圓豆」（Peaberry），風味較集中。"
+  },
+  {
+    "id": 21,
+    "cat": "🇹🇼 台灣",
+    "q": "台灣的珍珠奶茶是在哪一年、哪個城市發明的？",
+    "a": "1980年代，台中春水堂或台南翰林茶館（兩方都說是自己）",
+    "detail": "珍珠奶茶的起源有爭議。台中春水堂的劉漢介聲稱1986年發明，台南翰林茶館的塗宗和聲稱1987年。兩家都有申請商標但都未獲准，因此珍珠奶茶成為無人擁有的美食文化遺產。"
+  },
+  {
+    "id": 22,
+    "cat": "🇹🇼 台灣",
+    "q": "台灣哪個城市被稱為「文化首都」？",
+    "a": "台南，擁有最多古蹟與廟宇",
+    "detail": "台南是台灣最古老的城市，建城已超過400年，擁有超過1,500座廟宇（密度全台最高）、27處國定古蹟。台南也是府城台灣的第一個行政中心。"
+  },
+  {
+    "id": 23,
+    "cat": "🇹🇼 台灣",
+    "q": "台灣的921地震發生在什麼時間？有多大？",
+    "a": "1999年9月21日凌晨1:47，芮氏規模7.3",
+    "detail": "921大地震造成2,415人罹難，11,305人受傷，105,000棟建築物毀損。震央在南投縣集集鎮。這場地震讓台灣徹底翻新了建築耐震規範，也推動了防災教育普及化。"
+  },
+  {
+    "id": 24,
+    "cat": "🇹🇼 台灣",
+    "q": "台灣夜市文化起源於何處？",
+    "a": "廟前廣場，配合廟會活動自然形成",
+    "detail": "台灣夜市多發源於廟宇前廣場，廟會期間攤販聚集，逐漸演變成固定夜市。台灣夜市文化已被列為無形文化資產，更在米其林指南中獲得推薦。"
+  },
+  {
+    "id": 25,
+    "cat": "🇹🇼 台灣",
+    "q": "台灣高鐵最快時速是多少？從台北到高雄最短要幾分鐘？",
+    "a": "最高時速300km/h，最短約96分鐘",
+    "detail": "台灣高鐵（THSR）採用日本新幹線700T型車廂，最高營運時速300km/h，台北至左營最快約96分鐘，全線長345公里。2007年通車至今年均運量超過6,000萬人次。"
+  },
+  {
+    "id": 26,
+    "cat": "⚖️ 職場",
+    "q": "台灣勞基法規定，加班費第一個小時應加給多少？",
+    "a": "1.33倍（加給原工資1/3）",
+    "detail": "依勞基法第24條，延長工時第1、2小時，加給原工資1/3以上（即1.33倍）；第3小時起加給2/3以上（即1.67倍）。超過12小時不得使勞工工作。"
+  },
+  {
+    "id": 27,
+    "cat": "⚖️ 職場",
+    "q": "職場發生死亡工安意外，雇主最晚幾小時內要通報？",
+    "a": "8小時內",
+    "detail": "依職業安全衛生法第37條，勞動場所發生死亡職業災害，雇主應於8小時內通報勞動檢查機構。未依時通報可處3萬至30萬元罰鍰。"
+  },
+  {
+    "id": 28,
+    "cat": "⚖️ 職場",
+    "q": "台灣法定「例假日」出勤，工資應如何計算？",
+    "a": "加倍工資（2倍）＋補假一天",
+    "detail": "例假（每7日中的1天）為法定休息日，雇主原則上不得使勞工工作。若確有必要出勤，須給予加倍工資並另補一天休假，共等同3倍報酬。"
+  },
+  {
+    "id": 29,
+    "cat": "⚖️ 職場",
+    "q": "台灣「基本工資」2024年調漲到多少？",
+    "a": "月薪27,470元，時薪183元",
+    "detail": "2024年1月起台灣基本工資月薪調整為27,470元（較2023年的26,400元增加4.05%），時薪183元。基本工資調整由行政院核定，通常每年10月公告隔年實施。"
+  },
+  {
+    "id": 30,
+    "cat": "⚖️ 職場",
+    "q": "噪音超過多少分貝的工作場所，應強制勞工佩戴護耳器具？",
+    "a": "85分貝以上",
+    "detail": "依職業安全衛生設施規則，勞工作業場所噪音超過85dB時，雇主應提供聽力防護具並強制佩戴；超過90dB時，應採工程控制減少噪音。長期暴露高噪音會造成永久性聽力損失。"
+  },
+  {
+    "id": 31,
+    "cat": "🧬 人體",
+    "q": "人體最強韌的肌腱是哪條？能承受多少重量？",
+    "a": "阿基里斯腱，可承受體重8-10倍的力量",
+    "detail": "阿基里斯腱（跟腱）連接小腿肌肉與腳跟骨，跑步時每步需承受體重3-4倍的張力，起跳瞬間可達8-10倍。它是人體最粗壯的肌腱，但也是最常斷裂的肌腱之一。"
+  },
+  {
+    "id": 32,
+    "cat": "🧬 人體",
+    "q": "人體有多少塊骨頭？嬰兒和成人一樣嗎？",
+    "a": "成人206塊，嬰兒約270-300塊",
+    "detail": "嬰兒出生時約有270-300塊骨頭，隨著成長，許多小骨頭逐漸融合，成年後只剩206塊。人類最小的骨頭是耳朵裡的鐙骨，長度僅約3毫米。"
+  },
+  {
+    "id": 33,
+    "cat": "🧬 人體",
+    "q": "人體最大的器官是什麼？",
+    "a": "皮膚，面積約1.5-2平方公尺",
+    "detail": "皮膚是人體最大的器官，成人皮膚面積約1.5-2平方公尺，重量約4-5公斤。皮膚每2-4週會完全更新一次，每小時約脫落30,000-40,000個死皮細胞，一天下來約相當於一茶匙的粉末。"
+  },
+  {
+    "id": 34,
+    "cat": "🧬 人體",
+    "q": "人的眼睛能分辨多少種顏色？",
+    "a": "約1,000萬種顏色",
+    "detail": "人眼有約600萬個錐狀細胞，能分辨約1,000萬種顏色。其中有些人（稱為「四色視覺者」）擁有第四種錐狀細胞，理論上可分辨高達1億種顏色，這種基因多見於女性。"
+  },
+  {
+    "id": 35,
+    "cat": "🧬 人體",
+    "q": "人打一個噴嚏的速度有多快？",
+    "a": "約160公里/小時，相當於颱風風速",
+    "detail": "噴嚏時的氣流速度可達每小時160公里，飛沫可飛出超過1.5公尺。打噴嚏時眼睛會自動閉上，這是保護反射，而非防止眼球彈出（那是謠言）。"
+  },
+  {
+    "id": 36,
+    "cat": "🧬 人體",
+    "q": "人體每天製造多少個紅血球？",
+    "a": "約200億個",
+    "detail": "人體骨髓每天製造約200億個紅血球，每個紅血球壽命約120天，之後在脾臟被分解回收。血液中的鐵質約有70%用於製造血紅素，這就是缺鐵性貧血如此常見的原因。"
+  },
+  {
+    "id": 37,
+    "cat": "🧬 人體",
+    "q": "人的腸道有多長？",
+    "a": "小腸約6-7公尺，大腸約1.5公尺，合計約8公尺",
+    "detail": "小腸約6-7公尺是消化吸收的主要場所，表面積因有絨毛而高達250平方公尺（相當於一個網球場）。腸道中含有約100兆個細菌，數量是人體細胞的10倍，總重量約1.5公斤。"
+  },
+  {
+    "id": 38,
+    "cat": "🧬 人體",
+    "q": "人在睡覺時會長高嗎？",
+    "a": "是的，早上比晚上高約1-2公分",
+    "detail": "白天直立時，脊椎椎間盤因重力和活動被壓縮；夜晚躺下後，椎間盤吸水膨脹，所以早晨剛起床時身高比晚上高約1-2公分。太空人返回地球後甚至可暫時高出3-5公分。"
+  },
+  {
+    "id": 39,
+    "cat": "📜 歷史",
+    "q": "鉛筆裡的「鉛」其實是什麼材料？",
+    "a": "石墨，而非鉛",
+    "detail": "鉛筆的芯是石墨（碳的一種形態）與黏土的混合物。1564年英國發現大量純石墨礦後，人們誤以為是固態鉛，「鉛筆」這個名稱因此沿用至今。石墨比鉛毒性低得多，直接接觸是安全的。"
+  },
+  {
+    "id": 40,
+    "cat": "📜 歷史",
+    "q": "「OK」這個詞是怎麼來的？",
+    "a": "1839年美國報紙的幽默拼錯縮寫「oll korrect」",
+    "detail": "1839年波士頓報紙流行一種把單詞故意拼錯再縮寫的幽默風格，「all correct」被故意寫成「oll korrect」縮寫成「OK」。後來在1840年美國總統選舉中廣泛使用後，這個詞傳遍全球。"
+  },
+  {
+    "id": 41,
+    "cat": "📜 歷史",
+    "q": "古代羅馬人用什麼來刷牙？",
+    "a": "尿液，因為其中的氨有清潔效果",
+    "detail": "古羅馬人將尿液（特別是從葡萄牙進口的）當作漱口水和牙齒清潔劑，因為尿素分解成氨後確實有去除汙垢的效果。直到18世紀，化學家才合成出牙膏的前身。"
+  },
+  {
+    "id": 42,
+    "cat": "📜 歷史",
+    "q": "世界上第一張照片需要曝光多久？",
+    "a": "約8小時",
+    "detail": "1826年尼塞福爾·尼埃普斯拍攝的「窗外景色」是現存最古老的照片，使用白鑞版塗布瀝青，曝光時間約8小時。現代數位相機的快門速度可短至1/8000秒。"
+  },
+  {
+    "id": 43,
+    "cat": "📜 歷史",
+    "q": "撲克牌的花色（♠♥♦♣）分別代表什麼？",
+    "a": "劍（軍人）、聖杯（教士）、錢幣（商人）、棍棒（農民），代表中世紀歐洲四個階層",
+    "detail": "法式撲克牌的四種花色源自中世紀社會階層：黑桃（♠）代表貴族的劍、紅心（♥）代表教士的聖杯、方塊（♦）代表商人的錢幣、梅花（♣）代表農民的棍棒。"
+  },
+  {
+    "id": 44,
+    "cat": "📜 歷史",
+    "q": "「三明治」這個名字從哪裡來？",
+    "a": "來自英國三明治伯爵，他懶得離開賭桌去吃飯",
+    "detail": "18世紀英國三明治伯爵約翰·孟塔古太愛賭博，叫僕人把肉夾在兩片麵包間送來，這樣就不用離開賭桌。其他賭客效仿，這種吃法因此以他的爵位命名。"
+  },
+  {
+    "id": 45,
+    "cat": "📜 歷史",
+    "q": "奧運五環的顏色代表什麼？",
+    "a": "並非代表各洲，而是每個國旗至少含有這五色之一",
+    "detail": "1913年顧拜旦設計五環時，解釋說藍、黃、黑、綠、紅加上白色背景，每個當時參賽國的國旗都至少含有其中一種顏色。「五環代表五大洲」是後來衍生的說法，非原始設計意涵。"
+  },
+  {
+    "id": 46,
+    "cat": "💡 科技",
+    "q": "第一個電腦「bug」是真實的蟲子嗎？",
+    "a": "是的，1947年一隻蛾被夾在哈佛電腦繼電器中",
+    "detail": "1947年9月9日，葛麗絲·霍普和她的團隊在哈佛Mark II電腦中發現一隻真正的蛾（蠹蛾）卡在繼電器裡導致故障，他們把蟲子黏在工作日誌上，並寫下「First actual case of bug being found（第一個真正找到臭蟲的案例）」。"
+  },
+  {
+    "id": 47,
+    "cat": "💡 科技",
+    "q": "YouTube第一支影片是什麼？",
+    "a": "創辦人Jawed Karim在動物園拍攝的18秒短片",
+    "detail": "2005年4月23日，YouTube共同創辦人Jawed Karim上傳了第一支影片「Me at the zoo」，18秒，他站在聖地亞哥動物園大象前說「大象有很長很長的鼻子」。這支影片目前已超過2億次觀看。"
+  },
+  {
+    "id": 48,
+    "cat": "💡 科技",
+    "q": "Google搜尋引擎最初叫什麼名字？",
+    "a": "「BackRub」，因為它分析網站的反向連結",
+    "detail": "1996年史丹佛大學學生賴利·佩吉和謝爾蓋·布林開發了BackRub搜尋引擎，以反向連結（backlinks）來評估網頁重要性。1998年改名Google，來自數學術語「googol」（10的100次方），代表搜尋龐大數量的網路資訊。"
+  },
+  {
+    "id": 49,
+    "cat": "💡 科技",
+    "q": "全球每天發送多少封電子郵件？",
+    "a": "約3,300億封，其中45-85%是垃圾郵件",
+    "detail": "2023年全球每天發送約3,330億封電子郵件，平均每人每天收發約121封。其中45-85%為垃圾郵件（Spam），垃圾郵件過濾每年消耗的電力相當於數十萬輛汽車的碳排放。"
+  },
+  {
+    "id": 50,
+    "cat": "💡 科技",
+    "q": "WiFi這個名字有什麼含義？",
+    "a": "其實什麼都沒有，是行銷公司取的響亮名字",
+    "detail": "WiFi並不是「Wireless Fidelity」的縮寫（儘管很多人這樣以為）。Wi-Fi聯盟在1999年聘請行銷公司為「IEEE 802.11b Direct Sequence」取一個朗朗上口的名字，靈感來自音響界的「Hi-Fi（High Fidelity）」，純粹是行銷名稱。"
+  },
+  {
+    "id": 51,
+    "cat": "🐧 動物",
+    "q": "企鵝會求婚嗎？",
+    "a": "會！雄企鵝會送雌企鵝一塊特別的石頭",
+    "detail": "阿德利企鵝（Adélie Penguin）的雄性會在海灘尋找最光滑、最圓的小石頭送給心儀的雌性。如果雌企鵝接受石頭，就算訂婚成功。企鵝夫妻通常終生配對，每年在同一地點重聚。"
+  },
+  {
+    "id": 52,
+    "cat": "🌱 植物",
+    "q": "世界上最古老的生物是什麼？",
+    "a": "一棵名為Methuselah的狐尾松，約5,000歲",
+    "detail": "美國加州白山的狐尾松「瑪土撒拉」（Methuselah）估計樹齡約5,070年，是目前已知最古老的獨立生物，萌芽時間比埃及金字塔還早。確切位置被保密以防破壞。"
+  },
+  {
+    "id": 53,
+    "cat": "🌊 海洋",
+    "q": "海洋中有多少種尚未被發現的物種？",
+    "a": "科學家估計海洋中91%的物種還未被命名",
+    "detail": "科學家估計海洋中約有70-100萬種物種，但目前只記錄了約22萬種，意即超過91%尚未被發現。海洋深處（200公尺以下）仍是地球上探索最少的區域，面積比陸地上所有沙漠加起來還大。"
+  },
+  {
+    "id": 54,
+    "cat": "🔬 科學",
+    "q": "鑽石是世界上最硬的天然物質，那最難切割的是什麼？",
+    "a": "石墨烯，一個原子厚的碳層，強度是鋼的200倍",
+    "detail": "鑽石是最硬的天然礦物（莫氏硬度10），但石墨烯（graphene，單層碳原子網狀結構）的拉伸強度是鋼的200倍，是目前已知最強的材料。有趣的是，鑽石和石墨烯的主要成分都是碳原子。"
+  },
+  {
+    "id": 55,
+    "cat": "🎵 文化",
+    "q": "「生日快樂歌」的版權是誰的？",
+    "a": "已於2016年進入公共領域，之前屬於華納音樂",
+    "detail": "「生日快樂歌」的旋律1893年由兩位教師創作，但歌詞的版權被華納音樂持有直到2016年（一直在收取授權費）。2015年美國法院裁定版權無效，現已進入公共領域，可自由使用。"
+  },
+  {
+    "id": 56,
+    "cat": "🌏 地理",
+    "q": "澳洲比月球小嗎？",
+    "a": "不，澳洲（769萬平方公里）比月球（3,793萬平方公里）還要小！",
+    "detail": "月球的表面積約3,793萬平方公里，而澳洲陸地面積約769萬平方公里，月球的表面積約是澳洲的5倍。但月球是球體，如果展平其表面積是地球的7.4%。"
+  },
+  {
+    "id": 57,
+    "cat": "🧲 科學",
+    "q": "磁鐵的南北極如果切開會怎樣？",
+    "a": "會變成兩個各有南北極的磁鐵，永遠無法分開單極",
+    "detail": "磁偶極是磁性的基本特性，無論如何切割，每一段都會產生新的南北極。迄今為止，科學家在理論上預測的「磁單極」（只有一個極的磁鐵）在實驗中仍未被觀測到。"
+  },
+  {
+    "id": 58,
+    "cat": "🎲 趣聞",
+    "q": "麻將是在哪個國家發明的？大約哪個年代？",
+    "a": "中國，清朝同治年間（約1850-1870年代）",
+    "detail": "麻將起源於中國，清朝時期由太平天國戰爭後的士兵在無聊時改良自紙牌遊戲。19世紀末傳入上海租界，再傳至西方。台灣的麻將（16張）與大陸麻將（13張）規則略有不同。"
+  },
+  {
+    "id": 59,
+    "cat": "🌡️ 科學",
+    "q": "「絕對零度」是多少度？在這個溫度下會發生什麼？",
+    "a": "-273.15°C（0 Kelvin），分子幾乎停止運動",
+    "detail": "絕對零度是熱力學溫標的零點，理論上是物質能達到的最低溫度，分子動能趨近於零。目前人類創造的最低溫度約為0.0000001K（1億分之一開爾文），比外太空（2.7K）還冷得多。"
+  },
+  {
+    "id": 60,
+    "cat": "🐾 動物",
+    "q": "貓咪打呼嚕的頻率對人體有什麼影響？",
+    "a": "25-50Hz的振動頻率有助於骨骼修復和壓力緩解",
+    "detail": "貓的呼嚕聲頻率在25-50赫茲之間，研究顯示這個頻段的振動可以促進骨骼癒合和肌肉修復。同時，和貓互動確實可以降低人的皮質醇（壓力荷爾蒙）水平，減少心臟病發作風險。"
+  },
+  {
+    "id": 61,
+    "cat": "🍜 食物",
+    "q": "泡麵是哪個國家發明的？發明人是誰？",
+    "a": "日本，安藤百福，1958年",
+    "detail": "安藤百福（台裔日本人，出生於台灣嘉義）在1958年發明雞湯拉麵，創立日清食品。1971年再發明杯麵。他過世前的遺言是「泡麵萬歲」。安藤百福被CNN評選為20世紀最重要的亞洲人之一。"
+  },
+  {
+    "id": 62,
+    "cat": "🌏 地理",
+    "q": "世界上哪個國家擁有最多時區？",
+    "a": "法國，共12個時區（含海外領土）",
+    "detail": "法國本土只有1個時區，但加上法屬圭亞那、玻里尼西亞、新喀里多尼亞等海外領土，法國跨越12個時區，比俄羅斯（11個）和美國（11個）還多。"
+  },
+  {
+    "id": 63,
+    "cat": "🐠 動物",
+    "q": "小丑魚（尼莫）可以改變性別？",
+    "a": "是的，小丑魚群中的最大個體會變為雌性",
+    "detail": "小丑魚群由一對雌雄和數條較小的雄魚組成。當雌魚死亡，體型最大的雄魚會在幾週內完全變成雌魚。所以「海底總動員」中若尼莫的媽媽死了，爸爸馬林應該變成媽媽。"
+  },
+  {
+    "id": 64,
+    "cat": "🎨 文化",
+    "q": "梵谷生前只賣出了幾幅畫？",
+    "a": "只有一幅：《紅色葡萄園》",
+    "detail": "梵谷在世時（1853-1890）幾乎沒有名氣，據記載只賣出一幅畫《紅色葡萄園》。他去世後，弟媳喬安娜將他的作品推廣至世界，現在他的畫作是世界最昂貴藝術品之一。"
+  },
+  {
+    "id": 65,
+    "cat": "🔢 數學",
+    "q": "圓周率π在第22,459,157,718位數字後面跟著什麼？",
+    "a": "這超過人類已知的計算範圍（2022年計算到100兆位）",
+    "detail": "截至2022年，π已被計算到100,000,000,000,000（100兆）位數，由Google工程師Emma Haruka Iwao完成。π是無理數，小數點後永不循環。有趣的是，在π的某處，你的電話號碼、生日甚至整部小說（理論上）都存在。"
+  },
+  {
+    "id": 66,
+    "cat": "🌿 植物",
+    "q": "為什麼草是綠色的？",
+    "a": "葉綠素吸收紅光和藍紫光，反射綠光",
+    "detail": "葉綠素是植物進行光合作用的關鍵分子，它吸收紅光（波長680nm）和藍紫光（波長450nm）來驅動光合作用，卻反射綠光（波長550nm），這就是植物呈現綠色的原因。"
+  },
+  {
+    "id": 67,
+    "cat": "⭐ 宇宙",
+    "q": "太陽光從太陽到達地球需要多久？",
+    "a": "約8分20秒",
+    "detail": "光速約30萬公里/秒，地球與太陽平均距離約1億5千萬公里，所以太陽光需要約8分20秒到達地球。這意味著我們看到的太陽，是它8分鐘前的樣子。如果太陽突然消失，我們8分鐘後才會察覺。"
+  },
+  {
+    "id": 68,
+    "cat": "🧪 科學",
+    "q": "人類每天吸入和呼出多少公升空氣？",
+    "a": "約11,000公升，相當於11個大型浴缸",
+    "detail": "成人每次呼吸約0.5公升，每分鐘呼吸12-20次，每天吸入約8,000-11,000公升空氣。空氣中約21%是氧氣，我們吸入後只利用其中約5%，呼出的氣體中氧氣含量仍有16%。"
+  },
+  {
+    "id": 69,
+    "cat": "🎭 文化",
+    "q": "為什麼高跟鞋最初是男性穿的？",
+    "a": "17世紀歐洲貴族男性騎馬時穿高跟鞋固定腳踏馬鐙",
+    "detail": "高跟鞋起源於15-16世紀中東騎兵，傳入歐洲後成為貴族男性地位的象徵，路易十四以穿4英寸紅跟高跟鞋聞名。直到18世紀，高跟鞋才逐漸轉變為女性時尚，男性停止穿著。"
+  },
+  {
+    "id": 70,
+    "cat": "🌊 科學",
+    "q": "冰山只有多少比例露出水面？",
+    "a": "大約10-15%露出水面，85-90%在水下",
+    "detail": "「冰山一角」這個成語源於物理現實：純冰密度約917kg/m³，海水密度約1025kg/m³，因此冰山約89.5%沉在水下，只有10.5%露出水面。鐵達尼號撞上的正是冰山水下部分。"
+  },
+  {
+    "id": 71,
+    "cat": "🐝 動物",
+    "q": "蜜蜂如何向同伴傳達花蜜的位置？",
+    "a": "透過「搖擺舞蹈」（Waggle Dance）",
+    "detail": "蜜蜂透過8字形的「搖擺舞蹈」傳達花蜜位置：搖擺跑的方向代表相對於太陽的角度，持續時間代表距離，舞蹈的活躍程度代表食物的豐富程度。奧地利科學家卡爾·馮·弗里希因此獲得1973年諾貝爾獎。"
+  },
+  {
+    "id": 72,
+    "cat": "🍦 食物",
+    "q": "冰淇淋甜筒（脆皮甜筒）是怎麼被發明的？",
+    "a": "1904年聖路易斯世界博覽會，一個意外的靈感",
+    "detail": "1904年世博會上，一個冰淇淋攤位的紙杯用完了，隔壁賣瓦夫餅的商販靈機一動把瓦夫餅捲成錐形裝冰淇淋。這個意外發明立即大受歡迎，甜筒冰淇淋從此誕生。"
+  },
+  {
+    "id": 73,
+    "cat": "🧠 科學",
+    "q": "「左腦理性、右腦創意」的說法是真的嗎？",
+    "a": "是神話，大腦功能並不是這樣分工的",
+    "detail": "「左腦理性分析、右腦感性創意」是流行的誤解。2013年猶他大學的研究分析了1,000多人的腦部掃描，發現沒有人是「左腦型」或「右腦型」。大部分腦部功能需要兩個半球合作，且因人而異。"
+  },
+  {
+    "id": 74,
+    "cat": "🌍 地理",
+    "q": "亞馬遜河流出的淡水佔全球河流淡水總量的多少？",
+    "a": "約20%",
+    "detail": "亞馬遜河是世界上流量最大的河流，它流入大西洋的淡水量佔全球所有河流的約20%。亞馬遜流域佔地球陸地面積的5%，卻保存了全球約10%的生物多樣性。"
+  },
+  {
+    "id": 75,
+    "cat": "🎵 音樂",
+    "q": "「A=440Hz」是什麼意思？什麼時候訂下這個標準？",
+    "a": "標準音高，1939年由國際標準化組織制定",
+    "detail": "A=440Hz是目前全球通用的音樂調音標準（稱為「Concert Pitch」），由國際標準化組織在1939年制定。在此之前各地的A音高低不一，從422Hz到452Hz都有。部分樂手偏好A=432Hz，聲稱聽起來更和諧，但缺乏科學依據。"
+  },
+  {
+    "id": 76,
+    "cat": "⚖️ 職場",
+    "q": "台灣勞基法規定，員工資遣時每年年資應給幾個月薪水？",
+    "a": "每滿一年給一個月平均工資，未滿一年按比例",
+    "detail": "依勞基法第17條，雇主依法資遣勞工，每服務滿一年發給一個月平均工資的資遣費，未滿一年者按比例計算，最多六個月。勞退新制後，可選擇用勞工退休金個人帳戶抵充。"
+  },
+  {
+    "id": 77,
+    "cat": "🐬 動物",
+    "q": "海馬是由誰負責生育下一代？",
+    "a": "雄性海馬負責懷孕和生產",
+    "detail": "雄海馬是自然界少數由雄性懷孕的動物。雌海馬將卵產入雄海馬腹部的育兒囊中，雄海馬在囊中孕育幼海馬14-45天，最多可一次生產數百隻幼海馬。"
+  },
+  {
+    "id": 78,
+    "cat": "🔬 科學",
+    "q": "病毒比細菌小多少？",
+    "a": "約10-100倍，大部分病毒小到光學顯微鏡看不到",
+    "detail": "細菌通常1-10微米（百萬分之一公尺），而病毒通常0.02-0.3微米，需要電子顯微鏡才能看見。新冠病毒（SARS-CoV-2）直徑約0.1微米（100奈米），體積約為細菌的1/100。"
+  },
+  {
+    "id": 79,
+    "cat": "💡 發明",
+    "q": "便利貼（Post-it Note）是因為失敗的發明而誕生的？",
+    "a": "是的，原本是想開發超強黏膠，卻意外發明了黏性不夠強的便利貼膠",
+    "detail": "3M工程師史賓賽·席爾弗在1968年試圖開發超強黏合劑，卻意外製造出黏性弱、可重複貼合的壓克力微球。這個「失敗品」在實驗室被忽視了六年，直到同事亞瑟·富萊（Arthur Fry）在1974年想到用它來固定書籤，才發展成便利貼。"
+  },
+  {
+    "id": 80,
+    "cat": "🌿 植物",
+    "q": "向日葵的「臉」真的會跟著太陽轉嗎？",
+    "a": "只有幼苗期的向日葵會跟著太陽轉，成熟後固定朝東",
+    "detail": "向日葵的向日性（Heliotropism）只出現在生長期，由莖部不均勻生長驅動。一旦花朵成熟開放，莖部停止生長，向日葵就固定朝向東方。朝東有助於清晨陽光暖化花盤，吸引蜜蜂。"
+  },
+  {
+    "id": 81,
+    "cat": "🧊 科學",
+    "q": "熱水比冷水結冰更快，這可能嗎？",
+    "a": "有時候是，這叫「姆潘巴效應」",
+    "detail": "1963年坦尚尼亞學生姆潘巴發現熱牛奶比冷牛奶結冰快，報告給老師卻被嘲笑。後來科學家確認在特定條件下確實存在此效應，但確切機制仍有爭議。可能的原因包括蒸發、對流、溶解氣體和過冷卻等。"
+  },
+  {
+    "id": 82,
+    "cat": "🎨 顏色",
+    "q": "為什麼學校黑板現在多改成綠色？",
+    "a": "綠色對眼睛更友善，減少反光和眼睛疲勞",
+    "detail": "傳統黑板（Black Board）後來改為綠色，因為研究發現深綠色對眼睛的刺激比純黑小，反光率也較低，長時間看綠板後眼睛疲勞程度明顯低於黑板。這也是為什麼醫療手術室和軍事指揮所常用橄欖綠色。"
+  },
+  {
+    "id": 83,
+    "cat": "🌏 語言",
+    "q": "世界上最難學的語言是哪種（對英語母語者而言）？",
+    "a": "美國外交部評估：中文、日文、韓文、阿拉伯文最難",
+    "detail": "美國外交學院將語言分級，中文（普通話）、日文、韓文、阿拉伯文被評為「第四類」——最難學的語言，英語母語者需要約88週（2,200小時）的密集學習才能達到工作水準。"
+  },
+  {
+    "id": 84,
+    "cat": "🏃 運動",
+    "q": "馬拉松的標準距離42.195公里是怎麼確定的？",
+    "a": "1908年倫敦奧運為讓英國皇室觀看而調整距離，從此沿用",
+    "detail": "1908年倫敦奧運，馬拉松的起點從溫莎城堡（方便王室觀看出發）移至奧運場地的特定位置，讓英國公主可以從窗口看到選手，最後距離計算為42.195公里。這個「意外」距離在1921年被確定為國際標準。"
+  },
+  {
+    "id": 85,
+    "cat": "🔑 趣聞",
+    "q": "QWERTY鍵盤是刻意設計成打字慢的嗎？",
+    "a": "這是誤解，QWERTY是為減少打字機卡鍵而設計",
+    "detail": "流行說法稱QWERTY是為減慢打字速度，但其實是為了讓常見的字母組合（如th、st）分配到不同手指，減少機械打字機的金屬鍵臂互相碰撞卡住。Dvorak鍵盤雖說更有效率，但目前科學研究顯示差異有限。"
+  },
+  {
+    "id": 86,
+    "cat": "🦈 動物",
+    "q": "鯊魚沉入水底會怎樣？",
+    "a": "大部分鯊魚沒有魚鰾，必須不斷游泳才能維持浮力",
+    "detail": "大多數硬骨魚有魚鰾幫助控制浮力，但鯊魚（軟骨魚）沒有魚鰾，靠肝臟中的油脂（鯊烯）和不斷游泳來維持浮力。大多數鯊魚如果停止游泳就會下沉，部分種類（如護士鯊）可靠鰓的主動抽水在底部休息。"
+  },
+  {
+    "id": 87,
+    "cat": "🌈 光學",
+    "q": "彩虹為什麼是弧形的？可以看到完整的圓形彩虹嗎？",
+    "a": "可以，飛機上或特定高山上可以看到完整圓形彩虹",
+    "detail": "彩虹的形狀是你眼睛、每個水滴和太陽形成的固定角度（約42°）所決定的圓錐面截面。在地面上地平線擋住了下半部分，但在飛機上或高處可以看到完整的圓形彩虹。"
+  },
+  {
+    "id": 88,
+    "cat": "🍰 烘焙",
+    "q": "為什麼蛋糕烘烤時不能打開烤箱門？",
+    "a": "溫差造成蛋糕中的氣泡收縮，導致蛋糕塌陷",
+    "detail": "蛋糕在烘烤初期結構尚未固定，打開烤箱門會使冷空氣進入，溫度驟降導致麵糊中膨脹的氣泡快速收縮，蛋糕就會塌陷。通常需要烘烤到達固定時間的2/3後才可以稍微開門檢查。"
+  },
+  {
+    "id": 89,
+    "cat": "🎭 台灣",
+    "q": "台灣的「布袋戲」（霹靂）有多受歡迎？最高收視率達到多少？",
+    "a": "1990年代霹靂布袋戲收視率曾超過80%",
+    "detail": "台灣布袋戲在1990年代創下驚人的收視紀錄，霹靂布袋戲系列累計超過2,000集，霹靂衛視頻道對霹靂迷而言是24小時播不完的戲劇。布袋戲已被列為台灣重要無形文化資產。"
+  },
+  {
+    "id": 90,
+    "cat": "🌺 植物",
+    "q": "蘭花能活多久？世界上最古老的蘭花盆栽是幾歲？",
+    "a": "英國皇家植物園（邱園）有一棵蘭花已超過200歲",
+    "detail": "英國邱植物園保有一棵蘭花（Grammatophyllum speciosum）種植於1820年，至今已超過200歲，是有記錄以來最古老的盆栽蘭花。正常照顧下，許多蘭花可存活50-100年。"
+  },
+  {
+    "id": 91,
+    "cat": "⚖️ 職場",
+    "q": "台灣勞工每年的特休假是幾天？工作幾年後開始有？",
+    "a": "工作滿半年後有3天，滿一年後有7天，之後逐年增加",
+    "detail": "依勞基法第38條，勞工繼續工作：滿半年未滿1年給3天，1年以上未滿2年給7天，2年以上未滿3年給10天，3年以上未滿5年給14天，5年以上未滿10年給15天，10年以上每年20天。"
+  },
+  {
+    "id": 92,
+    "cat": "🎲 趣聞",
+    "q": "骰子的相對兩面數字加起來是？",
+    "a": "固定等於7（1-6、2-5、3-4）",
+    "detail": "標準骰子的設計讓相對兩面永遠相加等於7：1對面是6，2對面是5，3對面是4。這個設計在中國起源時就確立了，全世界通用。另外，骰子的「正面」通常是1點在左上，2點在左下，3點面向自己。"
+  },
+  {
+    "id": 93,
+    "cat": "🧊 食物",
+    "q": "台灣珍珠奶茶裡的「珍珠」，冰過之後為什麼會變硬？",
+    "a": "木薯澱粉低溫下會回凝（澱粉老化），失去Q彈口感",
+    "detail": "珍珠（波霸）由木薯粉製成，剛煮好時澱粉糊化呈Q彈狀。冷藏後澱粉分子重新結晶（老化），口感變硬失去彈性。這就是為什麼珍奶店叮嚀要在2小時內喝完，以及外賣的珍珠會越來越硬。"
+  },
+  {
+    "id": 94,
+    "cat": "🌟 宇宙",
+    "q": "我們看到的星星，有些其實已經消失了？",
+    "a": "是的，光需要時間旅行，我們看到的是過去的星光",
+    "detail": "我們看到的星光是數百甚至數百萬年前發出的。距離地球最近的恆星（半人馬座比鄰星）的光需要4.2年才能到達地球。我們看到的銀河系中心，是2.6萬年前的景象。"
+  },
+  {
+    "id": 95,
+    "cat": "🧪 科學",
+    "q": "人類史上最致命的毒素是什麼？",
+    "a": "肉毒桿菌毒素（Botulinum toxin），1公克可殺死100萬人",
+    "detail": "肉毒桿菌毒素是已知毒性最強的生物毒素，1奈克/公斤體重即可致死。諷刺的是，這種毒素以極微量（Botox）被用於醫美除皺和治療肌肉痙攣，也是目前人類使用的最毒醫療用品。"
+  },
+  {
+    "id": 96,
+    "cat": "📺 文化",
+    "q": "台灣人平均每天看多少小時電視？",
+    "a": "約3-4小時，但YouTube等串流平台逐漸取代",
+    "detail": "根據尼爾森調查，台灣民眾平均每天傳統電視收看時間約3-4小時，但60歲以上長者每天超過6小時。年輕族群（18-34歲）則更多透過手機觀看YouTube、Netflix等串流媒體。"
+  },
+  {
+    "id": 97,
+    "cat": "🌱 環保",
+    "q": "台灣回收率世界第幾？是否真的很高？",
+    "a": "台灣資源回收率曾達55%以上，位居全球前幾名",
+    "detail": "台灣從1990年代開始推動垃圾分類和資源回收，2018年整體資源回收率達55%以上，在亞洲居首位。但台灣垃圾問題仍嚴峻，每年人均垃圾量也相當可觀，回收率高的同時廢棄物產生量也高。"
+  },
+  {
+    "id": 98,
+    "cat": "🎬 電影",
+    "q": "《侏儸紀公園》中的迅猛龍實際上有多大？",
+    "a": "真實迅猛龍只有火雞大小，電影嚴重誇大了",
+    "detail": "真實的伶盜龍（Velociraptor）身高約0.5公尺，體重約15-30公斤，大約火雞大小，還有羽毛。電影中6英尺高的「迅猛龍」其實更接近恐爪龍（Deinonychus）。導演史匹柏承認是為了戲劇效果而放大。"
+  },
+  {
+    "id": 99,
+    "cat": "🌊 台灣",
+    "q": "台灣四面環海，海岸線總長多少公里？",
+    "a": "約1,566公里（含離島），本島約1,139公里",
+    "detail": "台灣本島海岸線約1,139公里，加上金門、馬祖、澎湖等離島共約1,566公里。台灣海岸地形多樣，東部為陡峭的斷層海岸，西部為平緩的沙泥海岸，南部有珊瑚礁。"
+  },
+  {
+    "id": 100,
+    "cat": "💡 科技",
+    "q": "台灣的台積電（TSMC）佔全球晶片市場多少份額？",
+    "a": "先進製程（7nm以下）超過90%，整體約55%",
+    "detail": "台積電是全球最大的獨立晶片代工廠，在最先進的製程技術（7奈米以下）中市占率超過90%。全球許多重要晶片（包括Apple、NVIDIA、AMD的產品）都由台積電製造，其重要性使台灣被稱為「矽盾」。"
+  }
+];
+
 const QS=[
   {id:1,type:'single',cat:'法規',text:'依職業安全衛生法規定，事業單位勞工人數在幾人以上，應設置職業安全衛生管理單位？',opts:['50人','100人','200人','300人'],ans:[1],exp:'依職業安全衛生管理辦法，第一類事業勞工人數在100人以上者，應設置職業安全衛生管理單位。'},
   {id:2,type:'single',cat:'法規',text:'職業安全衛生法所稱「雇主」，係指何者？',opts:['事業主或事業之經營負責人','人事主管','安全衛生管理人員','工地主任'],ans:[0],exp:'依職業安全衛生法第2條，雇主係指事業主或事業之經營負責人。'},
@@ -915,6 +1672,438 @@ const QS=[
   {id:58,type:'single',cat:'職業道德',text:'職業安全衛生管理員發現事業單位有違反職安法規之情形，應如何處理？',opts:['為維護關係而隱瞞','立即向媒體舉發','依法提出改善建議並通報主管人員','自行停工處理'],ans:[2],exp:'職安管理員應據實提出改善建議並向主管人員報告，不可因私人關係而隱匿危害。'},
   {id:59,type:'single',cat:'計畫管理',text:'PDCA循環中，「Check」查核階段的主要工作為何？',opts:['制定目標與計畫','執行安全衛生活動','監測績效並與目標比較','採取矯正措施'],ans:[2],exp:'PDCA中Check查核階段，主要是監測、測量、分析實際績效，並與預定目標或標準進行比較。'},
   {id:60,type:'single',cat:'計畫管理',text:'「型式檢定」之申請，應向哪個機關為之？',opts:['縣市政府勞工局','勞動部職業安全衛生署','中央主管機關認可之驗證機構','勞動檢查機構'],ans:[2],exp:'機械設備器具型式檢定，應向中央主管機關認可之驗證機構申請，取得型式驗證合格證書後，方可販售或使用。'},
+// ═══ 飲料調製丙級 08000 ═══,
+  {id:5001,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是濃縮咖啡（Espresso）的標準萃取量（單份）？",opts:["15ml", "30ml", "60ml", "90ml"],ans:[1],exp:"標準單份Espresso約30ml（1oz），使用7-9g咖啡粉，萃取時間約25-30秒。"},
+  {id:5002,type:"single",cat:"飲料調製",subj:"08000",text:"卡布奇諾（Cappuccino）的正確比例為下列何者？",opts:["濃縮咖啡:牛奶:奶泡 = 1:1:1", "濃縮咖啡:牛奶:奶泡 = 1:3:1", "濃縮咖啡:牛奶:奶泡 = 1:2:2", "濃縮咖啡:牛奶:奶泡 = 2:1:1"],ans:[0],exp:"傳統卡布奇諾比例為Espresso:熱牛奶:奶泡各佔1/3。"},
+  {id:5003,type:"single",cat:"飲料調製",subj:"08000",text:"拿鐵（Latte）與卡布奇諾（Cappuccino）最主要的差異為何？",opts:["咖啡豆種類不同", "牛奶比例不同，拿鐵牛奶比例更高", "杯子大小不同", "萃取時間不同"],ans:[1],exp:"拿鐵牛奶比例更高，奶泡較薄；卡布奇諾奶泡較厚，比例各三分之一。"},
+  {id:5004,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種咖啡萃取方式屬於「浸泡式」？",opts:["義式濃縮機", "虹吸壺（賽風）", "義式摩卡壺", "冰滴咖啡"],ans:[1],exp:"虹吸壺（賽風壺）讓咖啡粉完全浸泡在熱水中萃取，屬於浸泡式。"},
+  {id:5005,type:"single",cat:"飲料調製",subj:"08000",text:"阿拉比卡（Arabica）與羅布斯塔（Robusta）咖啡豆相比，下列敘述何者正確？",opts:["阿拉比卡咖啡因含量較高", "阿拉比卡風味較佳、酸度較高", "羅布斯塔生長海拔較高", "阿拉比卡苦味較重"],ans:[1],exp:"阿拉比卡風味複雜、酸度較高；羅布斯塔咖啡因含量更高、苦味較重。"},
+  {id:5006,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者為「冷萃咖啡（Cold Brew）」的主要特徵？",opts:["使用熱水快速萃取後冷卻", "以冷水長時間浸泡萃取（12-24小時）", "使用冰塊直接沖泡", "加入冰淇淋製成"],ans:[1],exp:"冷萃咖啡以冷水低溫長時間浸泡（12-24小時），酸度低、甜度高。"},
+  {id:5007,type:"single",cat:"飲料調製",subj:"08000",text:"製作奶泡時，牛奶的最適打發溫度約為多少度？",opts:["40-45°C", "55-65°C", "70-75°C", "80-85°C"],ans:[1],exp:"牛奶奶泡最佳打發溫度為55-65°C，此溫度下蛋白質結構最適合形成細緻綿密的奶泡。"},
+  {id:5008,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者不是影響咖啡萃取品質的主要因素？",opts:["研磨粗細", "水溫", "咖啡杯顏色", "萃取時間"],ans:[2],exp:"咖啡萃取品質取決於研磨度、水溫（90-95°C）、萃取時間和咖啡粉量，杯子顏色不影響。"},
+  {id:5009,type:"single",cat:"飲料調製",subj:"08000",text:"義式濃縮咖啡（Espresso）萃取的最佳水溫為下列何者？",opts:["70-75°C", "80-85°C", "90-95°C", "100°C"],ans:[2],exp:"Espresso最佳萃取水溫為90-95°C，過高會過度萃取產生苦味，過低則萃取不足。"},
+  {id:5010,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種咖啡飲品含有冰淇淋？",opts:["冰拿鐵", "阿芙佳朵（Affogato）", "冰摩卡", "冷萃咖啡"],ans:[1],exp:"阿芙佳朵是將熱Espresso淋在香草冰淇淋上的義式甜點飲品。"},
+  {id:5011,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者屬於全發酵茶（紅茶）？",opts:["龍井", "烏龍茶", "阿薩姆紅茶", "白毫銀針"],ans:[2],exp:"紅茶屬全發酵茶，代表有阿薩姆、錫蘭、大吉嶺等；烏龍茶為半發酵；龍井為不發酵綠茶。"},
+  {id:5012,type:"single",cat:"飲料調製",subj:"08000",text:"珍珠奶茶中的「珍珠」主要成分為何？",opts:["麵粉", "樹薯粉（木薯澱粉）", "玉米澱粉", "蓮藕粉"],ans:[1],exp:"珍珠（波霸）主要由樹薯粉（木薯澱粉）製成，加入焦糖或黑糖增色調味。"},
+  {id:5013,type:"single",cat:"飲料調製",subj:"08000",text:"製作手搖飲料時，下列何者是「滿冰」的正確做法？",opts:["加入冰塊至杯子1/3", "加入冰塊至杯子1/2", "加入冰塊至杯緣", "依客人喜好決定"],ans:[2],exp:"手搖飲料術語「滿冰」指加冰塊至接近杯緣，「少冰」為正常量的一半，「去冰」則不加冰。"},
+  {id:5014,type:"single",cat:"飲料調製",subj:"08000",text:"台灣手搖飲料中，「三分糖」是指含糖量約為正常甜度的多少？",opts:["30%", "50%", "70%", "全糖的1/3"],ans:[0],exp:"台灣手搖飲甜度換算：三分糖=正常甜度的30%，五分糖=50%，七分糖=70%，全糖=100%。"},
+  {id:5015,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種泡茶方式茶葉浸泡時間最長、適合製作大量冷泡茶？",opts:["熱泡法", "冷泡法", "悶泡法", "快速萃取法"],ans:[1],exp:"冷泡法以冷水在冰箱低溫浸泡8-12小時，苦澀味低、甘甜度高，適合大量製作。"},
+  {id:5016,type:"single",cat:"飲料調製",subj:"08000",text:"下列哪種成分會影響飲料的甜度標準？",opts:["水溫", "糖漿的白利糖度（Brix）", "茶葉品種", "冰塊量"],ans:[1],exp:"白利糖度（Brix°）是衡量液體中糖分濃度的單位，直接影響飲料甜度，需定期校正。"},
+  {id:5017,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製中「搖盪法（Shake）」的主要目的為下列何者？",opts:["加熱飲料", "均勻混合材料並快速冷卻", "增加甜度", "過濾雜質"],ans:[1],exp:"搖盪法利用冰塊快速冷卻並充分混合材料，同時稀釋濃度，常用於調製雞尾酒或特調飲品。"},
+  {id:5018,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種茶葉屬於台灣特產的半發酵茶？",opts:["鐵觀音", "東方美人茶", "大吉嶺紅茶", "煎茶"],ans:[1],exp:"東方美人茶（白毫烏龍）是台灣特有的重發酵烏龍茶，因小綠葉蟬叮咬產生獨特蜜香。"},
+  {id:5019,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是抹茶與一般綠茶粉最大的差異？",opts:["顏色不同", "抹茶由遮光栽培的茶葉研磨而成，品質較高", "抹茶含糖量較高", "抹茶咖啡因含量較低"],ans:[1],exp:"抹茶需用覆蓋栽培法（遮光增甘），並以石磨研磨成極細粉末，品質和風味遠優於一般綠茶粉。"},
+  {id:5020,type:"single",cat:"飲料調製",subj:"08000",text:"飲料製作時，下列何種材料屬於「基底糖漿」？",opts:["鮮奶", "椰果", "黑糖糖漿", "仙草"],ans:[2],exp:"黑糖糖漿是調整飲料甜度的基底材料；椰果和仙草屬配料。"},
+  {id:5021,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者屬於蒸餾酒（烈酒）？",opts:["啤酒", "葡萄酒", "威士忌", "清酒"],ans:[2],exp:"威士忌屬蒸餾酒（烈酒）；啤酒、葡萄酒、清酒皆為釀造酒。"},
+  {id:5022,type:"single",cat:"飲料調製",subj:"08000",text:"莫希托（Mojito）雞尾酒的主要基酒為何？",opts:["龍舌蘭（Tequila）", "蘭姆酒（Rum）", "伏特加（Vodka）", "琴酒（Gin）"],ans:[1],exp:"莫希托的標準配方：白蘭姆酒+薄荷葉+萊姆汁+糖+蘇打水。"},
+  {id:5023,type:"single",cat:"飲料調製",subj:"08000",text:"「龍舌蘭（Tequila）」是由哪種植物釀造而成？",opts:["仙人掌", "龍舌蘭（Agave）", "甘蔗", "葡萄"],ans:[1],exp:"龍舌蘭酒以墨西哥特定產區的藍色龍舌蘭（Blue Agave）植物的心部釀造而成。"},
+  {id:5024,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種雞尾酒以「伏特加+柳橙汁」為基本配方？",opts:["血腥瑪麗", "螺絲起子（Screwdriver）", "長島冰茶", "瑪格麗特"],ans:[1],exp:"螺絲起子（Screwdriver）基本配方為伏特加+柳橙汁；血腥瑪麗為伏特加+番茄汁。"},
+  {id:5025,type:"single",cat:"飲料調製",subj:"08000",text:"台灣酒類販售規定，下列何者正確？",opts:["任何年齡均可購買酒類", "未滿18歲不得購買酒類", "未滿20歲不得購買酒類", "未滿16歲不得購買酒類"],ans:[1],exp:"依台灣菸酒管理法，未滿18歲者不得購買酒類，販售者違規可處罰鍰。"},
+  {id:5026,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者屬於「釀造啤酒」的主要原料？",opts:["大麥麥芽、啤酒花、酵母、水", "小麥、砂糖、酵母、水", "大麥、葡萄、酵母、水", "玉米、麥芽糖、水、防腐劑"],ans:[0],exp:"啤酒四大原料為大麥麥芽（提供糖分）、啤酒花（苦味和香氣）、酵母（發酵）、水。"},
+  {id:5027,type:"single",cat:"飲料調製",subj:"08000",text:"雞尾酒調製中「Float」技法是指下列何者？",opts:["搖盪混合", "分層漂浮，輕倒在上層不混合", "直接倒入攪拌", "加入奶泡"],ans:[1],exp:"Float技法是將密度較低的酒或飲料輕輕沿湯匙背面倒入，使其漂浮在飲料上層形成分層效果。"},
+  {id:5028,type:"single",cat:"飲料調製",subj:"08000",text:"在飲料吧台衛生管理中，下列何者是正確的做法？",opts:["徒手取用冰塊", "一個杯子裝完多種客人的飲料", "使用冰鏟或冰夾取冰塊", "用嘴吹杯子裡的灰塵"],ans:[2],exp:"正確衛生操作應使用冰鏟或冰夾取用冰塊，避免手部細菌污染食品。"},
+  {id:5029,type:"single",cat:"飲料調製",subj:"08000",text:"飲料店使用的生乳開封後，應在幾小時內使用完畢？",opts:["4小時", "8小時", "24小時", "48小時"],ans:[2],exp:"生鮮鮮乳開封後應在冷藏（7°C以下）的情況下24小時內使用，避免細菌繁殖。"},
+  {id:5030,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是預防食源性疾病的最重要措施？",opts:["食材盡量買貴的", "保持食材和器具的清潔衛生，控制溫度", "使用大量防腐劑", "不提供生食"],ans:[1],exp:"預防食源性疾病最關鍵是維持清潔衛生、控制食材溫度（冷藏或熱食保溫），切斷細菌繁殖條件。"},
+  {id:5031,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製時，員工手部有傷口應如何處理？",opts:["包上OK繃繼續工作", "戴上防水手套後才可接觸食品", "請假休息", "用膠帶纏繞繼續工作"],ans:[1],exp:"手部有傷口時應包紮後戴上防水手套，避免傷口接觸飲料食材，預防細菌污染。"},
+  {id:5032,type:"single",cat:"飲料調製",subj:"08000",text:"冷藏設備的正常保存溫度應在幾度以下？",opts:["0°C", "4°C", "7°C", "10°C"],ans:[2],exp:"依食品安全規定，冷藏設備保存溫度應在7°C以下，以抑制細菌繁殖。"},
+  {id:5033,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者屬於食品良好衛生規範（GHP）的要求？",opts:["員工不需洗手", "廢棄物隨意堆放", "食材先進先出（FIFO）原則", "作業場所不需清掃"],ans:[2],exp:"先進先出（FIFO）原則是GHP的基本要求，確保較早進貨的食材先使用，避免過期。"},
+  {id:5034,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製人員的食品從業人員健康檢查，應至少多久進行一次？",opts:["每月", "每半年", "每年", "每兩年"],ans:[2],exp:"依食品安全衛生管理法，食品從業人員健康檢查至少每年進行一次，有傳染病者不得從事食品工作。"},
+  {id:5035,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種情況下，飲料調製人員應立即停止工作？",opts:["覺得有點累", "患有傳染性皮膚病或A型肝炎等傳染病", "輕微感冒", "工作時間過長"],ans:[1],exp:"患有傳染病（如A型肝炎、諾羅病毒、傳染性皮膚病）的從業人員應立即停止接觸食品工作。"},
+  {id:5036,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製中，1盎司（oz）等於多少毫升（ml）？",opts:["15ml", "20ml", "30ml", "45ml"],ans:[2],exp:"1盎司（oz）約等於30ml，這是酒吧調酒的基本計量單位。"},
+  {id:5037,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是計算飲料成本率的正確公式？",opts:["售價÷原料成本×100%", "原料成本÷售價×100%", "售價-原料成本", "原料成本×數量"],ans:[1],exp:"成本率（食材成本率）= 原料成本 ÷ 售價 × 100%，一般飲料店控制在30%以下。"},
+  {id:5038,type:"single",cat:"飲料調製",subj:"08000",text:"飲料店的「標準食譜（SOP）」主要目的為何？",opts:["讓每杯飲料都有不同口感", "確保每杯飲料品質一致、成本可控", "減少員工薪資", "增加飲料種類"],ans:[1],exp:"標準食譜規範每杯飲料的材料用量和製作步驟，確保品質一致性並有效控制成本。"},
+  {id:5039,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是正確的飲料材料儲存方式？",opts:["糖漿放在高溫陽光直射處", "茶葉開封後存放在密封容器中冷藏", "鮮奶常溫存放一週", "冰塊在常溫下備用"],ans:[1],exp:"茶葉應存放在密封容器中，冷藏或避光保存，以保持香氣和品質，避免受潮或異味污染。"},
+  {id:5040,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製時，「量酒器（Jigger）」的主要用途為何？",opts:["測量飲料溫度", "精準量取液體材料的份量", "過濾飲料", "打奶泡"],ans:[1],exp:"量酒器（Jigger）是量取精確液體份量的工具，確保每杯飲料材料比例一致，通常一端1oz一端1.5oz。"},
+  {id:5041,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是「手搖台」的主要功能？",opts:["加熱飲料", "提供搖晃飲料的平台，使材料充分混合", "清洗杯子", "儲存材料"],ans:[1],exp:"手搖台提供穩定支撐，讓調飲人員能有效率地搖晃雪克杯（shaker），使飲料充分混合冷卻。"},
+  {id:5042,type:"single",cat:"飲料調製",subj:"08000",text:"飲料店使用的「封口機」的主要目的為何？",opts:["加熱飲料", "為外帶飲料杯封上薄膜，防止溢出", "清潔杯子", "計算飲料份量"],ans:[1],exp:"封口機將薄膜熱封在杯口，方便外帶並防止飲料溢出，是台灣手搖飲料店的標準設備。"},
+  {id:5043,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是清潔飲料調製設備的正確順序？",opts:["先沖洗→再清潔劑洗→再沖洗→消毒→晾乾", "先消毒→再清潔劑洗→沖洗→晾乾", "直接用消毒水擦拭即可", "只需用清水沖洗"],ans:[0],exp:"正確清潔步驟：先沖洗去除食物殘渣→清潔劑洗淨→再次沖洗→消毒→自然晾乾。"},
+  {id:5044,type:"single",cat:"飲料調製",subj:"08000",text:"義式咖啡機的蒸汽管（Steam Wand）使用後，應立即做什麼？",opts:["關機冷卻", "用乾布擦拭並用蒸汽噴出殘留牛奶", "拔掉電源", "用水清洗"],ans:[1],exp:"蒸汽管使用後應立即用蒸汽清除管內殘乳，再用濕布擦拭外部，避免牛奶殘留堵塞或滋生細菌。"},
+  {id:5045,type:"single",cat:"飲料調製",subj:"08000",text:"飲料店的製冰機應多久進行一次清潔保養？",opts:["每日", "每週", "每月", "每半年"],ans:[2],exp:"製冰機應至少每月徹底清潔一次，清除水垢和細菌，確保冰塊衛生安全。"},
+  {id:5046,type:"single",cat:"飲料調製",subj:"08000",text:"顧客反映飲料甜度不符期待，飲料調製人員應如何處理？",opts:["告訴顧客自己做的沒有問題", "立即道歉並重新製作符合顧客需求的飲料", "請顧客下次注意說清楚", "忽略顧客反映"],ans:[1],exp:"面對顧客投訴應立即道歉並重新製作，以顧客滿意為優先，維護店家聲譽。"},
+  {id:5047,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者屬於良好的飲料服務禮儀？",opts:["讓顧客等待時不需要解釋", "主動告知等待時間並保持微笑", "不需要確認顧客訂單", "顧客來了不需要打招呼"],ans:[1],exp:"良好服務應主動問候、確認訂單、告知等待時間，讓顧客感受到被重視。"},
+  {id:5048,type:"single",cat:"飲料調製",subj:"08000",text:"飲料調製人員上班時的儀容規定，下列何者正確？",opts:["長髮不需要束起", "戴戒指和手環方便工作", "穿著整潔、髮型整齊、不戴首飾", "塗指甲油更顯專業"],ans:[2],exp:"食品從業人員應保持整潔儀容，長髮束起、不戴首飾（避免混入食品）、不塗指甲油。"},
+  {id:5049,type:"single",cat:"飲料調製",subj:"08000",text:"下列何種飲料需要特別注意對乳糖不耐症顧客的說明？",opts:["黑咖啡", "含奶製品的飲料（如拿鐵、奶茶）", "無糖綠茶", "礦泉水"],ans:[1],exp:"含牛奶或乳製品的飲料需告知乳糖不耐症顧客，應提供替代品（如豆漿或燕麥奶）。"},
+  {id:5050,type:"single",cat:"飲料調製",subj:"08000",text:"飲料店結帳時發現收錯錢，應如何處理？",opts:["假裝沒看到", "立即誠實告知顧客並更正", "等顧客走後再說", "推給其他同事處理"],ans:[1],exp:"收費錯誤應立即誠實告知顧客並更正，這是基本職業道德和誠信要求。"},
+  // ═══ 電腦軟體應用丙級 14100 ═══,
+  {id:6001,type:"single",cat:"電腦應用",subj:"14100",text:"Windows作業系統中，「剪下」的快速鍵為何？",opts:["Ctrl+C", "Ctrl+X", "Ctrl+V", "Ctrl+Z"],ans:[1],exp:"Ctrl+X=剪下，Ctrl+C=複製，Ctrl+V=貼上，Ctrl+Z=復原，是Windows最基本的快速鍵。"},
+  {id:6002,type:"single",cat:"電腦應用",subj:"14100",text:"Windows中，永久刪除檔案（不經資源回收桶）的方式為何？",opts:["直接按Delete鍵", "按Shift+Delete鍵", "右鍵選刪除", "拖曳到資源回收桶"],ans:[1],exp:"Shift+Delete會直接永久刪除檔案，不會將檔案移至資源回收桶，需謹慎使用。"},
+  {id:6003,type:"single",cat:"電腦應用",subj:"14100",text:"Windows中，「工作管理員」可透過下列哪個快速鍵開啟？",opts:["Ctrl+Alt+Delete後選取", "Ctrl+Shift+Esc", "兩者皆可", "以上皆非"],ans:[2],exp:"Ctrl+Alt+Delete顯示選單後選工作管理員，或直接按Ctrl+Shift+Esc可直接開啟工作管理員。"},
+  {id:6004,type:"single",cat:"電腦應用",subj:"14100",text:"檔案副檔名「.docx」屬於下列哪種軟體的文件格式？",opts:["Microsoft Excel", "Microsoft Word", "Microsoft PowerPoint", "記事本"],ans:[1],exp:".docx是Microsoft Word 2007以後的文件格式，舊版為.doc格式。"},
+  {id:6005,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是Windows作業系統的「桌面捷徑」？",opts:["儲存在硬碟的原始程式", "指向原始程式的連結圖示", "複製的程式備份", "暫存的程式檔案"],ans:[1],exp:"桌面捷徑是指向原始程式或檔案的連結，刪除捷徑不會影響原始程式。"},
+  {id:6006,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者不是常見的圖片檔案格式？",opts:["JPG", "PNG", "GIF", "EXE"],ans:[3],exp:".EXE是執行檔格式；.JPG、.PNG、.GIF都是常見的圖片格式。"},
+  {id:6007,type:"single",cat:"電腦應用",subj:"14100",text:"Windows「控制台」中的「新增或移除程式」主要用途為何？",opts:["新增使用者帳號", "安裝或解除安裝軟體程式", "調整螢幕亮度", "設定網路連線"],ans:[1],exp:"控制台的「新增或移除程式」（或程式和功能）用於管理安裝的軟體，包括安裝和解除安裝。"},
+  {id:6008,type:"single",cat:"電腦應用",subj:"14100",text:"電腦螢幕的解析度設定，下列敘述何者正確？",opts:["解析度越低，畫面越清晰", "解析度越高，畫面越清晰，但需要更多GPU運算", "解析度與畫面清晰度無關", "解析度只影響顏色數量"],ans:[1],exp:"解析度越高（如1920x1080比1280x720），每單位面積的像素越多，畫面越細膩清晰。"},
+  {id:6009,type:"single",cat:"電腦應用",subj:"14100",text:"Windows中，「我的文件」資料夾預設儲存在哪裡？",opts:["C槽根目錄", "C:\\Users\\使用者名稱\\Documents", "D槽", "桌面"],ans:[1],exp:"Windows的「文件」資料夾預設路徑為C:\Users\使用者名稱\Documents。"},
+  {id:6010,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種儲存媒體容量通常最大？",opts:["隨身碟（4GB）", "DVD光碟", "外接硬碟（1TB）", "SD記憶卡（32GB）"],ans:[2],exp:"1TB=1024GB，遠大於其他選項的容量。"},
+  {id:6011,type:"single",cat:"電腦應用",subj:"14100",text:"Microsoft Word中，「段落對齊方式」置中對齊的快速鍵為何？",opts:["Ctrl+L", "Ctrl+E", "Ctrl+R", "Ctrl+J"],ans:[1],exp:"Ctrl+E=置中，Ctrl+L=靠左，Ctrl+R=靠右，Ctrl+J=左右對齊。"},
+  {id:6012,type:"single",cat:"電腦應用",subj:"14100",text:"Word文件中，要插入頁碼，應從哪個功能表操作？",opts:["常用", "插入", "版面配置", "檢視"],ans:[1],exp:"頁碼設定在「插入」功能區中，可選擇頁碼位置和格式。"},
+  {id:6013,type:"single",cat:"電腦應用",subj:"14100",text:"Word中「尋找及取代」的快速鍵為何？",opts:["Ctrl+F（尋找）/ Ctrl+H（取代）", "Ctrl+G / Ctrl+K", "Ctrl+A / Ctrl+B", "Ctrl+P / Ctrl+S"],ans:[0],exp:"Ctrl+F開啟尋找功能，Ctrl+H開啟取代功能，可批次替換文件中的文字。"},
+  {id:6014,type:"single",cat:"電腦應用",subj:"14100",text:"Word中，若要設定文件的邊界（頁面邊距），應在哪個索引標籤設定？",opts:["常用", "插入", "版面配置", "校閱"],ans:[2],exp:"版面配置索引標籤包含頁面設定、邊界、方向、大小等設定。"},
+  {id:6015,type:"single",cat:"電腦應用",subj:"14100",text:"Word中插入的「表格」，若要合併儲存格應如何操作？",opts:["直接拖曳", "選取要合併的儲存格後，右鍵選「合併儲存格」", "使用格式刷", "插入另一個表格"],ans:[1],exp:"選取多個儲存格後，點擊右鍵或使用「表格設計」索引標籤中的「合併儲存格」功能。"},
+  {id:6016,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，輸入公式時開頭必須輸入什麼符號？",opts:["@", "#", "=", "$"],ans:[2],exp:"Excel公式必須以「=」開頭，例如=SUM(A1:A10)、=A1+B1等。"},
+  {id:6017,type:"single",cat:"電腦應用",subj:"14100",text:"Excel的SUM函數用於計算下列何者？",opts:["平均值", "最大值", "加總", "計數"],ans:[2],exp:"SUM函數計算指定範圍的數值總和，如=SUM(A1:A10)計算A1到A10的加總。"},
+  {id:6018,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，「$A$1」代表什麼意思？",opts:["相對參照", "絕對參照", "混合參照", "錯誤的格式"],ans:[1],exp:"$A$1是絕對參照，複製公式時列和欄都不會改變；A1是相對參照，會隨複製位置改變。"},
+  {id:6019,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，AVERAGE函數的用途為何？",opts:["計算加總", "計算平均值", "計算最大值", "計算筆數"],ans:[1],exp:"AVERAGE函數計算指定範圍數值的算術平均值，如=AVERAGE(A1:A10)。"},
+  {id:6020,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，要凍結第一列（標題列）使其在捲動時保持顯示，應在哪個功能區設定？",opts:["常用", "插入", "檢視", "資料"],ans:[2],exp:"凍結窗格功能在「檢視」索引標籤中，可凍結首列、首欄或指定位置以上/左側的內容。"},
+  {id:6021,type:"single",cat:"電腦應用",subj:"14100",text:"PowerPoint中，若要讓投影片全螢幕放映，應按下列哪個快速鍵？",opts:["F1", "F5", "F10", "F12"],ans:[1],exp:"F5從第一張投影片開始放映；Shift+F5從目前投影片開始放映。"},
+  {id:6022,type:"single",cat:"電腦應用",subj:"14100",text:"PowerPoint中，「投影片母片」的主要用途為何？",opts:["新增投影片", "統一設定所有投影片的樣式和格式", "插入圖片", "播放投影片"],ans:[1],exp:"投影片母片是整份簡報的設計範本，在母片上的變更會套用到所有套用該版面的投影片。"},
+  {id:6023,type:"single",cat:"電腦應用",subj:"14100",text:"PowerPoint投影片中要插入「動畫效果」，應在哪個索引標籤操作？",opts:["常用", "插入", "動畫", "投影片放映"],ans:[2],exp:"「動畫」索引標籤提供物件進入、強調、離開等動畫效果設定。"},
+  {id:6024,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是電子郵件地址的正確格式？",opts:["username@domain.com", "username#domain.com", "username/domain.com", "username.domain@com"],ans:[0],exp:"電子郵件格式為「使用者名稱@網域名稱」，@符號是必要元素。"},
+  {id:6025,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種行為最容易導致電腦感染病毒？",opts:["定期更新系統", "開啟不明來源的電子郵件附件", "使用正版軟體", "定期備份資料"],ans:[1],exp:"開啟不明來源的電子郵件附件是電腦感染病毒最常見的途徑，應避免開啟來路不明的附件。"},
+  {id:6026,type:"single",cat:"電腦應用",subj:"14100",text:"「釣魚網站（Phishing）」的主要目的為何？",opts:["提供免費軟體", "偽裝成合法網站以騙取帳號密碼等個人資訊", "加速網路瀏覽", "提供優惠購物"],ans:[1],exp:"釣魚網站偽裝成銀行、社群媒體等合法網站，誘騙使用者輸入帳號密碼或個人資訊。"},
+  {id:6027,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是保護個人電腦安全的最佳做法？",opts:["使用生日作為密碼方便記憶", "定期更新作業系統和防毒軟體", "關閉防火牆加速網路速度", "所有帳號使用相同密碼"],ans:[1],exp:"定期更新系統修補安全漏洞，安裝並更新防毒軟體，是保護電腦安全的基本措施。"},
+  {id:6028,type:"single",cat:"電腦應用",subj:"14100",text:"Wi-Fi網路中，「WPA2」是指什麼？",opts:["網路速度標準", "無線網路加密安全協定", "網路頻段", "網路供應商名稱"],ans:[1],exp:"WPA2（Wi-Fi Protected Access 2）是目前廣泛使用的無線網路加密協定，保護Wi-Fi通訊安全。"},
+  {id:6029,type:"single",cat:"電腦應用",subj:"14100",text:"雲端儲存服務（如Google Drive、OneDrive）的主要優點為何？",opts:["儲存容量無限且完全免費", "可在不同裝置存取，並提供備份功能", "不需要網路連線", "比本機硬碟速度更快"],ans:[1],exp:"雲端儲存的優點是跨裝置存取、自動備份、共享方便；通常有免費基本容量，超過需付費。"},
+  {id:6030,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是「IP位址」的正確說明？",opts:["網際網路上電腦的唯一識別地址", "電腦的品牌型號", "電子郵件帳號", "網站名稱"],ans:[0],exp:"IP位址（Internet Protocol Address）是網路上每台設備的唯一識別號碼，如192.168.1.1。"},
+  {id:6031,type:"single",cat:"電腦應用",subj:"14100",text:"電腦的「CPU」代表什麼？",opts:["中央處理器", "繪圖處理器", "記憶體", "硬碟"],ans:[0],exp:"CPU（Central Processing Unit，中央處理器）是電腦的核心運算單元，負責執行程式指令。"},
+  {id:6032,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者屬於「輸出裝置」？",opts:["鍵盤", "滑鼠", "印表機", "麥克風"],ans:[2],exp:"輸出裝置是將電腦處理結果顯示給使用者的設備，如印表機、螢幕、喇叭；鍵盤、滑鼠、麥克風是輸入裝置。"},
+  {id:6033,type:"single",cat:"電腦應用",subj:"14100",text:"電腦關機後資料會消失的儲存裝置為何？",opts:["硬碟（HDD）", "隨身碟", "RAM（記憶體）", "SSD固態硬碟"],ans:[2],exp:"RAM（隨機存取記憶體）是揮發性記憶體，斷電後資料消失；硬碟、隨身碟、SSD為非揮發性儲存。"},
+  {id:6034,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種連接埠（介面）常用於連接滑鼠、鍵盤、隨身碟？",opts:["HDMI", "VGA", "USB", "DisplayPort"],ans:[2],exp:"USB（Universal Serial Bus）是最常用的連接介面，可連接滑鼠、鍵盤、隨身碟等多種週邊設備。"},
+  {id:6035,type:"single",cat:"電腦應用",subj:"14100",text:"電腦「藍色當機畫面（BSOD）」通常表示什麼問題？",opts:["網路連線中斷", "系統發生嚴重錯誤，通常與驅動程式或硬體問題有關", "螢幕亮度過高", "電池電量不足"],ans:[1],exp:"藍色當機畫面（Blue Screen of Death）是Windows系統嚴重錯誤的提示，通常與驅動程式、記憶體或硬體故障有關。"},
+  {id:6036,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是資料備份的最佳實踐原則「3-2-1法則」？",opts:["每天備份3次", "保留3份備份，存放在2種不同媒體，其中1份放在異地", "備份3種格式", "每週備份2次"],ans:[1],exp:"3-2-1備份原則：3份備份（原始+2份）、2種儲存媒體（如硬碟+雲端）、1份異地備份。"},
+  {id:6037,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種檔案格式適合用於文件的最終發布，且能保持格式不被修改？",opts:["DOC", "TXT", "PDF", "XLS"],ans:[2],exp:"PDF格式可保持文件版面格式，在不同設備上顯示一致，且難以隨意修改，適合正式文件發布。"},
+  {id:6038,type:"single",cat:"電腦應用",subj:"14100",text:"電腦中的「資源回收桶」滿了或清空後，原本的檔案會怎樣？",opts:["備份到雲端", "可從其他位置找回", "永久刪除，無法從資源回收桶還原", "自動壓縮"],ans:[2],exp:"清空資源回收桶後，檔案被標記為可覆寫空間，一般方法無法還原，需使用專業救援軟體。"},
+  {id:6039,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是ZIP檔案的主要用途？",opts:["播放音樂", "壓縮多個檔案成一個較小的封存檔", "製作網頁", "編輯圖片"],ans:[1],exp:"ZIP是壓縮格式，可將多個檔案壓縮成一個較小的封存檔，方便傳輸和儲存。"},
+  {id:6040,type:"single",cat:"電腦應用",subj:"14100",text:"使用電腦時，「螢幕截圖」的快速鍵（擷取整個螢幕）為何？",opts:["PrintScreen（PrtSc）", "Ctrl+P", "Ctrl+S", "Alt+F4"],ans:[0],exp:"按PrtSc（Print Screen）鍵可截取整個螢幕並複製到剪貼簿；Windows+Shift+S可截取部分螢幕。"},
+  {id:6041,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種行為違反「著作權法」？",opts:["使用正版軟體", "將網路上的文章完整複製後以自己名義發布", "引用他人作品並標明出處", "創作原創作品"],ans:[1],exp:"未經授權將他人著作完整複製並冒名發布是侵犯著作權的行為，違反著作權法。"},
+  {id:6042,type:"single",cat:"電腦應用",subj:"14100",text:"「個人資料保護法」規定，未經當事人同意，不得任意蒐集、處理或利用他人的個人資料，其立法目的主要為何？",opts:["增加政府收入", "保護個人隱私及資料自主權", "限制網路使用", "規範企業競爭"],ans:[1],exp:"個資法立法目的是保護個人隱私，賦予當事人對自身資料的知情、存取、更正和刪除等權利。"},
+  {id:6043,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種行為屬於「網路霸凌」？",opts:["在網路上分享學習資源", "利用網路散布他人隱私或惡意攻擊特定人士", "在社群媒體分享旅遊照片", "在論壇上提問"],ans:[1],exp:"網路霸凌包含在網路上散布謠言、公開他人隱私、惡意攻擊、騷擾等傷害他人的行為。"},
+  {id:6044,type:"single",cat:"電腦應用",subj:"14100",text:"公司員工私自在工作電腦安裝未授權的破解版軟體，可能面臨何種法律責任？",opts:["民事賠償責任", "刑事責任（著作權法）", "行政罰鍰", "以上皆有可能"],ans:[3],exp:"安裝未授權的盜版軟體可能面臨著作權法的民事賠償、刑事追訴，以及主管機關的行政處分。"},
+  {id:6045,type:"single",cat:"電腦應用",subj:"14100",text:"使用網路時，「隱私權設定」的主要目的為何？",opts:["加快網路速度", "控制個人資訊被收集和分享的範圍", "增加網路安全性", "改善網頁顯示效果"],ans:[1],exp:"隱私權設定讓使用者控制哪些個人資訊可被應用程式或網站收集、儲存和分享。"},
+  {id:6046,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是電子試算表（Excel）中「IF函數」的用途？",opts:["計算數值加總", "根據條件判斷顯示不同結果", "計算平均值", "排序資料"],ans:[1],exp:"IF函數是條件判斷函數，格式為=IF(條件,真值,假值)，根據條件是否成立顯示不同結果。"},
+  {id:6047,type:"single",cat:"電腦應用",subj:"14100",text:"將Word文件儲存為PDF時，以下何者正確？",opts:["無法儲存成PDF", "透過「另存新檔」選擇PDF格式", "必須購買特別軟體", "只能用印表機列印成PDF"],ans:[1],exp:"Word 2007以後版本可透過「另存新檔」或「匯出」功能直接將文件儲存為PDF格式。"},
+  {id:6048,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，要統計某範圍內符合條件的儲存格數量，應使用哪個函數？",opts:["SUM", "COUNT", "COUNTIF", "SUMIF"],ans:[2],exp:"COUNTIF函數統計符合指定條件的儲存格數量，格式為=COUNTIF(範圍,條件)。"},
+  {id:6049,type:"single",cat:"電腦應用",subj:"14100",text:"在PowerPoint中，若要讓所有投影片使用相同的字體和顏色主題，最有效的方式為何？",opts:["逐張投影片手動設定", "使用「佈景主題」或編輯「投影片母片」", "複製貼上格式", "重新建立每張投影片"],ans:[1],exp:"套用佈景主題或在母片中設定，可一次性統一所有投影片的視覺風格，節省大量時間。"},
+  {id:6050,type:"single",cat:"電腦應用",subj:"14100",text:"下列何種密碼設定方式最安全？",opts:["使用生日：19900101", "使用英文名字：john", "使用大小寫字母+數字+符號組合，如：Abc@1234", "使用連續數字：123456"],ans:[2],exp:"安全密碼應包含大寫字母、小寫字母、數字、特殊符號的組合，長度至少8位，且避免個人資訊。"},
+  // ═══ 烘焙食品丙級 09500 ═══,
+  {id:7001,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包時，酵母的主要功能為何？",opts:["增加甜味", "使麵糰發酵產生二氧化碳，讓麵包膨脹", "增加麵包顏色", "防止麵包發霉"],ans:[1],exp:"酵母分解糖分產生二氧化碳和酒精，使麵糰膨脹，賦予麵包鬆軟的口感。"},
+  {id:7002,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是製作蛋糕時，麵粉選擇的主要考量？",opts:["顏色越白越好", "蛋白質含量：海綿蛋糕用低筋麵粉", "麵粉產地", "麵粉品牌"],ans:[1],exp:"蛋糕類使用低筋麵粉（蛋白質8-9%），成品較鬆軟；麵包使用高筋麵粉（蛋白質11-13%）。"},
+  {id:7003,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包時，「鹽」的主要功能為何？",opts:["增加甜味", "調整風味、強化麩質結構、抑制酵母過度發酵", "使麵包膨脹", "增加水分"],ans:[1],exp:"鹽在麵包製作中有多重功能：強化麩質、調節酵母發酵速度、增加風味。"},
+  {id:7004,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者屬於「油脂」在烘焙中的功能？",opts:["使麵糰發酵", "增加麵包的柔軟度和保濕性，延長保鮮", "使產品變酸", "增加脆度（所有產品）"],ans:[1],exp:"油脂（奶油、植物油等）能增加烘焙品的柔軟度、保濕性和風味，延長產品保鮮期。"},
+  {id:7005,type:"single",cat:"烘焙食品",subj:"09500",text:"製作海綿蛋糕時，蛋液打發的目的為何？",opts:["增加甜味", "打入空氣使蛋糕膨脹", "讓蛋液加熱", "讓蛋液更容易攪拌"],ans:[1],exp:"海綿蛋糕的膨脹主要靠打發蛋液時打入的空氣，加熱後氣泡膨脹使蛋糕鬆軟。"},
+  {id:7006,type:"single",cat:"烘焙食品",subj:"09500",text:"「塔塔粉（Cream of Tartar）」在蛋白霜製作中的作用為何？",opts:["增加甜味", "穩定蛋白霜、幫助蛋白打發", "使蛋白顏色更白", "增加香氣"],ans:[1],exp:"塔塔粉是酸性物質，可穩定蛋白霜、幫助蛋白更快打發，並使蛋白霜更白。"},
+  {id:7007,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何種糖在烘焙中吸濕性最強，常用於保持產品濕潤？",opts:["砂糖", "糖粉", "黑糖", "麥芽糖"],ans:[3],exp:"麥芽糖（和葡萄糖）的吸濕性強，常用於月餅等需要保持柔軟口感的烘焙產品。"},
+  {id:7008,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包所使用的「高筋麵粉」，其蛋白質含量約為多少？",opts:["5-7%", "8-9%", "11-13%", "15%以上"],ans:[2],exp:"高筋麵粉蛋白質含量11-13%，形成強韌麩質網路，適合製作麵包；低筋8-9%適合蛋糕。"},
+  {id:7009,type:"single",cat:"烘焙食品",subj:"09500",text:"「泡打粉（Baking Powder）」與「小蘇打粉（Baking Soda）」的主要差異為何？",opts:["泡打粉含有酸性物質，本身可以自行反應；小蘇打需要額外的酸性材料", "兩者完全相同", "小蘇打比泡打粉更強力", "只有顏色不同"],ans:[0],exp:"泡打粉含小蘇打+酸性劑+澱粉，遇液體即可反應；小蘇打需搭配酸性食材（如優格、檸檬汁）才會產生CO2。"},
+  {id:7010,type:"single",cat:"烘焙食品",subj:"09500",text:"製作牛油蛋糕（奶油蛋糕）時，「奶油打發（cream）」步驟的目的為何？",opts:["融化奶油", "將空氣打入奶油使其體積膨脹並變白，賦予蛋糕鬆軟口感", "使奶油降溫", "使奶油顏色更黃"],ans:[1],exp:"奶油打發（cream）是將奶油與糖一起打至膨鬆發白，打入空氣，是磅蛋糕等奶油蛋糕的關鍵步驟。"},
+  {id:7011,type:"single",cat:"烘焙食品",subj:"09500",text:"麵包的「基本發酵（第一次發酵）」結束判斷方式為何？",opts:["麵糰顏色變黃", "麵糰膨脹至原來的2-2.5倍大", "麵糰變硬", "計時器響起"],ans:[1],exp:"基本發酵結束的標準是麵糰膨脹至原來的2至2.5倍，可用手指沾粉插入測試（指孔不回縮即可）。"},
+  {id:7012,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包時，「滾圓」步驟的目的為何？",opts:["增加麵糰甜度", "重新整理麵糰內的麩質結構，排出多餘氣體，形成光滑表面", "讓麵糰變大", "讓麵糰降溫"],ans:[1],exp:"滾圓是將分割後的麵糰重新整形，使表面光滑、麩質重新排列，為後續整形做準備。"},
+  {id:7013,type:"single",cat:"烘焙食品",subj:"09500",text:"麵包烘烤時，表面上色（焦糖化）的主要原因為何？",opts:["油脂融化", "梅納反應和焦糖化反應，使表面呈現金黃色", "酵母繼續發酵", "水分蒸發"],ans:[1],exp:"麵包上色是因為梅納反應（胺基酸+還原糖）和焦糖化反應（糖在高溫分解），賦予金黃色澤和香氣。"},
+  {id:7014,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是判斷麵包烘烤完成的方法？",opts:["按壓底部發出空洞聲", "麵包顏色變深就好", "烤箱計時器響起", "表面出現裂紋"],ans:[0],exp:"敲擊麵包底部，發出空洞響聲表示已熟透；同時麵包應呈金黃色，內部溫度達95-100°C。"},
+  {id:7015,type:"single",cat:"烘焙食品",subj:"09500",text:"製作吐司麵包時，「最後發酵（最終發酵）」的目的為何？",opts:["讓麵包表面硬化", "讓整形後的麵糰再次膨脹，達到適合烘烤的大小", "讓麵包冷卻", "增加麵包甜味"],ans:[1],exp:"最終發酵讓整形後的麵糰恢復並再次膨脹，通常發酵至吐司模8-9分滿，使成品體積適當。"},
+  {id:7016,type:"single",cat:"烘焙食品",subj:"09500",text:"製作戚風蛋糕（Chiffon Cake）時，蛋白和蛋黃需要分開處理，主要原因為何？",opts:["節省時間", "蛋白單獨打發可打入更多空氣，使蛋糕更輕盈", "分開加熱更容易", "蛋黃味道較重需要分開"],ans:[1],exp:"戚風蛋糕蛋白單獨打發成蛋白霜，打入大量空氣，使蛋糕組織特別輕盈細緻。"},
+  {id:7017,type:"single",cat:"烘焙食品",subj:"09500",text:"磅蛋糕（Pound Cake）的名稱由來為何？",opts:["重量約1磅", "傳統配方中麵粉、奶油、糖、蛋各使用1磅（等比例）", "需要烤1小時", "在英國磅莊製作"],ans:[1],exp:"磅蛋糕傳統配方是麵粉:奶油:糖:蛋各1磅，比例1:1:1:1，是最基本的奶油蛋糕。"},
+  {id:7018,type:"single",cat:"烘焙食品",subj:"09500",text:"製作海綿蛋糕時，麵糊加入麵粉後應如何攪拌？",opts:["使用電動攪拌機高速攪拌", "以切拌或翻拌方式輕柔混合，避免消泡", "劇烈攪拌讓麵粉完全溶解", "加熱後再攪拌"],ans:[1],exp:"加入麵粉後需以切拌（fold）方式輕柔混合，過度攪拌會破壞打發的氣泡，導致蛋糕扁塌。"},
+  {id:7019,type:"single",cat:"烘焙食品",subj:"09500",text:"「烘焙百分比（Baker's Percentage）」是以下列何者為基準（100%）？",opts:["糖的重量", "油脂的重量", "麵粉的重量", "水的重量"],ans:[2],exp:"烘焙百分比以麵粉總重量為100%，其他材料的重量以相對於麵粉重量的百分比表示。"},
+  {id:7020,type:"single",cat:"烘焙食品",subj:"09500",text:"蛋糕出爐後立即倒扣，這個步驟主要適用於哪種蛋糕？",opts:["重奶油蛋糕", "磅蛋糕", "戚風蛋糕", "巧克力蛋糕"],ans:[2],exp:"戚風蛋糕出爐後需立即倒扣，利用重力防止蛋糕回縮塌陷，因為其結構較脆弱。"},
+  {id:7021,type:"single",cat:"烘焙食品",subj:"09500",text:"製作泡芙（Choux Pastry）時，麵糊的特殊之處為何？",opts:["不需要加熱", "麵粉在烹煮過程中預先糊化（燙麵），加熱後水蒸氣使外殼膨脹", "不需要加蛋", "只需要麵粉和水"],ans:[1],exp:"泡芙麵糊採燙麵法（將麵粉加入沸騰的油水中燙熟），加熱後水蒸氣在外殼內膨脹，形成空心結構。"},
+  {id:7022,type:"single",cat:"烘焙食品",subj:"09500",text:"「塔皮（Tart Shell）」製作時，加入麵粉前奶油應為何種狀態？",opts:["融化的液態", "冷凍硬塊", "室溫軟化", "沸騰狀態"],ans:[1],exp:"製作酥脆塔皮時，需用冷藏硬奶油與麵粉快速混合成砂狀，避免麩質過度形成，使塔皮酥脆易碎。"},
+  {id:7023,type:"single",cat:"烘焙食品",subj:"09500",text:"千層派皮（Puff Pastry）的膨脹原理為何？",opts:["添加泡打粉", "酵母發酵", "奶油層間的水分蒸發產生蒸汽，使層次分開膨脹", "蛋白打發"],ans:[2],exp:"千層派皮通過反覆折疊包入奶油，烘烤時奶油中的水分汽化，蒸汽撐開麵糰形成層次。"},
+  {id:7024,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何種材料常用於製作奶油霜（Buttercream）裝飾蛋糕？",opts:["澱粉", "砂糖+奶油+蛋（白）", "鮮奶油+明膠", "水+食用色素"],ans:[1],exp:"奶油霜基本材料是奶油+糖粉（義式則需加蛋白/蛋黃+糖漿），打發後可擠花裝飾蛋糕。"},
+  {id:7025,type:"single",cat:"烘焙食品",subj:"09500",text:"製作餅乾時，「鬆弛（Rest）」麵糰的目的為何？",opts:["讓麵糰發酵膨脹", "讓麩質放鬆，防止擀薄後麵糰縮回，且讓油脂重新分佈", "增加甜度", "使麵糰變硬"],ans:[1],exp:"餅乾麵糰經過鬆弛（通常冷藏30分鐘以上），讓麩質放鬆，使後續擀薄、切割更容易。"},
+  {id:7026,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是烘焙從業人員的基本衛生要求？",opts:["工作時可以佩戴戒指", "進入作業場所前應洗手並佩戴帽子", "用口吹氣冷卻產品", "隨意處理廢棄物"],ans:[1],exp:"烘焙作業前應徹底洗手，配戴帽子（防頭髮落入食品），確保食品安全衛生。"},
+  {id:7027,type:"single",cat:"烘焙食品",subj:"09500",text:"烘焙食品的「保存期限」標示，主要依據為何？",opts:["業者任意決定", "依據產品在正常條件下維持品質安全的時間", "越長越好，吸引顧客", "只需標示年份"],ans:[1],exp:"保存期限需依據產品的實際品質安全測試結果標示，過期產品不得販售。"},
+  {id:7028,type:"single",cat:"烘焙食品",subj:"09500",text:"烘焙食品中常見的「蜂蜜蛋糕過濕發霉」問題，主要原因為何？",opts:["蜂蜜添加量不足", "包裝時產品溫度過高（含水蒸氣），或儲存環境潮濕", "烘烤時間不夠", "糖分不足"],ans:[1],exp:"產品未充分冷卻就包裝，或儲存環境濕度過高，都會使蛋糕受潮發霉。"},
+  {id:7029,type:"single",cat:"烘焙食品",subj:"09500",text:"烤箱使用前，「預熱」的主要目的為何？",opts:["節省電力", "確保烤箱達到設定溫度，使產品從一開始就在正確溫度下烘烤", "清潔烤箱", "增加濕度"],ans:[1],exp:"預熱讓烤箱均勻達到所需溫度，確保產品受熱均勻，避免初始溫度不足導致膨脹或上色不均。"},
+  {id:7030,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是正確的烘焙食品食材儲存方式？",opts:["麵粉存放在潮濕的地方", "乾燥材料（麵粉、砂糖）存放在密封容器中，置於乾燥陰涼處", "奶油放在常溫環境", "所有材料一起存放"],ans:[1],exp:"乾燥烘焙材料應密封保存於乾燥陰涼處，防止受潮、蟲害和異味污染。"},
+  {id:7031,type:"single",cat:"烘焙食品",subj:"09500",text:"依食品安全衛生管理法，烘焙食品的包裝標示必須包含下列哪些項目？",opts:["只需產品名稱", "產品名稱、內容物、食品添加物、製造商名稱、地址、保存期限等", "只需保存期限", "只需製造日期"],ans:[1],exp:"依法烘焙食品包裝必須標示：品名、內容物、食品添加物、製造商、地址、原產地、有效日期等。"},
+  {id:7032,type:"single",cat:"烘焙食品",subj:"09500",text:"「過敏原」標示在烘焙食品中的重要性為何？",opts:["只是裝飾性標示", "讓對特定食材過敏的消費者了解產品成分，保護其健康安全", "增加產品售價", "法律規定必須標示但實際上不重要"],ans:[1],exp:"過敏原標示（如小麥、蛋、牛奶、堅果等）是保護過敏消費者的重要安全措施，也是法律要求。"},
+  {id:7033,type:"single",cat:"烘焙食品",subj:"09500",text:"烘焙中，若配方要求使用「全蛋100g」，約需要幾顆雞蛋（每顆帶殼60g，蛋殼約佔10%）？",opts:["1顆", "2顆", "3顆", "4顆"],ans:[1],exp:"每顆雞蛋去殼後約54g（60g×90%），所以100g全蛋約需2顆雞蛋。"},
+  {id:7034,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是「烘焙百分比」計算正確的例子（以麵粉100%計算）？",opts:["若配方為麵粉200g、糖100g，則糖的烘焙百分比為100%", "若配方為麵粉200g、糖100g，則糖的烘焙百分比為50%", "若配方為麵粉200g、糖100g，則糖的烘焙百分比為200%", "以總重量計算"],ans:[1],exp:"烘焙百分比=材料重量÷麵粉重量×100%，100g糖÷200g麵粉×100%=50%。"},
+  {id:7035,type:"single",cat:"烘焙食品",subj:"09500",text:"「法國麵包（Baguette）」與一般軟式麵包最大的不同點為何？",opts:["法國麵包添加較多糖和奶油", "法國麵包配方只有麵粉、水、鹽、酵母，外皮酥脆、內部有氣孔", "法國麵包使用低筋麵粉", "法國麵包不需要發酵"],ans:[1],exp:"法棍（Baguette）是傳統硬式麵包，配方簡單（麵粉、水、鹽、酵母），外皮酥脆、內部多孔洞。"},
+  {id:7036,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者屬於「發酵麵包」？",opts:["墨西哥薄餅（Tortilla）", "酥餅", "貝果（Bagel）", "蔥油餅"],ans:[2],exp:"貝果使用酵母發酵麵糰，整形後先水煮再烘烤；墨西哥薄餅和蔥油餅不使用酵母發酵。"},
+  {id:7037,type:"single",cat:"烘焙食品",subj:"09500",text:"「可頌（Croissant）」屬於下列哪種麵包類型？",opts:["直接法麵包", "裹入油脂的層次麵包（丹麥類）", "全麥麵包", "快速麵包"],ans:[1],exp:"可頌屬於裹入麵包（Laminated Dough），將奶油反覆折入麵糰中形成層次，外皮酥脆多層。"},
+  {id:7038,type:"single",cat:"烘焙食品",subj:"09500",text:"台灣傳統紅豆麵包製作時，包餡步驟應在哪個階段進行？",opts:["基本發酵前", "整形時（分割滾圓後）", "最終發酵時", "烘烤時"],ans:[1],exp:"餡料在整形步驟時包入麵糰，確保餡料均勻分佈，並讓麵糰完整包覆。"},
+  {id:7039,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包時，烤箱內噴蒸汽（蒸汽烘烤）的目的為何？",opts:["增加麵包甜度", "在烘烤初期保持麵包表面濕潤，使其充分膨脹並形成酥脆外皮", "幫助麵包降溫", "增加麵包濕度"],ans:[1],exp:"烘烤初期噴蒸汽（如法棍）可延遲表皮形成，讓麵包充分膨脹，後期蒸汽停止使外皮酥脆。"},
+  {id:7040,type:"single",cat:"烘焙食品",subj:"09500",text:"「直接法」與「中種法」製作麵包的主要差異為何？",opts:["使用的麵粉種類不同", "直接法一次完成所有材料混合；中種法先製作部分麵糰發酵後再加入剩餘材料", "烘烤溫度不同", "兩者完全相同"],ans:[1],exp:"直接法一次混合所有材料；中種法先將部分麵粉和水及酵母製成中種麵糰，先發酵後再加入其餘材料，風味更佳。"},
+  {id:7041,type:"single",cat:"烘焙食品",subj:"09500",text:"製作「布丁（Pudding）」的主要凝固原理為何？",opts:["泡打粉的作用", "蛋白質（蛋）在加熱後凝固", "麵粉糊化", "奶油凝固"],ans:[1],exp:"布丁的凝固靠蛋（蛋白質）在60-80°C的加熱過程中凝固，形成滑嫩質地。"},
+  {id:7042,type:"single",cat:"烘焙食品",subj:"09500",text:"「焦糖（Caramel）」的製作原理為何？",opts:["砂糖與蛋的反應", "砂糖加熱至約160-180°C後焦糖化，形成深琥珀色的焦糖", "砂糖與奶油混合", "砂糖與麵粉反應"],ans:[1],exp:"焦糖是砂糖加熱至160°C以上發生焦糖化反應，糖分子分解形成深色、具有獨特苦甜風味的焦糖。"},
+  {id:7043,type:"single",cat:"烘焙食品",subj:"09500",text:"製作慕斯（Mousse）時，「明膠（吉利丁）」的作用為何？",opts:["增加甜味", "使慕斯凝固定型", "使慕斯膨脹", "增加顏色"],ans:[1],exp:"吉利丁（明膠）是動物性凝膠，溶解後冷卻可使慕斯等甜點凝固定型。"},
+  {id:7044,type:"single",cat:"烘焙食品",subj:"09500",text:"製作「檸檬塔」的凝固檸檬奶油醬（Lemon Curd）時，主要依靠什麼使其變稠？",opts:["澱粉", "蛋黃中的蛋白質遇熱凝固及奶油乳化", "吉利丁", "泡打粉"],ans:[1],exp:"檸檬奶油醬通過加熱使蛋黃蛋白質凝固，並加入奶油形成乳化，使其濃稠。"},
+  {id:7045,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是製作「馬卡龍（Macaron）」時最重要的注意事項？",opts:["需要大量油脂", "杏仁粉必須充分研磨、過篩，蛋白需熟成，濕度控制非常重要", "使用低筋麵粉", "不需要發酵"],ans:[1],exp:"馬卡龍製作非常精細，需要充分研磨的杏仁粉、熟成蛋白（提前分蛋冷藏）、嚴格的濕度控制。"},
+  {id:7046,type:"single",cat:"烘焙食品",subj:"09500",text:"製作麵包時，控制「麵糰終溫（Dough Temperature）」的重要性為何？",opts:["影響麵包顏色", "確保酵母活性適當，使發酵時間和品質穩定一致", "影響麵包甜度", "使麵糰更硬"],ans:[1],exp:"麵糰終溫（通常24-26°C）直接影響酵母發酵速度，終溫過高發酵過快，過低發酵太慢，需精確控制。"},
+  {id:7047,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者屬於「無麩質」烘焙的替代粉類？",opts:["高筋麵粉", "全麥麵粉", "米粉或杏仁粉", "麵包粉"],ans:[2],exp:"米粉、杏仁粉、椰子粉、玉米粉等不含麩質，適合麩質不耐症者（Celiac Disease）使用。"},
+  {id:7048,type:"single",cat:"烘焙食品",subj:"09500",text:"烘焙食品「老化（Staling）」的主要原因為何？",opts:["微生物繁殖", "澱粉回凝（retrogradation），水分散失，使產品變硬", "油脂氧化", "糖分結晶"],ans:[1],exp:"麵包老化主要因澱粉回凝（支鏈澱粉重新結晶）和水分散失導致質地變硬，添加乳化劑可延緩老化。"},
+  {id:7049,type:"single",cat:"烘焙食品",subj:"09500",text:"「隔水加熱（Bain-marie）」技法常用於哪種烘焙情況？",opts:["製作麵包", "融化巧克力或烘烤蛋糕布丁（防止過熱焦糊）", "快速烘烤餅乾", "製作發酵麵糰"],ans:[1],exp:"隔水加熱（水浴法）可溫和均勻加熱，適用於融化巧克力（避免直接加熱焦糊）、烘烤布丁等。"},
+  {id:7050,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是防止餅乾製作時「出筋」（麵糰韌性過強）的方法？",opts:["多加水", "多揉麵", "使用低筋麵粉並且不要過度攪拌", "加入泡打粉"],ans:[2],exp:"餅乾使用低筋麵粉（蛋白質含量低），且避免過度攪拌，可減少麩質生成，使餅乾酥脆易碎。"},
+  // ═══ 22200職安管理乙級 (法規) ═══
+{id:3000,type:"single",cat:"法規",subj:"22200",text:"勞動基準法計算職業災害補償引用「平均工資」一詞，係指災害發生之當日前多久期間內所得工資總額除以該期間之總日數所得之金額",opts:["1個月", "3個月", "6個月", "1年"],ans:[2],exp:"參考22200第1題"},
+  {id:3001,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，勞工每幾日中至少應有一日休息作為例假",opts:["5", "6", "7", "14"],ans:[2],exp:"參考22200第2題"},
+  {id:3002,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，勞工遭受職業災害後，雇主之職業災害補償原則為下列何者",opts:["不論雇主有無過失責任均應予以補償", "視雇主有無過失決定補償與否", "視勞工有無過失決定補償與否", "視勞工是否提出要求決定補償與否"],ans:[0],exp:"參考22200第3題"},
+  {id:3003,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，勞工因職業災害死亡，雇主除給與5個月平均工資喪葬費外，並應一次給予其遺屬多少個月平均工資之死亡補償",opts:["30", "40", "50", "60"],ans:[1],exp:"參考22200第4題"},
+  {id:3004,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，勞工遭遇職業災害死亡，其死亡補償受領之遺屬第一順位為下列何者",opts:["父母", "配偶及子女", "祖父母", "兄弟姊妹"],ans:[1],exp:"參考22200第5題"},
+  {id:3005,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法施行細則規定，勞工因職業災害死亡，雇主應於幾日內給予其遺屬喪葬費",opts:["3", "5", "10", "15"],ans:[0],exp:"參考22200第6題"},
+  {id:3006,type:"single",cat:"法規",subj:"22200",text:"依勞工請假規則規定，下列何者有誤",opts:["婚假8日工資照給", "養父母喪亡喪假6日工資照給", "普通傷病假未住院者1年內合計不超過30日", "事假不給工資1年內合計不超過14日"],ans:[1],exp:"參考22200第7題"},
+  {id:3009,type:"single",cat:"法規",subj:"22200",text:"依勞工保險條例規定，普通事故保險之分類及其給付種類，不包括下列何者",opts:["生育", "傷病", "失能", "醫療"],ans:[3],exp:"參考22200第10題"},
+  {id:3018,type:"single",cat:"法規",subj:"22200",text:"下列何者非勞動檢查法明定之立法目的",opts:["貫徹勞動法令之執行", "人力發展", "安定社會", "發展經濟"],ans:[1],exp:"參考22200第19題"},
+  {id:3021,type:"single",cat:"法規",subj:"22200",text:"勞動檢查員執行下列何種職務，不得事前通知事業單位",opts:["危險性工作場所審查或檢查", "危險性機械或設備檢查", "職業災害檢查", "專案檢查"],ans:[3],exp:"參考22200第22題"},
+  {id:3022,type:"single",cat:"法規",subj:"22200",text:"對於事業單位有違反勞動法令規定之檢查結果，勞動檢查機構應於幾日內以書面通知立即改正或限期改善",opts:["5", "8", "10", "15"],ans:[2],exp:"參考22200第23題"},
+  {id:3023,type:"single",cat:"法規",subj:"22200",text:"經勞動檢查機構以書面通知之檢查結果，事業單位應於該違規場所顯明易見處公告幾日以上",opts:["7", "10", "15", "30"],ans:[0],exp:"參考22200第24題"},
+  {id:3024,type:"single",cat:"法規",subj:"22200",text:"下列何者不屬於職業安全衛生法所稱之職業災害",opts:["勞工於噴漆時有機溶劑中毒", "勞工因工作罹患疾病", "勞工為修理機器感電死亡", "化學工廠爆炸致居民死傷多人"],ans:[3],exp:"參考22200第25題"},
+  {id:3026,type:"single",cat:"法規",subj:"22200",text:"職業安全衛生法之中央主管機關為下列何者",opts:["內政部", "行政院國家永續發展委員會", "勞動部", "衛生福利部"],ans:[2],exp:"參考22200第27題"},
+  {id:3030,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生法規定，在高溫場所工作之勞工，雇主不得使其每日工作時間超過多少小時",opts:["4", "5", "6", "7"],ans:[2],exp:"參考22200第31題"},
+  {id:3031,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生法規定，僱用勞工時應施行下列何種檢查",opts:["體格檢查", "定期健康檢查", "特殊健康檢查", "其他經中央主管機關指定之健康檢查"],ans:[0],exp:"參考22200第32題"},
+  {id:3036,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生法規定，事業單位與承攬人、再承攬人分別僱用勞工共同作業時，應由何者指定工作場所負責人擔任統一指揮及協調工作",opts:["承攬人", "再承攬人", "原事業單位", "檢查機構"],ans:[2],exp:"參考22200第37題"},
+  {id:3040,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生法規定，事業單位工作場所如發生職業災害，應由下列何者會同勞工代表實施調查、分析及作成紀錄",opts:["勞動檢查機構", "警察局", "縣市政府", "雇主"],ans:[3],exp:"參考22200第41題"},
+  {id:3044,type:"single",cat:"法規",subj:"22200",text:"職業安全衛生法規所稱重傷之災害，指造成罹災者肢體或器官嚴重受損，危及生命或造成其身體機能嚴重喪失，且住院治療連續達幾小時以上",opts:["4", "8", "12", "24"],ans:[3],exp:"參考22200第45題"},
+  {id:3053,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，建築物工作室之樓地板至天花板淨高應在多少公尺以上",opts:["2", "2.1", "2.8", "3"],ans:[1],exp:"參考22200第54題"},
+  {id:3055,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，機械間或其他設備間之通道不得小於多少公分",opts:["60", "75", "80", "90"],ans:[2],exp:"參考22200第56題"},
+  {id:3060,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，下列有關固定梯使用應符合之條件，何者有誤",opts:["踏條應等間隔", "梯腳與地面之角度應在75度以上", "不得有妨礙工作人員通行的障礙物", "應有防止梯子移位之措施"],ans:[1],exp:"參考22200第61題"},
+  {id:3063,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，起重機具所使用之鉤環，其安全係數應在多少以上",opts:["2", "3", "4", "5"],ans:[2],exp:"參考22200第64題"},
+  {id:3065,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，多少公斤以上之物品宜以人力車輛或工具搬運為原則",opts:["40", "45", "50", "55"],ans:[0],exp:"參考22200第66題"},
+  {id:3071,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，可燃性氣體及氧氣之容器，應保持容器之溫度在攝氏幾度以下",opts:["36", "38", "40", "45"],ans:[2],exp:"參考22200第72題"},
+  {id:3073,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，合梯梯腳與地面之角度應在多少度以內",opts:["30", "45", "60", "75"],ans:[3],exp:"參考22200第74題"},
+  {id:3076,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，良導體機械設備內之檢修工作所用之手提式照明燈具，其使用之電壓不得超過多少伏特",opts:["12", "18", "24", "60"],ans:[2],exp:"參考22200第77題"},
+  {id:3081,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，勞工暴露之噪音音壓級增加多少分貝時，其工作日容許暴露時間減半",opts:["2", "3", "5", "7"],ans:[2],exp:"參考22200第82題"},
+  {id:3082,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，勞工暴露衝擊性噪音峰值不得超過多少分貝",opts:["85", "90", "115", "140"],ans:[3],exp:"參考22200第83題"},
+  {id:3083,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，噪音超過多少分貝之工作場所，應標示並公告噪音危害之預防事項，使勞工周知",opts:["80", "85", "90", "95"],ans:[2],exp:"參考22200第84題"},
+  {id:3086,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生設施規則規定，有關一般辦公場所之人工照明，應至少達多少米燭光",opts:["50", "100", "200", "300"],ans:[3],exp:"參考22200第87題"},
+  {id:3088,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，醫療保健服務業勞工人數多少人以上者，應設職業安全衛生管理單位",opts:["50", "100", "300", "500"],ans:[2],exp:"參考22200第89題"},
+  {id:3091,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，勞工人數至少在多少人以上之事業單位，擔任職業安全衛生業務主管者，應受甲種職業安全衛生業務主管安全衛生教育訓練",opts:["30", "100", "200", "300"],ans:[1],exp:"參考22200第92題"},
+  {id:3092,type:"single",cat:"法規",subj:"22200",text:"事業單位勞工人數未滿幾人者，其應置之職業安全衛生業務主管，得由事業經營負責人或其代理人擔任",opts:["10", "30", "50", "100"],ans:[1],exp:"參考22200第93題"},
+  {id:3096,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，職業安全衛生委員會應置委員幾人以上",opts:["3", "5", "7", "9"],ans:[2],exp:"參考22200第97題"},
+  {id:3097,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，職業安全衛生委員會之委員中由工會推派或勞工推選之代表應佔委員人數之多少以上",opts:["二分之一", "三分之一", "四分之一", "五分之一"],ans:[1],exp:"參考22200第98題"},
+  {id:3098,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，職業安全衛生委員會應每幾個月舉行會議1次",opts:["1", "2", "3", "4"],ans:[2],exp:"參考22200第99題"},
+  {id:3099,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，事業單位勞工在多少人以上時，雇主應訂定職業安全衛生管理規章",opts:["30", "50", "100", "300"],ans:[2],exp:"參考22200第100題"},
+  {id:3110,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生管理辦法規定，定期檢查、重點檢查之紀錄應保存幾年以上",opts:["1", "2", "3", "4"],ans:[2],exp:"參考22200第111題"},
+  {id:3112,type:"single",cat:"法規",subj:"22200",text:"雇主僱用勞工人數未滿30人者，應使擔任職業安全衛生業務主管者接受何種職業安全衛生業務主管安全衛生教育訓練",opts:["甲種", "乙種", "丙種", "丁種"],ans:[2],exp:"參考22200第113題"},
+  {id:3113,type:"single",cat:"法規",subj:"22200",text:"僱用勞工人數在30人以上未滿100人之事業擔任職業安全衛生業務主管應接受何種教育訓練",opts:["甲種職業安全衛生業務主管", "乙種職業安全衛生業務主管", "丙種職業安全衛生業務主管", "職業安全衛生管理員"],ans:[1],exp:"參考22200第114題"},
+  {id:3115,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生教育訓練規則規定，訓練單位辦理缺氧作業或有機溶劑作業等有害作業主管安全衛生教育訓練時，其訓練時數均不得少於多少小時",opts:["6", "18", "24", "30"],ans:[1],exp:"參考22200第116題"},
+  {id:3118,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生教育訓練規則規定，訓練單位辦理使用起重機具從事吊掛作業人員特殊作業安全衛生教育訓練時，其訓練時數不得少於多少小時",opts:["6", "18", "24", "30"],ans:[1],exp:"參考22200第119題"},
+  {id:3121,type:"single",cat:"法規",subj:"22200",text:"辦理新僱勞工一般安全衛生教育訓練時，其訓練時數依職業安全衛生教育訓練規則不得少於多少小時",opts:["3", "6", "12", "18"],ans:[0],exp:"參考22200第122題"},
+  {id:3129,type:"single",cat:"法規",subj:"22200",text:"依勞工健康保護規則規定，第一類事業之事業單位勞工人數多少人以上時，應聘專任職業醫學科專科醫師1人",opts:["3000", "5000", "6000", "8000"],ans:[2],exp:"參考22200第130題"},
+  {id:3130,type:"single",cat:"法規",subj:"22200",text:"依勞工健康保護規則規定，事業單位之同一工作場所，勞工總人數在多少人以上者，應視該場所之規模及性質，僱用從事勞工健康服務之護理人員",opts:["100", "300", "500", "1000"],ans:[1],exp:"參考22200第131題"},
+  {id:3132,type:"single",cat:"法規",subj:"22200",text:"依勞工健康保護規則規定，勞工人數為345人之事業單位，至少應有多少位合格之急救人員",opts:["4", "5", "6", "7"],ans:[2],exp:"參考22200第133題"},
+  {id:3198,type:"single",cat:"法規",subj:"22200",text:"依缺氧症預防規則規定，缺氧危險作業場所係指空氣中氧氣濃度未達多少%之場所",opts:["14", "16", "18", "20"],ans:[2],exp:"參考22200第199題"},
+  {id:3280,type:"single",cat:"法規",subj:"22200",text:"下列何者為有機溶劑中毒預防規則所列之第一種有機溶劑",opts:["四氯化碳", "甲苯", "異丙醇", "丙酮"],ans:[0],exp:"參考22200第281題"},
+  {id:3289,type:"single",cat:"法規",subj:"22200",text:"下列何者為單純窒息性物質",opts:["甲烷", "一氧化碳", "氰化氫", "硫化氫"],ans:[0],exp:"參考22200第290題"},
+  {id:3200,type:"single",cat:"計畫管理",subj:"22200",text:"下列有關臺灣職業安全衛生管理系統驗證的敘述，何者正確",opts:["為自願性驗證", "通過驗證即可免接受勞動檢查", "高風險事業單位須優先通過驗證", "申請驗證須向勞動部繳費"],ans:[0],exp:"參考22200第1題"},
+  {id:3203,type:"single",cat:"計畫管理",subj:"22200",text:"下列何者為臺灣職業安全衛生管理系統之簡稱",opts:["VPP", "OHSAS 18001", "TOSHMS", "TS"],ans:[2],exp:"參考22200第4題"},
+  {id:3204,type:"single",cat:"計畫管理",subj:"22200",text:"下列何者為臺灣職業安全衛生管理系統指引之主要架構及依據",opts:["ILO-OSH", "OHSAS18002", "ISO18002", "ISO14001"],ans:[0],exp:"參考22200第5題"},
+  {id:3215,type:"single",cat:"計畫管理",subj:"22200",text:"依臺灣職業安全衛生管理系統指引所定預防與控制措施，其排列第一優先的預防及控制措施為下列何者",opts:["設置護欄及護蓋", "提供個人防護具", "實施教育訓練", "源頭消除危害及風險"],ans:[3],exp:"參考22200第16題"},
+  {id:3220,type:"single",cat:"計畫管理",subj:"22200",text:"職業安全衛生管理系統中之主要項目中，首先必須要有下列何者",opts:["稽核", "組織", "控制", "政策"],ans:[3],exp:"參考22200第21題"},
+  {id:3221,type:"single",cat:"計畫管理",subj:"22200",text:"職業安全衛生管理系統中之安全衛生政策，最重要應由下列何者承諾",opts:["安全衛生人員", "雇主", "勞工", "第一線之主管"],ans:[1],exp:"參考22200第22題"},
+  {id:3222,type:"single",cat:"計畫管理",subj:"22200",text:"職業安全衛生管理系統所強調的P-D-C-A管理循環，係指哪些管理功能",opts:["規劃－實施－檢查－改進", "程序－執行－改進－考核", "規劃－發展－確認－改進", "計畫－檢討－執行－回饋"],ans:[0],exp:"參考22200第23題"},
+  {id:3224,type:"single",cat:"計畫管理",subj:"22200",text:"依職業安全衛生法施行細則規定，下列何者非職業安全衛生管理計畫應包含之安全衛生事項",opts:["安全衛生教育訓練", "安全衛生資訊之蒐集、分享及運用", "工作時間規劃", "個人防護具之管理"],ans:[2],exp:"參考22200第25題"},
+  {id:3226,type:"single",cat:"計畫管理",subj:"22200",text:"依職業安全衛生法施行細則所定職業安全衛生管理計畫，包括幾款安全衛生事項",opts:["16", "14", "12", "10"],ans:[0],exp:"參考22200第27題"},
+  {id:3229,type:"single",cat:"計畫管理",subj:"22200",text:"依職業安全衛生管理辦法規定，勞工人數在多少人以下之事業單位，得以安全衛生管理執行紀錄或文件代替職業安全衛生管理計畫",opts:["30", "50", "100", "300"],ans:[0],exp:"參考22200第30題"},
+  {id:3232,type:"single",cat:"計畫管理",subj:"22200",text:"針對某特殊狀況需要或實施操作效率試驗等進行之變更，此等變更必須清楚界定變更之期間，且於期滿時，恢復變更前之狀況稱之為何種變更",opts:["緊急性變更", "暫時性變更", "永久性變更", "同型變更"],ans:[1],exp:"參考22200第33題"},
+  {id:3235,type:"single",cat:"計畫管理",subj:"22200",text:"一件不希望發生的事故，雖然沒有造成損失，但顯示其潛在可能造成傷害或損失的事故，稱之為下列何者",opts:["輕微事故", "急救事故", "虛驚事故", "失能事故"],ans:[2],exp:"參考22200第36題"},
+  {id:3245,type:"single",cat:"計畫管理",subj:"22200",text:"自動檢查計畫係由下列何者核定",opts:["安全衛生業務主管", "各部門主管", "職業代表", "雇主"],ans:[3],exp:"參考22200第46題"},
+  {id:3249,type:"single",cat:"計畫管理",subj:"22200",text:"下列何者不是職業安全衛生法規定協議組織應協議之事項",opts:["承攬人勞工薪資", "從事動火、高架、開挖、爆破、高壓電活線等危險作業之管制", "對進入密閉空間、有害物質作業等作業環境之作業管制", "電氣機具入廠管制"],ans:[0],exp:"參考22200第50題"},
+  {id:3253,type:"single",cat:"計畫管理",subj:"22200",text:"依職業安全衛生管理辦法規定，事業單位勞工在多少人以上時，雇主應訂定職業安全衛生管理規章",opts:["30", "50", "100", "300"],ans:[2],exp:"參考22200第54題"},
+  {id:3256,type:"single",cat:"計畫管理",subj:"22200",text:"事業單位經有關人員擬定職業安全衛生管理規章後，應請下列何者核定後實施之",opts:["職業安全衛生人員", "部門主管", "雇主", "工會（職業）代表"],ans:[2],exp:"參考22200第57題"},
+  {id:3259,type:"single",cat:"計畫管理",subj:"22200",text:"僱用勞工從事作業時，於各項職業安全衛生管理措施中，應報請勞動檢查機構備查者為何",opts:["安全衛生管理計畫", "實施勞工體格檢查結果", "新僱勞工之安全衛生教育訓練", "安全衛生工作守則"],ans:[3],exp:"參考22200第60題"},
+  {id:3260,type:"single",cat:"計畫管理",subj:"22200",text:"訂定安全衛生工作守則時，下列敘述何者有誤",opts:["要有勞工代表會同訂定", "訂定後要報經勞動檢查機構備查", "屬於雇主責任不得轉嫁給勞工", "只要合理即可不需考慮其可行性"],ans:[3],exp:"參考22200第61題"},
+  {id:3263,type:"single",cat:"計畫管理",subj:"22200",text:"依職業安全衛生法施行細則規定，會同訂定安全衛生工作守則及參與實施職業災害調查分析之勞工代表的推派或推選，依優先順序，其第一優先為下列何者",opts:["由勞資會議之勞方代表推選", "由工會推派", "由全體員工推選", "由雇主派任"],ans:[1],exp:"參考22200第64題"},
+  {id:3266,type:"single",cat:"計畫管理",subj:"22200",text:"主管人員藉觀察屬下工作步驟，分析作業實況，以發掘作業場所潛在的危險及可能的危害，經協商、討論、修正而建立安全的工作方法，稱為下列何者",opts:["安全作業標準", "安全觀察", "風險管理", "工作安全分析"],ans:[3],exp:"參考22200第67題"},
+  {id:3267,type:"single",cat:"計畫管理",subj:"22200",text:"經由工作安全分析，建立正確工作程序，以消除工作時的不安全行為，設備與環境，確保工作安全的標準，稱為下列何者",opts:["安全作業標準", "安全觀察", "風險管理", "工作安全分析"],ans:[0],exp:"參考22200第68題"},
+  {id:3269,type:"single",cat:"計畫管理",subj:"22200",text:"下列工作安全分析中何者為最後一個程序",opts:["尋求避免危害及可能發生事故的方法", "決定要分析的工作", "找出危害及可能發生的事故", "將工作分解成若干步驟"],ans:[0],exp:"參考22200第70題"},
+  {id:3272,type:"single",cat:"計畫管理",subj:"22200",text:"工作安全分析的分析者通常為下列何者",opts:["事業經營負責人", "廠長", "急救人員", "領班"],ans:[3],exp:"參考22200第73題"},
+  {id:3273,type:"single",cat:"計畫管理",subj:"22200",text:"工作安全分析的初核者為何人",opts:["事業經營負責人", "廠長", "職業安全衛生人員", "領班"],ans:[2],exp:"參考22200第74題"},
+  {id:3279,type:"single",cat:"計畫管理",subj:"22200",text:"工作安全分析過程中，詳細觀察、記錄作業中的危害，並採取適當的工作方法和程序，以防止危害發生，是下列那項工作安全分析的目的",opts:["作為員工在職訓練的方法", "確立工作安全所需的資格條件", "作為安全觀察的參考資料", "發現及杜絕工作危害"],ans:[3],exp:"參考22200第80題"},
+  {id:3286,type:"single",cat:"計畫管理",subj:"22200",text:"製作安全作業標準時，下列何者為首要步驟",opts:["確認實際工作步驟", "不安全因素", "可能造成之傷害", "事故處理之方法"],ans:[0],exp:"參考22200第87題"},
+  {id:3381,type:"single",cat:"計畫管理",subj:"22200",text:"下列何者為實施工作場所風險評估之第一步驟",opts:["決定控制方法", "危害辨識", "採取控制措施", "計算風險等級"],ans:[1],exp:"參考22200第182題"},
+  {id:3382,type:"single",cat:"計畫管理",subj:"22200",text:"風險評估方法以簡單的公式描述為下列何者",opts:["風險x暴露=危害", "風險x危害=評估", "危害x暴露=風險", "危害x風險=暴露"],ans:[2],exp:"參考22200第183題"},
+  {id:3383,type:"single",cat:"計畫管理",subj:"22200",text:"將災害發生要素有系統地以一定之順序、型態分析各要素間之關係的方法，為下列何者",opts:["檢核表", "故障樹分析法", "危害評估分析法", "初步危害分析法"],ans:[1],exp:"參考22200第184題"},
+  {id:3389,type:"single",cat:"計畫管理",subj:"22200",text:"下列有關危害辨識之敘述何者正確",opts:["無須參考作業環境監測之結果", "應指定勞工單獨限時完成", "以往事故已經發生過者無須再辨識", "事業單位應依安全衛生法規要求選擇適合方法執行危害辨識"],ans:[3],exp:"參考22200第190題"},
+  {id:3392,type:"single",cat:"計畫管理",subj:"22200",text:"危害辨識係指下列何者",opts:["辨識工作場所的潛在危害", "考量危害後果的嚴重度與發生的可能性", "評估其風險等級", "採取降低風險的控制設施"],ans:[0],exp:"參考22200第193題"},
+  {id:3546,type:"single",cat:"計畫管理",subj:"22200",text:"不安全動作、不安全設備是屬於職業災害發生的何種原因",opts:["直接原因", "間接原因", "基本原因", "不確定原因"],ans:[1],exp:"參考22200第347題"},
+  {id:3548,type:"single",cat:"計畫管理",subj:"22200",text:"職業災害發生，係因安全衛生管理不良，屬下列何種原因",opts:["基本原因", "直接原因", "間接原因", "天災"],ans:[0],exp:"參考22200第349題"},
+  {id:3554,type:"single",cat:"計畫管理",subj:"22200",text:"職業災害統計，有關失能傷害頻率計算公式，下列何者正確",opts:["失能傷害人次數乘以10乘以總經歷工時", "失能傷害人次數乘以10除以總經歷工時", "總損失日數乘以10乘以總經歷工時", "總損失日數乘以10除以總經歷工時"],ans:[1],exp:"參考22200第355題"},
+  {id:3555,type:"single",cat:"計畫管理",subj:"22200",text:"勞工發生職業傷害在一次事故中，有一手指截斷，失去原有機能，依規定為下列何種職業傷害類型",opts:["永久全失能", "永久部分失能", "暫時全失能", "輕傷害事故"],ans:[1],exp:"參考22200第356題"},
+  {id:3557,type:"single",cat:"計畫管理",subj:"22200",text:"勞工因工作傷害雙目失明，依國家標準(CNS)其損失日數為多少日",opts:["3000", "4000", "5000", "6000"],ans:[3],exp:"參考22200第358題"},
+  {id:3558,type:"single",cat:"計畫管理",subj:"22200",text:"所謂失能傷害係指損失日數在多少日以上",opts:["1", "2", "3", "4"],ans:[0],exp:"參考22200第359題"},
+  {id:3559,type:"single",cat:"計畫管理",subj:"22200",text:"勞工在一次事故中受傷使雙眼失明是屬下列何者",opts:["輕傷害", "暫時全失能", "永久部分失能", "永久全失能"],ans:[3],exp:"參考22200第360題"},
+  {id:3560,type:"single",cat:"計畫管理",subj:"22200",text:"我國失能傷害嚴重率係指多少工作時數所發生之失能損失日數",opts:["一萬", "十萬", "百萬", "千萬"],ans:[2],exp:"參考22200第361題"},
+  {id:3562,type:"single",cat:"計畫管理",subj:"22200",text:"四用氣體偵測器無法偵測下列何種氣體之濃度",opts:["硫化氫", "一氧化碳", "氧氣", "氮氣"],ans:[3],exp:"參考22200第363題"},
+  {id:3575,type:"single",cat:"計畫管理",subj:"22200",text:"噪音測定儀器上有A.B.C.D四個權衡電網供做選擇，若要評估噪音對人耳之危害，應使用何種權衡電網",opts:["A", "B", "C", "D"],ans:[0],exp:"參考22200第376題"},
+  {id:3576,type:"single",cat:"計畫管理",subj:"22200",text:"表示噪音音壓級之單位為下列何者",opts:["赫茲(Hz)", "分貝(dB)", "每秒米(m/s)", "公分(cm)"],ans:[1],exp:"參考22200第377題"},
+  {id:3595,type:"single",cat:"計畫管理",subj:"22200",text:"下列何種通風設備可用於第一種有機溶劑之室內作業場所",opts:["局部排氣", "整體換氣", "自然換氣", "溫差換氣"],ans:[0],exp:"參考22200第396題"},
+  {id:3596,type:"single",cat:"計畫管理",subj:"22200",text:"能使有害物在其發生源處未擴散前，即加以排除的工程控制方法為下列何者",opts:["整體換氣", "熱對流換氣", "自然通風", "局部排氣"],ans:[3],exp:"參考22200第397題"},
+  {id:3603,type:"single",cat:"計畫管理",subj:"22200",text:"排氣量相同時，制控效果最好之局部排氣裝置氣罩為下列何者",opts:["手套箱式", "崗亭式", "外裝式", "吹吸式"],ans:[0],exp:"參考22200第404題"},
+  {id:3614,type:"single",cat:"計畫管理",subj:"22200",text:"局部排氣裝置之動力源，係指下列何者",opts:["氣罩", "排氣機", "導管", "排氣口"],ans:[1],exp:"參考22200第415題"},
+  {id:3401,type:"single",cat:"專業課程",subj:"22200",text:"下列敘述何者有誤",opts:["滿18歲可以從事橡膠化合物之滾輾作業", "高溫場所每日工作時間不得高於4小時", "新進勞工應施行體格檢查", "勞工代表應優先由工會推派之"],ans:[1],exp:"參考22200第2題"},
+  {id:3403,type:"single",cat:"專業課程",subj:"22200",text:"有關堆高機搬運作業，下列何者為非",opts:["載物行駛中可搭乘人員", "作業前應實施檢點", "作業完畢人員離開座位時應關閉動力並拉上手煞車", "載貨荷重不得超過該機械所能承受最大荷重"],ans:[0],exp:"參考22200第4題"},
+  {id:3405,type:"single",cat:"專業課程",subj:"22200",text:"人體墜落是屬於何種危害因子",opts:["物理性", "化學性", "生物性", "人因性"],ans:[0],exp:"參考22200第6題"},
+  {id:3407,type:"single",cat:"專業課程",subj:"22200",text:"將要與不要的物品加以區分，是指5S中之下列何者",opts:["整理", "整頓", "清掃", "清潔"],ans:[0],exp:"參考22200第8題"},
+  {id:3408,type:"single",cat:"專業課程",subj:"22200",text:"需要的物品要能很快的拿到，是指5S中之下列何者",opts:["整頓", "整理", "清掃", "清潔"],ans:[0],exp:"參考22200第9題"},
+  {id:3409,type:"single",cat:"專業課程",subj:"22200",text:"對於經常使用手部從事劇烈局部振動作業時，易造成下列何種職業病",opts:["白指症", "皮膚病", "高血壓", "中風"],ans:[0],exp:"參考22200第10題"},
+  {id:3410,type:"single",cat:"專業課程",subj:"22200",text:"人力搬運時應儘量利用人體之何部位",opts:["腿肌", "手肌", "腳肌", "肩肌"],ans:[0],exp:"參考22200第11題"},
+  {id:3423,type:"single",cat:"專業課程",subj:"22200",text:"下列何者防止感電效果最佳",opts:["感電防止用漏電斷路器", "無熔絲開關", "保險絲", "消弧開關"],ans:[0],exp:"參考22200第24題"},
+  {id:3424,type:"single",cat:"專業課程",subj:"22200",text:"漏電斷路器之性能中，高感應型者係指額定動作電流在多少毫安培以下",opts:["30", "35", "40", "45"],ans:[0],exp:"參考22200第25題"},
+  {id:3433,type:"single",cat:"專業課程",subj:"22200",text:"接地之目的為何",opts:["防止短路", "防止絕緣破壞", "防止感電", "節省電力"],ans:[2],exp:"參考22200第34題"},
+  {id:3434,type:"single",cat:"專業課程",subj:"22200",text:"下列有關電氣安全之敘述何者錯誤",opts:["電氣火災時用泡沫滅火器灌救", "不可用濕手操作開關", "更換保險絲等由合格電氣技術人員操作之", "非從事電氣有關人員不得進入電氣室"],ans:[0],exp:"參考22200第35題"},
+  {id:3438,type:"single",cat:"專業課程",subj:"22200",text:"通電之電氣設備所引起之火災，稱為下列何類火災",opts:["甲(A)", "乙(B)", "丙(C)", "丁(D)"],ans:[2],exp:"參考22200第39題"},
+  {id:3441,type:"single",cat:"專業課程",subj:"22200",text:"電氣安全中，下列何者為靜電危害防止對策",opts:["乾燥", "接地", "使用非導電性之材料", "使成為帶電體"],ans:[1],exp:"參考22200第42題"},
+  {id:3444,type:"single",cat:"專業課程",subj:"22200",text:"消除靜電的有效方法為下列何者",opts:["隔離", "摩擦", "接地", "絕緣"],ans:[2],exp:"參考22200第45題"},
+  {id:3447,type:"single",cat:"專業課程",subj:"22200",text:"下列何種裝置可以預防木材加工用圓盤鋸鋸切木條時反撥",opts:["撐縫片", "自動護罩", "手工具送料", "光電監視"],ans:[0],exp:"參考22200第48題"},
+  {id:3453,type:"single",cat:"專業課程",subj:"22200",text:"以下所列舉之機械，何者未有型式檢定制度",opts:["動力衝剪機械", "木材加工用鑽孔機", "動力堆高機", "研磨機"],ans:[1],exp:"參考22200第54題"},
+  {id:3459,type:"single",cat:"專業課程",subj:"22200",text:"依機械設備器具安全標準規定，堆高機頂蓬上框開口處寬度或長度，應不得超過多少公分",opts:["12", "14", "16", "18"],ans:[2],exp:"參考22200第60題"},
+  {id:3462,type:"single",cat:"專業課程",subj:"22200",text:"往復機件與固定物之間，會造成下列何種危險",opts:["捲入", "跌倒", "反彈", "擠夾"],ans:[3],exp:"參考22200第63題"},
+  {id:3464,type:"single",cat:"專業課程",subj:"22200",text:"操作車床時，其主要危險為下列何者",opts:["火災爆炸", "粉塵危害", "被夾、被捲", "墜落"],ans:[2],exp:"參考22200第65題"},
+  {id:3467,type:"single",cat:"專業課程",subj:"22200",text:"衝剪機械之滑塊在動作中，遇身體之一部接近危險界限時，能使滑塊等停止動作者，為下列何種型式之安全裝置",opts:["防護式", "感應式", "拉開式", "雙手操作式"],ans:[1],exp:"參考22200第68題"},
+  {id:3469,type:"single",cat:"專業課程",subj:"22200",text:"依營造安全衛生設施標準規定，工作台、作業面開口部分之護欄，其高度應在多少公分以上",opts:["90", "60", "70", "105"],ans:[0],exp:"參考22200第70題"},
+  {id:3472,type:"single",cat:"專業課程",subj:"22200",text:"依職業安全衛生設施規則規定，有墜落之虞之場所，應設置至少高度幾公分以上之堅固扶手",opts:["75", "80", "85", "90"],ans:[0],exp:"參考22200第73題"},
+  {id:3475,type:"single",cat:"專業課程",subj:"22200",text:"依職業安全衛生設施規則規定，勞工在高度多少公尺以上場所作業時，雇主應有防止勞工墜落之措施",opts:["1.5", "2", "3", "5"],ans:[1],exp:"參考22200第76題"},
+  {id:3477,type:"single",cat:"專業課程",subj:"22200",text:"依職業安全衛生設施規則規定，移動梯之寬度應在多少公分以上",opts:["15", "20", "25", "30"],ans:[3],exp:"參考22200第78題"},
+  {id:3484,type:"single",cat:"專業課程",subj:"22200",text:"高度2公尺以上作業遇強風大雨，勞工有墜落之虞時，應使勞工停止作業，所謂之強風係指10分鐘的平均風速達每秒多少公尺以上者",opts:["10", "20", "30", "40"],ans:[0],exp:"參考22200第85題"},
+  {id:3491,type:"single",cat:"專業課程",subj:"22200",text:"下列何種災害類型佔重大職業災害最高的比率",opts:["墜落", "感電", "捲夾", "倒崩塌"],ans:[0],exp:"參考22200第92題"},
+  {id:3492,type:"single",cat:"專業課程",subj:"22200",text:"預防樓地板開口墜落最有效的防護方式為下列何者",opts:["設置足夠強度的覆蓋", "設警語", "拉警示帶", "使用安全帶"],ans:[0],exp:"參考22200第93題"},
+  {id:3497,type:"single",cat:"專業課程",subj:"22200",text:"滅火方法有很多種，下列敘述何者不正確",opts:["油料漏油引起火災可關閉進口停止輸送為隔離法", "以水冷卻火場溫度為冷卻法", "密閉燃燒空間使火自然熄滅為窒息法", "以不燃性泡沫覆蓋燃燒物為抑制法"],ans:[3],exp:"參考22200第98題"},
+  {id:3498,type:"single",cat:"專業課程",subj:"22200",text:"可燃物於無明火等火源條件下，在大氣中僅因受熱而開始自行持續燃燒所需之最低溫度為下列何者",opts:["沸點", "閃火點", "熔點", "自燃溫度"],ans:[3],exp:"參考22200第99題"},
+  {id:3504,type:"single",cat:"專業課程",subj:"22200",text:"下列何種可燃性氣體比空氣重",opts:["氫", "乙炔", "甲烷", "丙烷"],ans:[3],exp:"參考22200第105題"},
+  {id:3505,type:"single",cat:"專業課程",subj:"22200",text:"易燃液體如汽油，與可燃性氣體如液化石油氣等引起之火災稱為何類火災",opts:["甲", "乙", "丙", "丁"],ans:[1],exp:"參考22200第106題"},
+  {id:3507,type:"single",cat:"專業課程",subj:"22200",text:"汽油桶發生火災，不宜使用下列何種滅火劑",opts:["水", "乾粉", "二氧化碳", "泡沫"],ans:[0],exp:"參考22200第108題"},
+  {id:3514,type:"single",cat:"專業課程",subj:"22200",text:"油料漏油引起火災，採關閉進料口或停止輸送屬何種滅火方法",opts:["隔離法", "冷卻法", "窒息法", "抑制法"],ans:[0],exp:"參考22200第115題"},
+  {id:3531,type:"single",cat:"專業課程",subj:"22200",text:"依營造安全衛生設施標準規定，從事露天開挖作業，其垂直開挖最大深度在幾公尺以上者，應設擋土支撐",opts:["1.5", "2", "3", "5"],ans:[0],exp:"參考22200第132題"},
+  {id:3533,type:"single",cat:"專業課程",subj:"22200",text:"雇主對於勞工於高度多少公尺以上之高處作業，應使勞工確實使用安全帶、安全帽及其他必要之防護具",opts:["1.5", "2", "2.5", "3"],ans:[1],exp:"參考22200第134題"},
+  {id:3546,type:"single",cat:"專業課程",subj:"22200",text:"依起重升降機具安全規則規定，在特定場所使用動力將貨物吊升，並做水平搬運為目的之機械裝置稱為下列何者",opts:["移動式起重機", "升降機", "固定式起重機", "營建用提升機"],ans:[2],exp:"參考22200第147題"},
+  {id:3562,type:"single",cat:"專業課程",subj:"22200",text:"吊掛用鋼索之張角愈大，則下列何者亦愈大",opts:["張力", "浮力", "扭力", "重力"],ans:[0],exp:"參考22200第163題"},
+  {id:3563,type:"single",cat:"專業課程",subj:"22200",text:"從事吊掛作業吊掛物之重心應在何處",opts:["起重機重心處", "起重機吊桿之中心", "吊鉤正下方", "吊鉤下方15度角"],ans:[2],exp:"參考22200第164題"},
+  {id:3596,type:"single",cat:"專業課程",subj:"22200",text:"四氯化碳可能危害下列何者",opts:["呼吸系統", "血液系統", "骨骼", "肝腎"],ans:[3],exp:"參考22200第197題"},
+  {id:3601,type:"single",cat:"專業課程",subj:"22200",text:"以下何者被吸入人體，較可能會導致肺部纖維化",opts:["鉛", "游離二氧化矽", "氧化鐵", "石膏"],ans:[1],exp:"參考22200第202題"},
+  {id:3602,type:"single",cat:"專業課程",subj:"22200",text:"二氧化矽作業勞工，因作業環境不良，較易罹患下列何種疾病",opts:["痛痛病", "塵肺症", "白血症", "多發性神經病變"],ans:[1],exp:"參考22200第203題"},
+  {id:3604,type:"single",cat:"專業課程",subj:"22200",text:"錳對人體之主要危害為下列何者",opts:["神經", "血液", "皮膚", "骨骼"],ans:[0],exp:"參考22200第205題"},
+  {id:3621,type:"single",cat:"專業課程",subj:"22200",text:"佩掛背負式安全帶主要目的為下列何者",opts:["防止感電", "防止人體墜落", "防止物體飛落", "幫助平衡"],ans:[1],exp:"參考22200第222題"},
+  {id:3643,type:"single",cat:"專業課程",subj:"22200",text:"下列何者不是急救的目的",opts:["維持呼吸功能", "維持血液循環功能", "防止傷情惡化", "施予治療"],ans:[3],exp:"參考22200第244題"},
+  {id:3644,type:"single",cat:"專業課程",subj:"22200",text:"依衛生福利部公告的2015民眾版心肺復甦術參考指引摘要表，心肺復甦術(CPR)之胸部按壓，每分鐘應該要幾次",opts:["1~2", "12~15", "72", "100~120"],ans:[3],exp:"參考22200第245題"},
+  {id:3645,type:"single",cat:"專業課程",subj:"22200",text:"施行心肺復甦術，按壓與吹氣次數比為何",opts:["30:1", "30:2", "15:1", "15:2"],ans:[1],exp:"參考22200第246題"},
+  {id:3657,type:"single",cat:"專業課程",subj:"22200",text:"對於化學燒傷傷患的一般處理原則，下列何者正確",opts:["立即用大量清水沖洗", "傷患必須臥下，而且頭、胸部須高於身體其他部位", "於燒傷處塗抹油膏、油脂或發酵粉", "使用酸鹼中和"],ans:[0],exp:"參考22200第258題"},
+  {id:3658,type:"single",cat:"專業課程",subj:"22200",text:"下列何者為燒傷急救口訣",opts:["沖脫泡蓋送", "叫叫壓", "拉拉壓", "快狠準"],ans:[0],exp:"參考22200第259題"},
+  {id:3670,type:"single",cat:"專業課程",subj:"22200",text:"一般而言，下列何種頻率(Hz)的感音性聽力損失最明顯",opts:["500", "1000", "2000", "4000"],ans:[3],exp:"參考22200第271題"},
+  {id:3687,type:"single",cat:"專業課程",subj:"22200",text:"有害物進入人體最常見的器官或途徑為下列何者",opts:["口", "呼吸", "皮膚", "眼睛"],ans:[1],exp:"參考22200第288題"},
+  {id:3691,type:"single",cat:"專業課程",subj:"22200",text:"一氧化碳被吸入人體，並進入血液中，將與血液中之下列何者結合",opts:["淋巴球", "白血球", "血紅素", "血小板"],ans:[2],exp:"參考22200第292題"},
+  {id:4000,type:"single",cat:"職業道德",subj:"90007",text:"請問下列何者「不是」個人資料保護法所定義的個人資料",opts:["身分證號碼", "最高學歷", "綽號", "護照號碼"],ans:[2],exp:"參考90007第1題"},
+  {id:4001,type:"single",cat:"職業道德",subj:"90007",text:"下列何者「違反」個人資料保護法",opts:["公司基於人事管理之特定目的張貼榮譽榜揭示績優員工姓名", "縣市政府提供村里長轄區內符合資格之老人名冊供發放敬老金", "網路購物公司為辦理退貨將客戶之住家地址提供予宅配公司", "學校將應屆畢業生之住家地址提供補習班招生使用"],ans:[3],exp:"參考90007第2題"},
+  {id:4003,type:"single",cat:"職業道德",subj:"90007",text:"個資法為保護當事人權益，多少位以上的當事人提出告訴，就可以進行團體訴訟",opts:["5人", "10人", "15人", "20人"],ans:[3],exp:"參考90007第4題"},
+  {id:4010,type:"single",cat:"職業道德",subj:"90007",text:"有關專利權的敘述，何者正確",opts:["專利有規定保護年限，當某商品、技術的專利保護年限屆滿，任何人皆可運用該項專利", "我發明了某項商品，卻被他人率先申請專利權，我仍可主張擁有這項商品的專利權", "專利權可涵蓋、保護抽象的概念性商品", "專利權為世界所共有，在本國申請專利之商品進軍國外，不需向他國申請專利權"],ans:[0],exp:"參考90007第11題"},
+  {id:4013,type:"single",cat:"職業道德",subj:"90007",text:"專利權又可區分為發明、新型與新式樣三種專利權，其中，發明專利權是否有保護期限？期限為何",opts:["有，5年", "有，20年", "有，50年", "無期限，只要申請後就永久歸申請人所有"],ans:[1],exp:"參考90007第14題"},
+  {id:4027,type:"single",cat:"職業道德",subj:"90007",text:"故意侵害他人之營業秘密，法院因被害人之請求，最高得酌定損害額幾倍之賠償",opts:["1倍", "2倍", "3倍", "4倍"],ans:[2],exp:"參考90007第28題"},
+  {id:4029,type:"single",cat:"職業道德",subj:"90007",text:"受雇者因承辦業務而知悉營業秘密，在離職後對於該營業秘密的處理方式，下列敘述何者正確",opts:["聘雇關係解除後便不再負有保障營業秘密之責", "僅能自用而不得販售獲取利益", "自離職日起3年後便不再負有保障營業秘密之責", "離職後仍不得洩漏該營業秘密"],ans:[3],exp:"參考90007第30題"},
+  {id:4038,type:"single",cat:"職業道德",subj:"90007",text:"公務機關首長要求人事單位聘僱自己的弟弟擔任工友，違反何種法令",opts:["公職人員利益衝突迴避法", "詐欺罪", "侵占罪", "未違反法令"],ans:[0],exp:"參考90007第39題"},
+  {id:4040,type:"single",cat:"職業道德",subj:"90007",text:"公司負責人為了要節省開銷，將員工薪資以高報低來投保全民健保及勞保，是觸犯了刑法上之何種罪刑",opts:["詐欺罪", "侵占罪", "背信罪", "工商秘密罪"],ans:[0],exp:"參考90007第41題"},
+  {id:4041,type:"single",cat:"職業道德",subj:"90007",text:"A受雇於公司擔任會計，因自己的財務陷入危機，多次將公司帳款轉入妻兒戶頭，是觸犯了刑法上之何種罪刑",opts:["工商秘密罪", "侵占罪", "侵害著作權罪", "違反公平交易法"],ans:[1],exp:"參考90007第42題"},
+  {id:4042,type:"single",cat:"職業道德",subj:"90007",text:"於公司執行採購業務時，因收受回扣而將訂單予以特定廠商，觸犯下列何種罪刑",opts:["背信罪", "貪污罪", "詐欺罪", "侵占罪"],ans:[0],exp:"參考90007第43題"},
+  {id:4048,type:"single",cat:"職業道德",subj:"90007",text:"與公務機關接洽業務時，下列敘述何者「正確」",opts:["沒有要求公務員違背職務，花錢疏通而已，並不違法", "唆使公務機關承辦採購人員配合浮報價額，僅屬偽造文書行為", "口頭允諾行賄金額但還沒送錢，尚不構成犯罪", "與公務員同謀之共犯，即便不具公務員身分，仍會依據貪污治罪條例處刑"],ans:[3],exp:"參考90007第49題"},
+  {id:4049,type:"single",cat:"職業道德",subj:"90007",text:"甲君為獲取乙級技術士技能檢定證照，行賄打點監評人員要求放水之行為，可能構成何罪",opts:["違背職務行賄罪", "不違背職務行賄罪", "背信罪", "詐欺罪"],ans:[0],exp:"參考90007第50題"},
+  {id:4054,type:"single",cat:"職業道德",subj:"90007",text:"廠商某甲承攬公共工程，工程進行期間，甲與其工程人員經常招待該公共工程委辦機關之監工及驗收之公務員喝花酒或招待出國旅遊，下列敘述何者為對",opts:["公務員若沒有收現金，就沒有罪", "只要工程沒有問題，某甲與監工及驗收等相關公務員就沒有犯罪", "因為不是送錢，所以都沒有犯罪", "某甲與相關公務員均已涉嫌觸犯貪污治罪條例"],ans:[3],exp:"參考90007第55題"},
+  {id:4058,type:"single",cat:"職業道德",subj:"90007",text:"為建立良好之公司治理制度，公司內部宜納入何種檢舉人制度",opts:["告訴乃論制度", "吹哨者（whistleblower）管道及保護制度", "不告不理制度", "非告訴乃論制度"],ans:[1],exp:"參考90007第59題"},
+  {id:4063,type:"single",cat:"職業道德",subj:"90007",text:"下列何者「非」屬公司對於企業社會責任實踐之原則",opts:["加強個人資料揭露", "維護社會公益", "發展永續環境", "落實公司治理"],ans:[0],exp:"參考90007第64題"},
+  {id:4065,type:"single",cat:"職業道德",subj:"90007",text:"下列行為何者「不」屬於敬業精神的表現",opts:["遵守時間約定", "遵守法律規定", "保守顧客隱私", "隱匿公司產品瑕疵訊息"],ans:[3],exp:"參考90007第66題"},
+  {id:4066,type:"single",cat:"職業道德",subj:"90007",text:"下列何者符合專業人員的職業道德",opts:["未經雇主同意，於上班時間從事私人事務", "利用雇主的機具設備私自接單生產", "未經顧客同意，任意散佈或利用顧客資料", "盡力維護雇主及客戶的權益"],ans:[3],exp:"參考90007第67題"},
+  {id:4067,type:"single",cat:"職業道德",subj:"90007",text:"身為公司員工必須維護公司利益，下列何者是正確的工作態度或行為",opts:["將公司逾期的產品更改標籤", "施工時以省時、省料為獲利首要考量，不顧品質", "服務時首先考慮公司的利益，然後再考量顧客權益", "工作時謹守本分，以積極態度解決問題"],ans:[3],exp:"參考90007第68題"},
+  {id:4069,type:"single",cat:"職業道德",subj:"90007",text:"因為工作本身需要高度專業技術及知識，所以在對客戶服務時應",opts:["不用理會顧客的意見", "保持親切、真誠、客戶至上的態度", "若價錢較低，就敷衍了事", "以專業機密為由，不用對客戶說明及解釋"],ans:[1],exp:"參考90007第70題"},
+  {id:4070,type:"single",cat:"職業道德",subj:"90007",text:"從事專業性工作，在與客戶約定時間應",opts:["保持彈性，任意調整", "儘可能準時，依約定時間完成工作", "能拖就拖，能改就改", "自己方便就好，不必理會客戶的要求"],ans:[1],exp:"參考90007第71題"},
+  {id:4072,type:"single",cat:"職業道德",subj:"90007",text:"當發現公司的產品可能會對顧客身體產生危害時，正確的作法或行動應是",opts:["立即向主管或有關單位報告", "若無其事，置之不理", "儘量隱瞞事實，協助掩飾問題", "透過管道告知媒體或競爭對手"],ans:[0],exp:"參考90007第73題"},
+  {id:4073,type:"single",cat:"職業道德",subj:"90007",text:"以下哪一項員工的作為符合敬業精神",opts:["利用正常工作時間從事私人事務", "運用雇主的資源，從事個人工作", "未經雇主同意擅離工作崗位", "謹守職場紀律及禮節，尊重客戶隱私"],ans:[3],exp:"參考90007第74題"},
+  {id:4079,type:"single",cat:"職業道德",subj:"90007",text:"筱珮要離職了，公司主管交代，她要做業務上的交接，她該怎麼辦",opts:["不用理它，反正都要離開公司了", "把以前的業務資料都刪除或設密碼，讓別人都打不開", "應該將承辦業務整理歸檔清楚，並且留下聯絡的方式，未來有問題可以詢問她", "盡量交接，如果離職日一到，就不關他的事"],ans:[2],exp:"參考90007第80題"},
+  {id:4080,type:"single",cat:"職業道德",subj:"90007",text:"彥江是職場上的新鮮人，剛進公司不久，他應該具備怎樣的態度",opts:["上班下班管好自己便可", "仔細觀察公司生態加入某些小團體以做為後盾", "只要做好人脈關係這樣以後就好辦事", "努力做好自己職掌的業務樂於工作與同事之間有良好的互動相互協助"],ans:[3],exp:"參考90007第81題"},
+  {id:4084,type:"single",cat:"職業道德",subj:"90007",text:"根據性別工作平等法，下列何者非屬職場性騷擾",opts:["公司員工執行職務時客戶對其講黃色笑話該員工感覺被冒犯", "雇主對求職者要求交往作為雇用與否之交換條件", "公司員工執行職務時遭到同事以性別歧視用語加以辱罵", "公司員工下班後搭乘捷運在捷運上遭到其他乘客偷拍"],ans:[3],exp:"參考90007第85題"},
+  {id:4085,type:"single",cat:"職業道德",subj:"90007",text:"根據性別工作平等法，下列何者非屬職場性別歧視",opts:["雇主考量男性賺錢養家之社會期待提供男性高於女性之薪資", "雇主考量女性以家庭為重之社會期待裁員時優先資遣女性", "雇主事先與員工約定倘其有懷孕之情事必須離職", "有未滿2歲子女之男性員工也可申請每日六十分鐘的哺乳時間"],ans:[3],exp:"參考90007第86題"},
+  {id:4088,type:"single",cat:"職業道德",subj:"90007",text:"根據消除對婦女一切形式歧視公約(CEDAW)，下列何者正確",opts:["對婦女的歧視指基於性別而作的任何區別、排斥或限制", "只關心女性在政治方面的人權和基本自由", "未要求政府需消除個人或企業對女性的歧視", "傳統習俗應予保護及傳承即使含有歧視女性的部分也不可以改變"],ans:[0],exp:"參考90007第89題"},
+  {id:4092,type:"single",cat:"職業道德",subj:"90007",text:"關於菸品對人體的危害的敘述，下列何者「正確」",opts:["只要開電風扇或是空調就可以去除二手菸", "抽雪茄比抽紙菸危害還要小", "吸菸者比不吸菸者容易得肺癌", "只要不將菸吸入肺部就不會對身體造成傷害"],ans:[2],exp:"參考90007第93題"},
+  {id:4094,type:"single",cat:"職業道德",subj:"90007",text:"有關菸害防制法規範，「不可販賣菸品」給幾歲以下的人",opts:["20", "19", "18", "17"],ans:[2],exp:"參考90007第95題"},
+  {id:4098,type:"single",cat:"職業道德",subj:"90007",text:"對電子煙的敘述，何者錯誤",opts:["含有尼古丁會成癮", "會有爆炸危險", "含有毒致癌物質", "可以幫助戒菸"],ans:[3],exp:"參考90007第99題"},
+  {id:4200,type:"single",cat:"環境保護",subj:"90008",text:"世界環境日是在每一年的：",opts:["6月5日", "4月10日", "3月8日", "11月12日"],ans:[0],exp:"參考90008第1題"},
+  {id:4201,type:"single",cat:"環境保護",subj:"90008",text:"2015年巴黎協議之目的為何",opts:["避免臭氧層破壞", "減少持久性污染物排放", "遏阻全球暖化趨勢", "生物多樣性保育"],ans:[2],exp:"參考90008第2題"},
+  {id:4211,type:"single",cat:"環境保護",subj:"90008",text:"依環境基本法第3條規定，如果經濟、科技及社會發展對環境有嚴重不良影響或有危害時，應以何者優先",opts:["經濟", "科技", "社會", "環境"],ans:[3],exp:"參考90008第12題"},
+  {id:4212,type:"single",cat:"環境保護",subj:"90008",text:"為了保護環境，政府提出了4個R的口號，下列何者不是4R中的其中一項",opts:["減少使用", "再利用", "再循環", "再創新"],ans:[3],exp:"參考90008第13題"},
+  {id:4220,type:"single",cat:"環境保護",subj:"90008",text:"「酸雨」定義為雨水酸鹼值達多少以下時稱之",opts:["5.0", "6.0", "7.0", "8.0"],ans:[0],exp:"參考90008第21題"},
+  {id:4221,type:"single",cat:"環境保護",subj:"90008",text:"一般而言，水中溶氧量隨水溫之上升而呈下列哪一種趨勢",opts:["增加", "減少", "不變", "不一定"],ans:[1],exp:"參考90008第22題"},
+  {id:4227,type:"single",cat:"環境保護",subj:"90008",text:"下列何者不是造成全球暖化的元凶",opts:["汽機車排放的廢氣", "工廠所排放的廢氣", "火力發電廠所排放的廢氣", "種植樹木"],ans:[3],exp:"參考90008第28題"},
+  {id:4229,type:"single",cat:"環境保護",subj:"90008",text:"下列何者不是溫室效應所產生的現象",opts:["氣溫升高而使海平面上升", "北極熊棲地減少", "造成全球氣候變遷，導致不正常暴雨、乾旱現象", "造成臭氧層產生破洞"],ans:[3],exp:"參考90008第30題"},
+  {id:4233,type:"single",cat:"環境保護",subj:"90008",text:"水中生化需氧量(BOD)愈高，其所代表的意義為",opts:["水為硬水", "有機污染物多", "水質偏酸", "分解污染物時不需消耗太多氧"],ans:[1],exp:"參考90008第34題"},
+  {id:4234,type:"single",cat:"環境保護",subj:"90008",text:"下列何者是酸雨對環境的影響",opts:["湖泊水質酸化", "增加森林生長速度", "土壤肥沃", "增加水生動物種類"],ans:[0],exp:"參考90008第35題"},
+  {id:4237,type:"single",cat:"環境保護",subj:"90008",text:"下列何種行為無法減少「溫室氣體」排放",opts:["騎自行車取代開車", "多搭乘公共運輸系統", "多吃肉少蔬菜", "使用再生紙張"],ans:[2],exp:"參考90008第38題"},
+  {id:4238,type:"single",cat:"環境保護",subj:"90008",text:"下列哪一項水質濃度降低會導致河川魚類大量死亡",opts:["氨氮", "溶氧", "二氧化碳", "生化需氧量"],ans:[1],exp:"參考90008第39題"},
+  {id:4239,type:"single",cat:"環境保護",subj:"90008",text:"下列何種生活小習慣的改變可減少細懸浮微粒(PM2.5)排放",opts:["少吃燒烤食物", "使用吸塵器", "養成運動習慣", "每天喝500cc的水"],ans:[0],exp:"參考90008第40題"},
+  {id:4241,type:"single",cat:"環境保護",subj:"90008",text:"大氣層中臭氧層有何作用",opts:["保持溫度", "對流最旺盛的區域", "吸收紫外線", "造成光害"],ans:[2],exp:"參考90008第42題"},
+  {id:4249,type:"single",cat:"環境保護",subj:"90008",text:"目前市面清潔劑均會強調「無磷」，是因為含磷的清潔劑使用後若廢水排至河川或湖泊等水域會造成甚麼影響",opts:["綠牡蠣", "優養化", "秘雕魚", "烏腳病"],ans:[1],exp:"參考90008第50題"},
+  {id:4250,type:"single",cat:"環境保護",subj:"90008",text:"冰箱在廢棄回收時應特別注意哪一項物質，以避免逸散至大氣中造成臭氧層的破壞",opts:["冷媒", "甲醛", "汞", "苯"],ans:[0],exp:"參考90008第51題"},
+  {id:4258,type:"single",cat:"環境保護",subj:"90008",text:"下列那一種氣體較易造成臭氧層被嚴重的破壞",opts:["氟氯碳化物", "二氧化硫", "氮氧化合物", "二氧化碳"],ans:[0],exp:"參考90008第59題"},
+  {id:4260,type:"single",cat:"環境保護",subj:"90008",text:"都市中常產生的「熱島效應」會造成何種影響",opts:["增加降雨", "空氣污染物不易擴散", "空氣污染物易擴散", "溫度降低"],ans:[1],exp:"參考90008第61題"},
+  {id:4261,type:"single",cat:"環境保護",subj:"90008",text:"廢塑膠等廢棄於環境除不易腐化外，若隨一般垃圾進入焚化廠處理，可能產生下列哪一種空氣污染物對人體有致癌疑慮",opts:["臭氧", "一氧化碳", "戴奧辛", "沼氣"],ans:[2],exp:"參考90008第62題"},
+  {id:4263,type:"single",cat:"環境保護",subj:"90008",text:"一般人生活產生之廢棄物，何者屬有害廢棄物",opts:["廚餘", "鐵鋁罐", "廢玻璃", "廢日光燈管"],ans:[3],exp:"參考90008第64題"},
+  {id:4272,type:"single",cat:"環境保護",subj:"90008",text:"日光燈管、水銀溫度計等，因含有哪一種重金屬，可能對清潔隊員造成傷害，應與一般垃圾分開處理",opts:["鉛", "鎘", "汞", "鐵"],ans:[2],exp:"參考90008第73題"},
+  {id:4274,type:"single",cat:"環境保護",subj:"90008",text:"台灣西部海岸曾發生的綠牡蠣事件是下列何種物質污染水體有關",opts:["汞", "銅", "磷", "鎘"],ans:[1],exp:"參考90008第75題"},
+  {id:4286,type:"single",cat:"環境保護",subj:"90008",text:"根據環保署資料顯示，世紀之毒「戴奧辛」主要透過何者方式進入人體",opts:["透過觸摸", "透過呼吸", "透過飲食", "透過雨水"],ans:[2],exp:"參考90008第87題"},
+  {id:4287,type:"single",cat:"環境保護",subj:"90008",text:"陳先生到機車行換機油時，發現機車行老闆將廢機油直接倒入路旁的排水溝，請問這樣的行為是違反了",opts:["道路交通管理處罰條例", "廢棄物清理法", "職業安全衛生法", "飲用水管理條例"],ans:[1],exp:"參考90008第88題"},
+  {id:4288,type:"single",cat:"環境保護",subj:"90008",text:"亂丟香菸蒂，此行為已違反什麼規定",opts:["廢棄物清理法", "民法", "刑法", "毒性化學物質管理法"],ans:[0],exp:"參考90008第89題"},
+  {id:4290,type:"single",cat:"環境保護",subj:"90008",text:"臺灣地狹人稠，垃圾處理一直是不易解決的問題，下列何種是較佳的因應對策",opts:["垃圾分類資源回收", "蓋焚化廠", "運至國外處理", "向海爭地掩埋"],ans:[0],exp:"參考90008第91題"},
+  {id:4291,type:"single",cat:"環境保護",subj:"90008",text:"臺灣嘉南沿海一帶發生的烏腳病可能為哪一種重金屬引起",opts:["汞", "砷", "鉛", "鎘"],ans:[1],exp:"參考90008第92題"},
+  {id:4293,type:"single",cat:"環境保護",subj:"90008",text:"酸雨對土壤可能造成的影響，下列何者正確",opts:["土壤更肥沃", "土壤液化", "土壤中的重金屬釋出", "土壤礦化"],ans:[2],exp:"參考90008第94題"},
+  {id:4295,type:"single",cat:"環境保護",subj:"90008",text:"醫療院所用過的棉球、紗布、針筒、針頭等感染性事業廢棄物屬於",opts:["一般事業廢棄物", "資源回收物", "一般廢棄物", "有害事業廢棄物"],ans:[3],exp:"參考90008第96題"},
+  {id:4296,type:"single",cat:"環境保護",subj:"90008",text:"下列何項法規的立法目的為預防及減輕開發行為對環境造成不良影響，藉以達成環境保護之目的",opts:["公害糾紛處理法", "環境影響評估法", "環境基本法", "環境教育法"],ans:[1],exp:"參考90008第97題"},
+  {id:4400,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者是節能減碳的正確做法",opts:["增加使用一次性餐具", "隨手關燈及電器", "多開冷氣保持涼爽", "增加私人汽車使用"],ans:[1],exp:"參考90009第1題"},
+  {id:4401,type:"single",cat:"節能減碳",subj:"90009",text:"溫室效應的主要原因為何",opts:["臭氧層破洞", "大氣中二氧化碳等溫室氣體增加", "海平面下降", "地球磁場改變"],ans:[1],exp:"參考90009第2題"},
+  {id:4402,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者不是溫室氣體",opts:["二氧化碳（CO₂）", "甲烷（CH₄）", "氮氣（N₂）", "氧化亞氮（N₂O）"],ans:[2],exp:"參考90009第3題"},
+  {id:4403,type:"single",cat:"節能減碳",subj:"90009",text:"台灣推動的「碳足跡」標籤，主要是標示產品在生命週期中排放多少",opts:["二氧化碳當量", "甲烷量", "氮氧化物量", "懸浮微粒量"],ans:[0],exp:"參考90009第4題"},
+  {id:4404,type:"single",cat:"節能減碳",subj:"90009",text:"使用省電燈泡（LED）取代傳統白熾燈泡，主要可達到什麼效果",opts:["增加亮度", "節省電力消耗", "壽命長且節電", "減少廢熱產生"],ans:[2],exp:"參考90009第5題"},
+  {id:4405,type:"single",cat:"節能減碳",subj:"90009",text:"下列何種交通方式碳排放量最低",opts:["開私家車", "搭計程車", "搭乘捷運或公車", "騎重型機車"],ans:[2],exp:"參考90009第6題"},
+  {id:4406,type:"single",cat:"節能減碳",subj:"90009",text:"能源效率標示中，冷氣機的能源效率比（EER）越高，代表什麼",opts:["耗電量越多", "製冷效果越差", "越省電越節能", "噪音越大"],ans:[2],exp:"參考90009第7題"},
+  {id:4407,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者屬於再生能源",opts:["煤炭", "天然氣", "石油", "風力發電"],ans:[3],exp:"參考90009第8題"},
+  {id:4408,type:"single",cat:"節能減碳",subj:"90009",text:"冷氣機設定幾度最節能",opts:["18°C", "20°C", "26°C", "30°C"],ans:[2],exp:"參考90009第9題"},
+  {id:4409,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者不是節約用水的方法",opts:["洗碗時關掉水龍頭", "安裝省水馬桶", "用洗米水澆花", "每天泡澡一小時"],ans:[3],exp:"參考90009第10題"},
+  {id:4413,type:"single",cat:"節能減碳",subj:"90009",text:"「碳中和」是指什麼",opts:["不排放任何碳", "碳排放量等於碳吸收量", "減少50%碳排放", "禁止使用化石燃料"],ans:[1],exp:"參考90009第14題"},
+  {id:4415,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者是造成全球暖化最主要的人為活動",opts:["農業耕作", "化石燃料的燃燒", "森林砍伐", "工業廢水排放"],ans:[1],exp:"參考90009第16題"},
+  {id:4417,type:"single",cat:"節能減碳",subj:"90009",text:"綠建築的設計理念主要是什麼",opts:["外觀要使用綠色塗料", "減少建築物對環境的衝擊", "增加建築物面積", "使用最新科技材料"],ans:[1],exp:"參考90009第18題"},
+  {id:4418,type:"single",cat:"節能減碳",subj:"90009",text:"下列何種能源使用方式最不環保",opts:["太陽能發電", "燃燒煤炭發電", "風力發電", "水力發電"],ans:[1],exp:"參考90009第19題"},
+  {id:4419,type:"single",cat:"節能減碳",subj:"90009",text:"「低碳飲食」的概念主要是指什麼",opts:["不吃任何肉類", "選擇碳水化合物少的食物", "選擇生產過程碳排放較低的食物", "只吃生食不烹調"],ans:[2],exp:"參考90009第20題"},
+  {id:4421,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者是「碳交易」的概念",opts:["交換碳粉匣", "企業間買賣碳排放權", "政府向企業收取碳稅", "個人的碳足跡計算"],ans:[1],exp:"參考90009第22題"},
+  {id:4423,type:"single",cat:"節能減碳",subj:"90009",text:"台灣「節能減碳」國家行動方案的主要目標之一是什麼",opts:["2030年碳排放歸零", "減少對再生能源的依賴", "2050年達成淨零碳排", "增加核能發電比例"],ans:[2],exp:"參考90009第24題"},
+  {id:4430,type:"single",cat:"節能減碳",subj:"90009",text:"台灣的再生能源發展條例主要目的為何",opts:["降低電費", "增加核能使用", "促進再生能源發展", "限制工業用電"],ans:[1],exp:"參考90009第31題"},
+  {id:4434,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者不是推廣使用太陽能的優點",opts:["零碳排放", "可永續利用", "夜間和陰天仍可穩定發電", "減少化石燃料依賴"],ans:[3],exp:"參考90009第35題"},
+  {id:4435,type:"single",cat:"節能減碳",subj:"90009",text:"下列哪一項家電最耗電",opts:["電風扇", "節能燈泡", "電熱水器", "電視"],ans:[2],exp:"參考90009第36題"},
+  {id:4438,type:"single",cat:"節能減碳",subj:"90009",text:"下列哪種食物的碳足跡通常最高",opts:["當地種植的蔬菜", "本地生產的水果", "進口牛肉", "本地養殖的魚"],ans:[2],exp:"參考90009第39題"},
+  {id:4439,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者是台灣「溫室氣體減量及管理法」的主管機關",opts:["經濟部", "環境部（原環保署）", "內政部", "科技部"],ans:[1],exp:"參考90009第40題"},
+  {id:4443,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者最能代表「循環經濟」的概念",opts:["不斷生產新產品", "廢棄物轉化為新資源再利用", "將廢棄物掩埋", "出口垃圾到其他國家"],ans:[1],exp:"參考90009第44題"},
+  {id:4444,type:"single",cat:"節能減碳",subj:"90009",text:"下列哪種照明方式最節能",opts:["傳統白熾燈泡", "日光燈管", "鹵素燈", "LED燈"],ans:[3],exp:"參考90009第45題"},
+  {id:4449,type:"single",cat:"節能減碳",subj:"90009",text:"政府推動的「能源稅」或「碳費」的主要目的是什麼",opts:["增加政府收入", "透過價格機制促使減少化石燃料使用", "懲罰工廠", "補貼再生能源業者"],ans:[1],exp:"參考90009第50題"},
+  {id:4454,type:"single",cat:"節能減碳",subj:"90009",text:"台灣「能源局」的主管機關為何",opts:["環境部", "經濟部", "行政院", "交通部"],ans:[1],exp:"參考90009第55題"},
+  {id:4456,type:"single",cat:"節能減碳",subj:"90009",text:"下列何者不是再生能源",opts:["地熱", "潮汐能", "天然氣", "太陽能"],ans:[2],exp:"參考90009第57題"},
+  {id:4457,type:"single",cat:"節能減碳",subj:"90009",text:"「能源轉型」主要指的是什麼",opts:["從電力轉為燃油", "從化石燃料轉向再生能源", "從核能轉向火力", "從進口能源轉為國產能源"],ans:[1],exp:"參考90009第58題"},
+  {id:4464,type:"single",cat:"節能減碳",subj:"90009",text:"減少牛肉消費對節能減碳的貢獻，主要是因為",opts:["牛隻養殖土地需求大", "牛隻養殖排放大量甲烷等溫室氣體", "牛肉需要冷藏", "牛隻喝很多水"],ans:[1],exp:"參考90009第65題"},
+  {id:4499,type:"single",cat:"節能減碳",subj:"90009",text:"台灣2050淨零碳排放路徑中，以下何者是台灣推動節能減碳最重要的長遠目標",opts:["2030年全面停止使用汽油車", "2050年達成淨零碳排放", "2025年全面改用核能", "2035年禁止化石燃料進口"],ans:[1],exp:"參考90009第100題"},
+
+  // ═══ 新增：22200 法規補充 V7 ═══
+  {id:3601,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，勞工正常工作時間，每日不得超過幾小時",opts:["6小時","7小時","8小時","10小時"],ans:[2],exp:"勞基法第30條，勞工正常工作時間每日不得超過8小時，每週不得超過40小時。"},
+  {id:3602,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法規定，雇主應置備勞工出勤紀錄，並保存幾年",opts:["1年","3年","5年","10年"],ans:[2],exp:"勞基法第30條之1，雇主應置備勞工出勤紀錄，保存5年。"},
+  {id:3603,type:"single",cat:"法規",subj:"22200",text:"下列何者不是勞動基準法所定義的「工資」",opts:["計時工資","加班費","年終獎金（非固定給付）","差旅費實報實銷"],ans:[3],exp:"差旅費係費用補償，非勞務對價，不屬工資。年終獎金若屬固定性給付則為工資，否則不是。"},
+  {id:3604,type:"single",cat:"法規",subj:"22200",text:"依勞動基準法，勞工在同一雇主處連續工作一年者，應給予幾天特別休假",opts:["3天","5天","7天","10天"],ans:[2],exp:"勞基法第38條，繼續工作滿1年未滿2年者，給予7天特別休假。"},
+  {id:3605,type:"single",cat:"法規",subj:"22200",text:"職業安全衛生法所稱「工作者」包含哪些人",opts:["只有受僱勞工","受僱勞工及自營作業者","只有本國勞工","只有正職員工"],ans:[1],exp:"職安法第2條，工作者指勞工、自營作業者及其他受工作場所負責人指揮或監督從事勞動之人員。"},
+  {id:3606,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生法，雇主對於具有危險性之機械應如何處理",opts:["自行判斷是否安全即可","向勞動檢查機構申請檢查合格後才能使用","購買保險即可","取得廠商保證書即可"],ans:[1],exp:"危險性機械設備（如鍋爐、壓力容器、起重機等）須經勞動檢查機構檢查合格，取得合格證後方得使用。"},
+  {id:3607,type:"single",cat:"專業課程",subj:"22200",text:"作業環境監測中，採樣時間8小時的時量平均濃度（TWA）是指什麼",opts:["最高濃度","8小時工作日中的平均暴露濃度","最低濃度","任意時間點濃度"],ans:[1],exp:"時量平均濃度（TWA）是指一個8小時工作日或40小時工作週中，勞工暴露於有害物的平均濃度。"},
+  {id:3608,type:"single",cat:"專業課程",subj:"22200",text:"下列何者是正確的手工具安全使用方式",opts:["用扳手套管加長力矩","用鐵槌敲打鑿子時不需要護目鏡","選用適合工作的工具並保持工具良好狀態","工具用完隨手放在地上"],ans:[2],exp:"手工具安全要求：選擇適合的工具、保持良好狀態、正確使用（不加套管）、用畢歸位，使用鑿子應戴護目鏡。"},
+  {id:3609,type:"single",cat:"計畫管理",subj:"22200",text:"海因里希（Heinrich）法則指出，每發生1件重大傷害，背後有多少件輕傷和無傷害事故",opts:["1:10:30","1:29:300","1:50:500","1:100:1000"],ans:[1],exp:"海因里希三角形：每1件重傷背後有29件輕傷，300件無傷害的虛驚事故（Near Miss）。預防應從底層的不安全行為著手。"},
+  {id:3610,type:"single",cat:"計畫管理",subj:"22200",text:"「製程安全管理（PSM）」主要適用於哪種作業場所",opts:["所有事業單位","使用大量危險化學物質的製程工廠","辦公室","零售商店"],ans:[1],exp:"製程安全管理（PSM）主要針對使用或儲存大量危害性化學物質的工廠，防止化學災害（火災、爆炸、毒性釋放）。"},
+  {id:3611,type:"single",cat:"專業課程",subj:"22200",text:"依規定，屋頂作業或高架作業高度達多少公尺以上時，應採取墜落防止措施",opts:["1公尺","1.5公尺","2公尺","3公尺"],ans:[2],exp:"依職業安全衛生設施規則，雇主對於高度在2公尺以上的作業場所，應設置護欄、護蓋或安全網等防墜措施。"},
+  {id:3612,type:"single",cat:"法規",subj:"22200",text:"職業安全衛生法施行細則所稱「特別危害健康作業」，下列何者不在其中",opts:["游離輻射作業","高溫作業","一般辦公室文書作業","異常氣壓作業"],ans:[2],exp:"特別危害健康作業包含：高溫、噪音、振動、游離輻射、異常氣壓、鉛、粉塵等作業，一般文書作業不在其列。"},
+  {id:3613,type:"single",cat:"法規",subj:"22200",text:"下列何者是「職業病」的定義",opts:["任何在工作中發生的疾病","因工作性質或工作環境所引起的特定疾病","只有急性中毒才算","只有因意外受傷才算"],ans:[1],exp:"職業病係指因工作場所的危害因素（化學、物理、生物、人因等）所導致的疾病，須與工作有因果關係。"},
+  {id:3614,type:"single",cat:"專業課程",subj:"22200",text:"化學品安全資料表（SDS）共有幾個章節",opts:["8節","12節","16節","20節"],ans:[2],exp:"依GHS全球化學品統一分類及標示制度，化學品安全資料表（SDS）標準格式共16個章節。"},
+  {id:3615,type:"single",cat:"專業課程",subj:"22200",text:"滅火器的ABC類乾粉可以撲滅下列哪幾類火災",opts:["只有A類（一般可燃物）","只有B類（油脂類）","A、B、C三類（一般可燃物、油脂、電氣）","只有C類（電氣）"],ans:[2],exp:"ABC乾粉滅火器可撲滅：A類（木材紙張等）、B類（油脂燃料等）、C類（電氣設備）三類火災，是最常見的多用途滅火器。"},
+  {id:3616,type:"single",cat:"計畫管理",subj:"22200",text:"「能量意外釋放理論（Haddon Matrix）」認為意外傷害是由哪三個要素互動造成的",opts:["人、設備、環境","宿主（Host）、媒介（Agent）、環境（Environment）","管理、技術、教育","設計、製造、使用"],ans:[1],exp:"Haddon矩陣分析意外傷害的宿主（受害者）、媒介（能量或有害物）、環境（物理及社會環境）三個要素的交互作用。"},
+  {id:3617,type:"single",cat:"法規",subj:"22200",text:"依職業安全衛生教育訓練規則，擔任「有機溶劑作業主管」須接受幾小時教育訓練",opts:["6小時","18小時","30小時","40小時"],ans:[1],exp:"有害作業主管（有機溶劑、鉛、特定化學物質等）安全衛生教育訓練時數為18小時。"},
+  {id:3618,type:"single",cat:"專業課程",subj:"22200",text:"下列何者屬於個人防護具使用的最後手段原則",opts:["個人防護具是最優先的控制方法","個人防護具是在工程控制和行政管理措施不足時的補充","只要有個人防護具就不需要其他措施","個人防護具可完全替代工程控制"],ans:[1],exp:"依危害控制層級（Hierarchy of Controls），個人防護具是最後手段，優先採用消除、取代、工程控制和行政管理。"},
+  {id:3619,type:"single",cat:"法規",subj:"22200",text:"依勞工健康保護規則，事業單位勞工人數在幾人以上，每年應辦理健康促進活動",opts:["30人","50人","100人","300人"],ans:[2],exp:"依勞工健康保護規則，僱用勞工人數在100人以上的事業單位，每年應辦理健康促進活動，並記錄備查。"},
+  {id:3620,type:"single",cat:"計畫管理",subj:"22200",text:"「危害及可操作性研究（HAZOP）」主要用於哪種安全分析",opts:["個人健康評估","識別製程設計中潛在的危害和操作問題","計算事故後果","統計意外發生頻率"],ans:[1],exp:"HAZOP（Hazard and Operability Study）是一種系統性的製程危害辨識技術，透過關鍵字（如多、少、無、逆向）檢視每個製程節點的偏差及其後果。"},
+  // ═══ 新增：飲料調製補充題 V7 ═══
+  {id:5101,type:"single",cat:"飲料調製",subj:"08000",text:"下列何者是「義式濃縮咖啡（Espresso）」萃取過程中最重要的因素之一",opts:["咖啡杯的材質","填壓粉末的壓力與均勻度（約20公斤）","咖啡機的顏色","水的品牌"],ans:[1],exp:"Espresso萃取的關鍵：研磨度、填壓力（約20kg）、水溫（90-95°C）、萃取時間（25-30秒）缺一不可。"},
+  {id:5102,type:"single",cat:"飲料調製",subj:"08000",text:"台灣手搖飲料常用的「仙草凍」主要原料是什麼",opts:["洋菜（海藻）","仙草（一種草本植物）熬煮後加澱粉凝固","明膠（動物膠原）","玉米澱粉"],ans:[1],exp:"仙草凍由仙草（Platostoma palustre）煮汁加入番薯粉或太白粉凝固而成，是台灣傳統消暑食品。"},
+  {id:5103,type:"single",cat:"飲料調製",subj:"08000",text:"在飲料衛生管理中，「交叉污染」最常見的發生原因為何",opts:["飲料太甜","生熟食器具未分開、手部未清潔即接觸不同食材","冰塊加太多","攪拌太久"],ans:[1],exp:"交叉污染指病原菌從一種食品轉移到另一種食品，主要途徑為手部、器具或砧板未清潔直接接觸不同食材。"},
+  {id:5104,type:"single",cat:"飲料調製",subj:"08000",text:"「氮氣咖啡（Nitro Cold Brew）」的特殊口感是如何產生的",opts:["加入大量奶油","將氮氣注入冷萃咖啡，形成細緻泡沫","加入碳酸水","加熱後急速冷卻"],ans:[1],exp:"Nitro Cold Brew將氮氣（N2）注入冷萃咖啡，氮氣氣泡細緻不刺激，使咖啡呈現如生啤酒般滑順綿密的口感。"},
+  {id:5105,type:"single",cat:"飲料調製",subj:"08000",text:"調製雞尾酒時，「Dry」（如Dry Martini）指的是什麼",opts:["不加冰塊","甜度低或不加甜的材料（如不甜苦艾酒）","加入大量烈酒","不加水"],ans:[1],exp:"在調酒術語中，「Dry」指使用不甜（dry）的材料，如Dry Martini使用較少或不甜的Dry Vermouth，口感偏辛辣不甜。"},
+  // ═══ 新增：電腦軟體補充題 V7 ═══
+  {id:6101,type:"single",cat:"電腦應用",subj:"14100",text:"Excel中，VLOOKUP函數的用途為何",opts:["計算加總","在表格第一欄垂直搜尋特定值並傳回對應欄的資料","排序資料","合併儲存格"],ans:[1],exp:"VLOOKUP（垂直查找）在表格最左欄搜尋值，找到後傳回同列指定欄的資料，常用於比對兩個表格的資料。格式=VLOOKUP(查找值,表格範圍,欄數,精確/模糊)。"},
+  {id:6102,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是「響應式網頁設計（RWD）」的主要目的",opts:["讓網頁載入更快","讓同一個網頁能自動適應不同螢幕尺寸（電腦、平板、手機）","增加網頁安全性","讓網頁顏色更鮮豔"],ans:[1],exp:"響應式網頁設計（Responsive Web Design）使用CSS媒體查詢讓版面自動調整，一個網頁適用所有裝置，是現代網頁開發標準。"},
+  {id:6103,type:"single",cat:"電腦應用",subj:"14100",text:"「巨集（Macro）」在Office軟體中的主要用途為何",opts:["美化文件外觀","錄製並自動執行一系列重複性操作，提升效率","加密文件","列印文件"],ans:[1],exp:"巨集可錄製重複的操作步驟，之後一鍵執行，大幅節省時間。Excel的巨集使用VBA語言，可自動化複雜的資料處理。"},
+  {id:6104,type:"single",cat:"電腦應用",subj:"14100",text:"下列何者是「兩步驟驗證（2FA）」的安全原理",opts:["使用兩個不同的密碼","結合「你知道的（密碼）」和「你擁有的（手機驗證碼）」兩種驗證方式","讓兩個人同時登入","備份密碼"],ans:[1],exp:"兩步驟驗證結合兩種不同類型的驗證：知識因素（密碼）+持有因素（手機OTP）或生物特徵，即使密碼外洩帳號仍受保護。"},
+  {id:6105,type:"single",cat:"電腦應用",subj:"14100",text:"Word中「追蹤修訂」功能的主要用途為何",opts:["自動儲存文件","顯示文件的修改歷程，方便多人協作審閱","自動更正錯字","插入圖片"],ans:[1],exp:"追蹤修訂功能記錄每個編輯動作（刪除、新增、格式變更）並顯示作者和時間，審閱者可接受或拒絕各項修訂，是多人協作必備功能。"},
+  // ═══ 新增：烘焙食品補充題 V7 ═══
+  {id:7101,type:"single",cat:"烘焙食品",subj:"09500",text:"製作「天使蛋糕（Angel Food Cake）」與一般海綿蛋糕的最大差異為何",opts:["不需要烤箱","只使用蛋白（不用蛋黃）打發，不含油脂","加入大量奶油","使用全麥麵粉"],ans:[1],exp:"天使蛋糕只使用蛋白打發，完全不含蛋黃和油脂，質地極輕，熱量低。需要管狀烤模中間空心讓熱氣穿透，出爐後倒扣冷卻。"},
+  {id:7102,type:"single",cat:"烘焙食品",subj:"09500",text:"「舒芙蕾（Soufflé）」出爐後為什麼會快速塌陷",opts:["溫度太高","麵粉太少","支撐結構脆弱（靠蛋白霜氣泡），出爐後遇冷空氣氣泡收縮","糖分不足"],ans:[2],exp:"舒芙蕾的膨脹靠打發蛋白霜中的氣泡受熱膨脹，但蛋白霜結構脆弱，出爐後溫差使氣泡收縮，需立刻上桌食用。"},
+  {id:7103,type:"single",cat:"烘焙食品",subj:"09500",text:"「德式黑麥麵包（Pumpernickel）」顏色深黑的原因為何",opts:["加入食用黑色素","長時間低溫烘烤（約16-24小時）使梅納反應充分進行","加入大量黑芝麻","烤焦了"],ans:[1],exp:"Pumpernickel使用100%黑麥全粒粉，在低溫（約100-120°C）長達16-24小時的烘烤中，梅納反應和焦糖化反應充分進行，產生深邃的深棕黑色和複雜風味。"},
+  {id:7104,type:"single",cat:"烘焙食品",subj:"09500",text:"製作蛋白霜時，「義式蛋白霜（Italian Meringue）」與法式蛋白霜的差異為何",opts:["兩者完全相同","義式蛋白霜將熱糖漿（118-121°C）沖入打發蛋白中，更穩定且安全","義式蛋白霜不需要糖","義式蛋白霜加入奶油"],ans:[1],exp:"義式蛋白霜將煮至118-121°C的熱糖漿緩緩沖入打發蛋白，高溫殺死沙門氏菌，且蛋白霜更穩定耐放，常用於慕斯、冰淇淋和裝飾蛋糕。"},
+  {id:7105,type:"single",cat:"烘焙食品",subj:"09500",text:"下列何者是「食品添加物」在烘焙中的合法使用原則",opts:["可以大量添加以增加保存期","在法規許可範圍內，使用最低有效量","不需要標示在成分表上","越多越好"],ans:[1],exp:"食品添加物應符合「安全性、必要性、最小量」原則，依食品安全衛生管理法使用核准的添加物，且用量不超過規定上限，並須在包裝標示。"}
 ];
 
 /* ══════════════════════════════════
@@ -978,64 +2167,383 @@ function goHome(){stopTimer();updateHome();showScreen('home')}
 function updateHome(){
   const ids=Object.keys(S.answered), total=ids.length;
   const cor=ids.filter(id=>S.answered[id].correct).length;
-  document.getElementById('sTotal').textContent=total;
-  document.getElementById('sRate').textContent=total>0?Math.round(cor/total*100)+'%':'—';
-  document.getElementById('sWrong').textContent=S.wrongIds.size;
-  document.getElementById('sBook').textContent=S.bookmarks.size;
+  // 安全更新：找不到元素就跳過（首頁已精簡，這些元素移至抽屜）
+  const upd=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  const updStyle=(id,prop,val)=>{const el=document.getElementById(id);if(el)el.style[prop]=val;};
+  upd('sTotal',total);
+  upd('sRate',total>0?Math.round(cor/total*100)+'%':'—');
+  upd('sWrong',S.wrongIds.size);
+  upd('sBook',S.bookmarks.size);
+  upd('streakNum',S.streak);
+  upd('streakBest','最高 '+S.bestStreak);
+  upd('drawerStreak','🔥 '+S.streak+' 連勝');
+  upd('drawerTotal',Object.keys(S.answered).length);
+  const tot2=Object.keys(S.answered).length,cor2=Object.values(S.answered).filter(Boolean).length;
+  upd('drawerRate',tot2?Math.round(cor2/tot2*100)+'%':'—');
+  upd('drawerWrong',S.wrongIds.size);
   const pct=Math.round(total/QS.length*100);
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=total+' / '+QS.length;
-  document.getElementById('streakNum').textContent=S.streak;
-  document.getElementById('streakBest').textContent='最高 '+S.bestStreak;
-  // share
+  updStyle('progFill','width',pct+'%');
+  upd('progTxt',total+' / '+QS.length);
   if(S.shareUnlocked){
-    document.getElementById('shareUnlocked').style.display='block';
-    document.getElementById('shareBtn').style.display='none';
+    const su=document.getElementById('shareUnlocked');
+    const sb=document.getElementById('shareBtn');
+    if(su)su.style.display='block';
+    if(sb)sb.style.display='none';
   }
-  // countdown
   calcCountdown();
-  // daily
   initDaily();
+  loadHomeLayout();
 }
 
 /* ══ COUNTDOWN ══ */
 function calcCountdown(){
-  // 職安乙級每年約2梯次，通常3月和9月
   const now=new Date();
   const year=now.getFullYear();
+  // 職安乙級三梯次：約4月、7月、11月
   const exams=[
-    new Date(year,2,15), // 3月
-    new Date(year,8,20), // 9月
-    new Date(year+1,2,15),
-    new Date(year+1,8,20),
+    new Date(year,3,15),new Date(year,6,6),new Date(year,10,2),
+    new Date(year+1,3,15),new Date(year+1,6,6),new Date(year+1,10,2),
   ];
   const next=exams.find(d=>d>now)||exams[exams.length-1];
   const diff=Math.ceil((next-now)/(1000*60*60*24));
-  document.getElementById('countdownDays').textContent=diff+' 天';
-  document.getElementById('countdownDate').textContent=
-    next.getFullYear()+'/'+(next.getMonth()+1)+'/'+next.getDate()+' 預估考試日';
+  const mo=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const label=`${next.getFullYear()}年${mo[next.getMonth()]}月 職安乙級`;
+  // 安全更新（倒數元素可能不在首頁）
+  const d=document.getElementById('countdownDays');
+  const s=document.getElementById('countdownDate');
+  if(d)d.textContent=diff+' 天';
+  if(s)s.textContent=label;
 }
 
 /* ══ DAILY QUESTION ══ */
+let _triviaIdx = -1; // -1 = 用今日日期，>= 0 = 手動翻頁index
+
+function getDailyTriviaIdx(){
+  const d=new Date();
+  const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return seed % TRIVIA.length;
+}
+function getCurrentTrivia(){
+  const idx = _triviaIdx >= 0 ? _triviaIdx : getDailyTriviaIdx();
+  return TRIVIA[idx];
+}
+function renderTrivia(t){
+  document.getElementById('triviaLabel').textContent=t.cat+' 冷知識';
+  document.getElementById('dailyQ').textContent=t.q;
+  document.getElementById('triviaAnsText').textContent=t.a;
+  document.getElementById('triviaDetail').textContent=t.detail;
+  // 重置展開狀態
+  document.getElementById('triviaAns').style.display='none';
+  document.getElementById('triviaTap').textContent='點擊看答案 ▾';
+  document.getElementById('triviaTap').style.display='block';
+  document.getElementById('dailyDone').style.display='none';
+}
 function initDaily(){
   const today=new Date().toDateString();
-  if(S.dailyDate!==today){S.dailyDone=false;S.dailyDate=today;saveS();}
-  const idx=new Date().getDate()%QS.length;
-  const q=QS[idx];
-  document.getElementById('dailyQ').textContent=q.text;
-  if(S.dailyDone){
+  if(S.dailyDate!==today){S.dailyDone=false;S.dailyDate=today;_triviaIdx=-1;saveS();}
+  const t=getCurrentTrivia();
+  renderTrivia(t);
+  if(S.dailyDone && _triviaIdx<0){
     document.getElementById('dailyDone').style.display='block';
   }
 }
+function expandTrivia(){
+  const ans=document.getElementById('triviaAns');
+  const tap=document.getElementById('triviaTap');
+  if(ans.style.display==='none'){
+    ans.style.display='block';
+    tap.textContent='收起 ▴';
+  } else {
+    ans.style.display='none';
+    tap.textContent='點擊看答案 ▾';
+  }
+}
+function nextTrivia(){
+  const base = _triviaIdx >= 0 ? _triviaIdx : getDailyTriviaIdx();
+  _triviaIdx = (base + 1) % TRIVIA.length;
+  renderTrivia(TRIVIA[_triviaIdx]);
+  // 小動畫：卡片閃一下
+  const card=document.getElementById('triviaCard');
+  card.style.opacity='0.5';
+  setTimeout(()=>{card.style.opacity='1';},150);
+}
+function markTriviaLearned(){
+  if(_triviaIdx<0){S.dailyDone=true;saveS();}
+  document.getElementById('dailyDone').style.display='block';
+  document.getElementById('triviaTap').style.display='none';
+}
+function shareTrivia(){
+  const t=getCurrentTrivia();
+  const text=`🧠 今日冷知識
+
+${t.cat}
+❓ ${t.q}
+✅ ${t.a}
+
+每天學一則冷知識 → examking.vercel.app`;
+  if(navigator.share){
+    navigator.share({title:'今日冷知識',text});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>alert('已複製到剪貼簿！'));
+  }
+}
 function startDaily(){
-  const today=new Date().toDateString();
-  const idx=new Date().getDate()%QS.length;
-  const q=QS[idx];
-  S.sess={mode:'daily',queue:[q.id],idx:0,correct:0,wrong:0,examMode:false,examAnswers:{}};
-  document.getElementById('qMode').textContent='今日一題';
-  document.getElementById('qTimer').style.display='none';
-  showScreen('quiz');
-  renderQ();
+  expandTrivia();
+}
+
+/* ══ 自訂首頁 ══ */
+const HOME_BLOCKS = [
+  {id:'block-trivia',    label:'今日冷知識',  ico:'🧠', def:true},
+  {id:'block-modes',     label:'練習模式',    ico:'🎯', def:true},
+  {id:'block-streak',    label:'連勝紀錄',    ico:'🔥', def:false},
+  {id:'block-stats',     label:'學習統計',    ico:'📊', def:false},
+  {id:'block-countdown', label:'考試倒數',    ico:'📅', def:false},
+  {id:'block-route',     label:'考照路線圖',  ico:'🗺️', def:false},
+  {id:'block-share',     label:'分享解鎖',    ico:'🎁', def:false},,
+
+  // ═══ 營造業甲種職安業務主管 C0100 ═══
+  {id:8001,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生法規定，營造業之事業單位對於橋樑、道路、隧道或輸配電等距離較長之工程，應於每幾公里內增置丙種職業安全衛生業務主管一人",opts:["5公里","10公里","15公里","20公里"],ans:[1],exp:"依職業安全衛生管理辦法第3條，橋樑、道路、隧道或輸配電等距離較長之工程，應於每10公里內增置丙種職業安全衛生業務主管一人。"},
+  {id:8002,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生法規定，雇主對於在高度2公尺以上之高處作業，勞工有墜落之虞者，應使勞工確實使用下列何者",opts:["棉紗手套","安全帽及安全帶","防塵口罩","護目鏡"],ans:[1],exp:"高度2公尺以上作業有墜落之虞，依規定應使勞工確實使用安全帽及安全帶（全身式），並設置防墜設施。"},
+  {id:8003,type:"single",cat:"法規",subj:"C0100",text:"依營造安全衛生設施標準規定，露天開挖作業，垂直開挖深度超過多少公尺時，應設擋土支撐",opts:["1公尺","1.5公尺","2公尺","3公尺"],ans:[1],exp:"依營造安全衛生設施標準第71條，垂直開挖深度超過1.5公尺時，應設擋土支撐或放坡措施。"},
+  {id:8004,type:"single",cat:"法規",subj:"C0100",text:"依營造安全衛生設施標準規定，施工架應能承受至少幾倍的使用載重而不破壞",opts:["2倍","3倍","4倍","5倍"],ans:[2],exp:"施工架應具有足夠強度，依規定能承受使用載重之4倍以上之強度，確保施工人員安全。"},
+  {id:8005,type:"single",cat:"法規",subj:"C0100",text:"下列何者非營造安全衛生設施標準所定義之「施工架」",opts:["鋼管施工架","懸吊式施工架","移動式施工架","臨時倉庫"],ans:[3],exp:"施工架係指鋼管、竹木等搭設供勞工作業用之架台，臨時倉庫為儲存設施，不屬施工架定義。"},
+  {id:8006,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生設施規則規定，雇主對於高度2公尺以上之作業場所，其開口部分（如樓板開口、坑道開口）應設置何種設施",opts:["只需設警示帶","護欄、護蓋或安全網等防止墜落的設施","貼上警示標誌即可","僅需加強照明"],ans:[1],exp:"依規定，2公尺以上開口部分應設護欄（高度90公分以上）、護蓋或安全網，防止人員或物體墜落。"},
+  {id:8007,type:"single",cat:"法規",subj:"C0100",text:"雇主對於高度在多少公尺以上之施工架，應由具有施工架作業主管資格人員指導或監督作業",opts:["1.5公尺","2公尺","5公尺","7公尺"],ans:[2],exp:"依職業安全衛生管理辦法，施工架高度在2公尺以上者，組配、拆除及變更等作業，應由具有施工架作業主管資格者指揮監督。"},
+  {id:8008,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生法施行細則，下列何者屬於「危險性工作場所」中的「甲類工作場所」",opts:["工廠","辦公室","爆竹煙火工廠","餐廳"],ans:[2],exp:"甲類危險性工作場所係指具有爆炸性、發火性物品之製造或處置之工作場所，如爆竹煙火工廠、彈藥製造廠等。"},
+  {id:8009,type:"single",cat:"法規",subj:"C0100",text:"依營造安全衛生設施標準規定，工作臺、作業面開口部分，應設置護欄，其高度應在多少公分以上",opts:["75公分","90公分","100公分","105公分"],ans:[1],exp:"依營造安全衛生設施標準第19條，作業台開口部分護欄高度應在90公分以上，中間設橫桿，底部設踢腳板。"},
+  {id:8010,type:"single",cat:"法規",subj:"C0100",text:"高溫作業指勞工工作時，其工作環境溫度與平均溫度達何種標準以上之作業",opts:["有效溫度超過28度","依行政院勞工委員會規定的特定條件","純粹以溫度計測量值決定","溫度超過35度"],ans:[1],exp:"高溫作業認定依「高溫作業勞工作息時間標準」，以綜合溫度熱指數（WBGT）或有效溫度值達規定標準者為高溫作業。"},
+  {id:8011,type:"single",cat:"施工安全",subj:"C0100",text:"進行電焊作業時，為防止電焊煙塵危害，下列何者最為有效",opts:["戴棉紗手套","在密閉空間作業","設置局部排氣裝置並佩戴電焊面罩","只開電風扇"],ans:[2],exp:"電焊作業應設置局部排氣裝置將焊接煙塵排除，並佩戴適當的電焊面罩（防紫外線及紅外線）和呼吸防護具。"},
+  {id:8012,type:"single",cat:"施工安全",subj:"C0100",text:"依規定，從事缺氧危險作業前，應確認作業場所空氣中氧氣濃度不得低於多少",opts:["14%","16%","18%","20%"],ans:[2],exp:"依缺氧症預防規則，缺氧危險作業場所指空氣中氧氣濃度未達18%之場所，作業前應先確認氧氣濃度達18%以上。"},
+  {id:8013,type:"single",cat:"施工安全",subj:"C0100",text:"在工地使用移動式起重機進行吊掛作業，吊掛物下方禁止人員進入的主要目的為何",opts:["節省空間","防止物體飛落打擊人員","防止噪音傷害","防止振動傷害"],ans:[1],exp:"移動式起重機吊掛作業中，若吊索斷裂或吊物脫落，下方人員有被物體打擊之致命風險，故嚴禁人員在吊掛物下方。"},
+  {id:8014,type:"single",cat:"施工安全",subj:"C0100",text:"依規定，混凝土澆置作業使用泵車時，管線接頭應注意下列何者",opts:["管線越長越好","管線接頭應確實固定，防止脫落噴射傷人","使用最細的管線","用手扶住管線即可"],ans:[1],exp:"混凝土泵車管線壓力極大，管線接頭若未確實固定可能瞬間脫落，造成管線彈射或混凝土噴濺傷人事故。"},
+  {id:8015,type:"single",cat:"施工安全",subj:"C0100",text:"下列何者是鋼筋混凝土工程中「模板支撐」最主要的安全重點",opts:["模板顏色統一","確保支撐系統之強度、穩定性及適當之接頭固定，防止倒塌","模板越厚越好","使用最便宜的材料"],ans:[1],exp:"模板支撐倒塌是營造業重大災害之一。支撐系統必須確保強度足夠、結構穩定、接頭固定，混凝土澆置前需進行安全檢查。"},
+  {id:8016,type:"single",cat:"施工安全",subj:"C0100",text:"依規定，高架作業指高度在多少公尺以上之作業",opts:["1公尺","1.5公尺","2公尺","3公尺"],ans:[2],exp:"依職業安全衛生設施規則第224條，高架作業係指高度在2公尺以上之作業，雇主應採取相應之防護措施。"},
+  {id:8017,type:"single",cat:"施工安全",subj:"C0100",text:"依規定，從事石綿之拆除及清理作業，勞工應佩戴何種呼吸防護具",opts:["一般棉紗口罩","活性碳口罩","符合規定之防塵口罩或電動空氣濾清式呼吸防護具","紙口罩即可"],ans:[2],exp:"石綿為第一類致癌物，從事石綿拆除清理作業應佩戴符合CNS規定的N95以上防塵口罩或電動空氣濾清式呼吸防護具。"},
+  {id:8018,type:"single",cat:"施工安全",subj:"C0100",text:"依規定，從事隧道掘進作業，雇主應於作業前確認何項安全措施",opts:["確認隧道長度","確認工資標準","氣體測定（氧氣、有害氣體）、通風換氣及緊急逃生路線","確認工程合約"],ans:[2],exp:"隧道掘進為缺氧及有害氣體高風險作業，作業前須進行氣體測定，確認通風換氣充分，並確認緊急逃生路線暢通。"},
+  {id:8019,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生法，雇主對於勞工從事其身體或衣著有被污染之虞之特殊作業時，應置備何種設施供勞工使用",opts:["更寬敞的辦公室","洗眼、洗澡、漱口、更衣及洗濯等設備","專用停車位","特別餐廳"],ans:[1],exp:"依職業安全衛生法第6條，雇主對於身體或衣著可能被污染之作業，應置備洗眼、洗澡、漱口、更衣、洗濯等設備。"},
+  {id:8020,type:"single",cat:"法規",subj:"C0100",text:"依職業安全衛生管理辦法規定，營造業之事業單位，其勞工人數在幾人以上者，應設置職業安全衛生管理單位",opts:["30人","50人","100人","300人"],ans:[2],exp:"依職業安全衛生管理辦法第2條，第一類事業（含營造業）勞工人數在100人以上者，應設置職業安全衛生管理單位。"},
+  // ═══ 公共工程品管人員 C0200 ═══
+  {id:8101,type:"single",cat:"品質管理",subj:"C0200",text:"依公共工程施工品質管理作業要點，「三級品管制度」中的第一級品管係指",opts:["主管機關品質評鑑","監造單位施工品質保證","廠商自主施工品質管制","第三方驗證機構"],ans:[2],exp:"三級品管制度：第一級為廠商施工品質管制（自主管理）、第二級為監造單位施工品質保證（查驗）、第三級為主管機關施工品質評鑑（抽查）。"},
+  {id:8102,type:"single",cat:"品質管理",subj:"C0200",text:"依規定，品管人員取得結業證書逾幾年者，應再取得最近四年內之回訓證明，始得擔任品管人員",opts:["2年","3年","4年","5年"],ans:[2],exp:"依公共工程施工品質管理作業要點，品管人員取得結業證書逾4年者，需取得最近4年內之回訓證明（36小時回訓班），始得繼續擔任品管人員。"},
+  {id:8103,type:"single",cat:"品質管理",subj:"C0200",text:"「品質計畫」中「分項品質計畫」應於何時提報",opts:["工程得標後立即提報","各分項工程施工前提報","全部工程完工後提報","任何時間均可"],ans:[1],exp:"整體品質計畫依契約規定期限提報；分項品質計畫（如模板、鋼筋、混凝土等）應在各分項工程施工前提報，不得邊施工邊提報。"},
+  {id:8104,type:"single",cat:"品質管理",subj:"C0200",text:"ISO 9001品質管理系統的核心概念PDCA循環，代表下列何者",opts:["計畫-設計-確認-評估","計畫-執行-查核-行動","計畫-完成-確認-改善","設計-執行-計畫-完成"],ans:[1],exp:"PDCA循環：Plan（計畫）→ Do（執行）→ Check（查核）→ Act（行動/改善），是持續改善品質的基本管理工具。"},
+  {id:8105,type:"single",cat:"品質管理",subj:"C0200",text:"公共工程施工品質管理作業要點中，工程金額達多少以上之查核金額工程，廠商應建立施工品質管制系統",opts:["新台幣1千萬元以上","新台幣2千萬元以上","新台幣5千萬元以上","新台幣1億元以上"],ans:[1],exp:"依公共工程施工品質管理作業要點，查核金額（一般為2千萬元）以上之工程，廠商應設置品管人員並建立施工品質管制系統。"},
+  {id:8106,type:"single",cat:"品質管理",subj:"C0200",text:"下列何者為「材料及施工品質」查核的主要項目之一",opts:["工程造價是否合理","施工規範是否符合、材料是否有合格檢驗報告","工地人員薪資是否合理","工地照明是否足夠"],ans:[1],exp:"品質查核的核心項目包含：材料是否符合規範並有合格試驗報告、施工方法是否依設計圖說及規範、品質管制是否落實等。"},
+  {id:8107,type:"single",cat:"品質管理",subj:"C0200",text:"混凝土工程品質管制中，「坍度試驗」的主要目的為何",opts:["測量混凝土強度","評估混凝土的工作性（稠度）是否符合規定","測量混凝土密度","測量混凝土溫度"],ans:[1],exp:"坍度試驗（Slump Test）用於現場評估新拌混凝土的工作性（流動性/稠度），確認是否符合設計規定，避免加水降低強度。"},
+  {id:8108,type:"single",cat:"品質管理",subj:"C0200",text:"RC工程中，鋼筋的「保護層厚度」的主要功能為何",opts:["美化外觀","保護鋼筋不被腐蝕並確保握裹力","增加建築物重量","節省材料"],ans:[1],exp:"保護層為混凝土包覆鋼筋的最小厚度，主要功能：防止鋼筋鏽蝕（防水及防鹼性破壞）、確保鋼筋與混凝土之握裹力、防火保護。"},
+  {id:8109,type:"single",cat:"品質管理",subj:"C0200",text:"「品質稽核」與「品質查驗」的主要差異為何",opts:["兩者完全相同","稽核是系統性評估整體品質管理系統；查驗是對特定品項的具體檢查確認","稽核只查帳目；查驗只看外觀","稽核由廠商辦理；查驗由政府辦理"],ans:[1],exp:"品質稽核是系統性評估品質管理系統的適切性與有效性；品質查驗是對特定施工項目或材料進行具體的檢查、測量和試驗確認。"},
+  {id:8110,type:"single",cat:"品質管理",subj:"C0200",text:"依公共工程品質管理訓練班課程，「不符合事項」（NCR, Non-Conformance Report）發生時，正確的處理程序為何",opts:["直接丟棄不符合的材料","填寫不符合事項報告→分析原因→採取矯正措施→追蹤驗證改善效果","不用理會，繼續施工","要求監造人員降低標準"],ans:[1],exp:"NCR處理程序：發現不符合→填寫NCR報告→停工或隔離→分析根本原因→採取矯正預防措施→主管核准→追蹤驗證→關閉NCR。"},
+  {id:8111,type:"single",cat:"品質管理",subj:"C0200",text:"混凝土抗壓試體應在澆置後幾小時內製作完成",opts:["1小時","2小時","4小時","8小時"],ans:[0],exp:"混凝土抗壓試體應在澆置混凝土後1小時內製作完成，以確保試體能代表實際使用的混凝土性質。"},
+  {id:8112,type:"single",cat:"品質管理",subj:"C0200",text:"鋼筋工程中，搭接長度不足可能導致下列何種問題",opts:["工程費用增加","鋼筋無法有效傳遞應力，造成結構強度不足","施工速度變慢","混凝土顏色不均"],ans:[1],exp:"搭接長度不足時，兩根鋼筋無法透過混凝土握裹力有效傳遞拉力或壓力，在受力時可能在接頭處破壞，影響結構安全。"},
+  {id:8113,type:"single",cat:"品質管理",subj:"C0200",text:"「監造計畫」主要由哪個單位撰寫",opts:["施工廠商","業主（建設公司）","監造單位（如工程顧問公司、監理公司）","下包商"],ans:[2],exp:"監造計畫由監造單位（工程主辦機關委託的監工單位，如工程顧問公司、建築師事務所等）撰寫，規範監造方式及查驗程序。"},
+  {id:8114,type:"single",cat:"品質管理",subj:"C0200",text:"統計品質管制中，「管制圖」的主要用途為何",opts:["計算工程費用","監控製程是否在統計控制狀態內，及時發現異常","計算員工薪資","決定材料採購數量"],ans:[1],exp:"管制圖（Control Chart）透過上下管制界限，即時監控製程數據的變化趨勢，判斷製程是否處於統計管制狀態，為品質管制的核心工具。"},
+  {id:8115,type:"single",cat:"品質管理",subj:"C0200",text:"依規定，公共工程竣工後辦理初驗時，品管人員應配合提供下列何者",opts:["廠商的財務報表","完整的品質管制相關文件及施工記錄","員工出勤記錄","廠商的客戶名單"],ans:[1],exp:"品管人員應保存並提供施工期間的品質管制文件，包含：材料試驗報告、施工查驗記錄、不符合事項報告及矯正措施、品質計畫等。"},
+  // ═══ 工地主任 C0300 ═══
+  {id:8201,type:"single",cat:"法規",subj:"C0300",text:"依營造業法規定，工地主任應負責工地的下列何者",opts:["僅負責財務管理","僅負責人員薪資","工地之施工管理及品質管制，並督導勞工安全衛生","僅負責對外公關"],ans:[2],exp:"依營造業法第32條，工地主任應負責工地之施工管理及品質管制，督導勞工安全衛生，並協助辦理工程竣工驗收等事項。"},
+  {id:8202,type:"single",cat:"法規",subj:"C0300",text:"依營造業法，承攬金額達多少新台幣以上之工程，應置工地主任",opts:["500萬元","1,000萬元","2,000萬元","5,000萬元"],ans:[1],exp:"依營造業法第30條，承攬金額新台幣1,000萬元以上之工程，綜合營造業應置工地主任一人，負責工地管理。"},
+  {id:8203,type:"single",cat:"法規",subj:"C0300",text:"工地主任執業證每幾年應辦理回訓換證",opts:["2年","3年","4年","5年"],ans:[2],exp:"工地主任執業證有效期限為4年，期滿前應完成32小時回訓課程，換發執業證，方可繼續執業。"},
+  {id:8204,type:"single",cat:"法規",subj:"C0300",text:"依政府採購法規定，廠商有下列何種情形，機關得終止或解除契約",opts:["工程進度稍有落後","廠商破產或無力清償債務","人員流動率較高","材料價格上漲"],ans:[1],exp:"依政府採購法第65條，廠商有破產、財務困難無力履約或其他違約情事，機關得終止或解除契約，並依法求償。"},
+  {id:8205,type:"single",cat:"法規",subj:"C0300",text:"依建築法規定，建築施工中，建築師或委託監造人員發現承造人施工與設計圖樣不符時，應如何處理",opts:["不理會，繼續監看","通知承造人改正，必要時停工並報告主管機關","向媒體曝光","自行修改設計圖"],ans:[1],exp:"依建築法第56條，建築師監造發現施工不符設計時，應通知承造人改正；情形嚴重時，應令停工並報告主管機關。"},
+  {id:8206,type:"single",cat:"法規",subj:"C0300",text:"依勞動基準法，工地緊急停工時，勞工在停工期間若非因可歸責勞工之事由，雇主應給付多少比例的工資",opts:["不需給付","工資的50%以上","工資的60%以上","全額工資"],ans:[2],exp:"依勞動基準法第40條，非因可歸責於勞工之事由致停止工作時，雇主應按原領工資數額給付，除非能証明屬天災等不可抗力。"},
+  {id:8207,type:"single",cat:"施工管理",subj:"C0300",text:"工地主任在施工前「界樁放樣」的主要目的為何",opts:["美觀施工現場","確認施工位置與尺寸是否與設計圖一致，防止位置偏差","節省材料","加快施工速度"],ans:[1],exp:"界樁放樣是依據設計圖說，在實地標定建築物角點、軸線和標高的作業，確認施工位置正確，是施工前必要的準備工作。"},
+  {id:8208,type:"single",cat:"施工管理",subj:"C0300",text:"工地發生重大職業災害，工地主任應於幾小時內採取緊急措施並通報",opts:["2小時","4小時","8小時","24小時"],ans:[2],exp:"依職業安全衛生法，發生死亡或重傷職業災害，雇主（含工地主任代理）應於8小時內通報勞動檢查機構，並保持現場不移動，等候調查。"},
+  {id:8209,type:"single",cat:"施工管理",subj:"C0300",text:"依政府採購法，廠商對於機關辦理採購認為有不符法令情形，應向何處提出異議",opts:["向法院起訴","向上級機關陳情","向原機關（或招標機關）提出異議，不服再申訴","向媒體投訴"],ans:[2],exp:"依政府採購法第75條，廠商應先向招標機關提出書面異議，對異議結果不服再向採購申訴審議委員會提出申訴，依序處理。"},
+  {id:8210,type:"single",cat:"施工管理",subj:"C0300",text:"在工地管理中「施工日誌」的法規要求為何",opts:["自由撰寫無規定","依規定應逐日填寫，記錄天候、人員、機具、材料、施工等情形，並妥善保管","只需記錄天氣","只在工程完工時填寫一次"],ans:[1],exp:"施工日誌為工程重要文件，須逐日據實填寫天候、出工人數、機具、材料進場、施工內容及特殊事項，並由工地主任或工地負責人簽認保存。"},
+  {id:8211,type:"single",cat:"法規",subj:"C0300",text:"依建築法，建築物施工時，應於施工場所設置何種標誌",opts:["公司logo廣告牌","建築許可（雜項執照）及告示牌","施工人員通訊錄","建築師作品介紹"],ans:[1],exp:"依建築法規定，建築施工時應於工地顯明處設置告示牌，標明建造執照字號、起造人、設計人、監造人及承造人等資訊。"},
+  {id:8212,type:"single",cat:"法規",subj:"C0300",text:"依政府採購法規定，機關辦理工程採購，採最低標決標時，以下何者正確",opts:["一定要採最低標","最低標廠商投標價格低於底價80%時，機關應即廢標","訂有底價，符合規定的最低標廠商得標","最低標廠商直接得標，不需審查"],ans:[2],exp:"採最低標決標時，訂有底價之採購，以不超過底價且符合招標文件規定之最低標廠商為得標廠商；未達底價最低標且未低於標底85%可洽減價。"},
+  {id:8213,type:"single",cat:"施工管理",subj:"C0300",text:"工地遇到颱風警報發布時，工地主任應採取何種措施",opts:["繼續照常施工","依颱風防災計畫實施停工，固定鷹架、施工機具及臨時設施，清理工地","等颱風來了再說","只關閉辦公室"],ans:[1],exp:"颱風警報發布後應依颱風防災計畫：停止高架作業、固定或拆除施工架、固定機具設備、清理鬆散物品，防止颱風造成工地災害。"},
+  {id:8214,type:"single",cat:"法規",subj:"C0300",text:"依職業安全衛生法，雇主使勞工從事「特別危害健康之作業」，應多久實施一次特殊健康檢查",opts:["每半年","每1年","每2年","依主管機關規定（依作業種類不同）"],ans:[3],exp:"特別危害健康作業之特殊健康檢查頻率，依各類有害作業的主管機關規定辦理，如噪音作業每年一次，游離輻射作業視劑量而定。"},
+  {id:8215,type:"single",cat:"施工管理",subj:"C0300",text:"「竣工驗收」時，下列何者為工地主任應配合準備的重要文件",opts:["只需提交工程進度表","完整施工紀錄、材料試驗報告、竣工圖說及相關保固文件","只需提交財務報告","只需提交員工名冊"],ans:[1],exp:"竣工驗收需備齊：竣工圖說、施工日誌、材料試驗報告、品質管制文件、相關許可文件及保固書，工地主任應確保文件完整齊備。"}
+];
+
+// 儲存格式：{order:[id,id,...], visible:{id:bool,...}}
+function getLayout(){
+  return JSON.parse(localStorage.getItem('homeLayout2')||'null');
+}
+function saveLayout(){
+  const items = [...document.getElementById('customizeList').querySelectorAll('[data-block-id]')];
+  const order = items.map(el=>el.dataset.blockId);
+  const visible = {};
+  items.forEach(el=>{
+    const cb = el.querySelector('input[type=checkbox]');
+    if(cb) visible[el.dataset.blockId] = cb.checked;
+  });
+  localStorage.setItem('homeLayout2', JSON.stringify({order, visible}));
+}
+
+function loadHomeLayout(){
+  const layout = getLayout();
+  const home = document.getElementById('home');
+  const pad  = document.querySelector('#home .home-pad');
+
+  // 決定順序
+  const order = (layout && layout.order && layout.order.length===HOME_BLOCKS.length)
+    ? layout.order
+    : HOME_BLOCKS.map(b=>b.id);
+
+  // 依順序把 block 移動到 home（pad 之前）
+  order.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) home.insertBefore(el, pad);
+  });
+
+  // 套用顯示/隱藏
+  HOME_BLOCKS.forEach(b=>{
+    const show = layout ? (layout.visible?.[b.id] ?? b.def) : b.def;
+    const el = document.getElementById(b.id);
+    if(el) el.style.display = show ? '' : 'none';
+  });
+}
+
+/* ── Modal ── */
+function openCustomizeModal(){
+  const layout = getLayout();
+  const order = (layout && layout.order && layout.order.length===HOME_BLOCKS.length)
+    ? layout.order : HOME_BLOCKS.map(b=>b.id);
+
+  const list = document.getElementById('customizeList');
+  list.innerHTML = order.map(id=>{
+    const b = HOME_BLOCKS.find(x=>x.id===id);
+    if(!b) return '';
+    const show = layout ? (layout.visible?.[b.id] ?? b.def) : b.def;
+    return `<div data-block-id="${b.id}" class="cz-row">
+      <div class="cz-drag">☰</div>
+      <span class="cz-ico">${b.ico}</span>
+      <span class="cz-label">${b.label}</span>
+      <label class="toggle-sw">
+        <input type="checkbox" ${show?'checked':''}>
+        <span class="toggle-track"></span>
+      </label>
+    </div>`;
+  }).join('');
+
+  // 套用 toggle 即時更新首頁
+  list.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const row = cb.closest('[data-block-id]');
+      const id  = row.dataset.blockId;
+      const el  = document.getElementById(id);
+      if(el) el.style.display = cb.checked ? '' : 'none';
+      saveLayout();
+    });
+  });
+
+  initDragSort(list);
+  document.getElementById('customizeModal').style.display='flex';
+}
+
+/* ── 拖曳排序（支援 mouse + touch） ── */
+function initDragSort(list){
+  let dragEl=null, dragClone=null, startY=0, lastY=0, raf=0;
+
+  function getY(e){ return e.touches ? e.touches[0].clientY : e.clientY; }
+
+  function onDown(e){
+    // 只有點到 .cz-drag 把手才啟動
+    if(!e.target.closest('.cz-drag')) return;
+    e.preventDefault();
+    dragEl = e.currentTarget;
+    startY = lastY = getY(e);
+
+    // clone 跟隨游標
+    const r = dragEl.getBoundingClientRect();
+    dragClone = dragEl.cloneNode(true);
+    Object.assign(dragClone.style, {
+      position:'fixed', left:r.left+'px', top:r.top+'px',
+      width:r.width+'px', zIndex:9999, opacity:'0.9',
+      background:'var(--s1)', borderRadius:'12px',
+      boxShadow:'0 8px 28px rgba(0,0,0,.3)',
+      pointerEvents:'none', transition:'none',
+      willChange:'transform'
+    });
+    document.body.appendChild(dragClone);
+    dragEl.style.opacity = '0.25';
+
+    window.addEventListener('mousemove', onMove, {passive:false});
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('mouseup',   onUp);
+    window.addEventListener('touchend',  onUp);
+  }
+
+  function onMove(e){
+    if(!dragEl) return;
+    e.preventDefault();
+    lastY = getY(e);
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(()=>{
+      // 移動 clone
+      const dy = lastY - startY;
+      const base = parseFloat(dragClone.style.top) || 0;
+      // 直接用 transform 比改 top 更順
+      dragClone.style.transform = `translateY(${dy}px)`;
+
+      // 找 clone 中心點下方的 row
+      const cloneRect = dragClone.getBoundingClientRect();
+      const cx = cloneRect.left + cloneRect.width/2;
+      const cy = cloneRect.top  + cloneRect.height/2 + dy;
+
+      dragClone.style.display = 'none';
+      const el = document.elementFromPoint(cx, cy);
+      dragClone.style.display = '';
+
+      if(!el) return;
+      const overRow = el.closest('[data-block-id]');
+      if(overRow && overRow !== dragEl){
+        const rows = [...list.querySelectorAll('[data-block-id]')];
+        const di = rows.indexOf(dragEl);
+        const ti = rows.indexOf(overRow);
+        if(ti < di) list.insertBefore(dragEl, overRow);
+        else        overRow.after(dragEl);
+        // 更新起點讓下次 dy 從當前位置算
+        startY = lastY;
+        const r2 = dragEl.getBoundingClientRect();
+        dragClone.style.top = r2.top + 'px';
+        dragClone.style.transform = '';
+      }
+    });
+  }
+
+  function onUp(){
+    if(!dragEl) return;
+    cancelAnimationFrame(raf);
+    dragEl.style.opacity = '';
+    dragClone.remove();
+    dragClone = null;
+    dragEl    = null;
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('touchmove', onMove);
+    window.removeEventListener('mouseup',   onUp);
+    window.removeEventListener('touchend',  onUp);
+    saveLayout();
+    applyOrder();
+  }
+
+  list.querySelectorAll('[data-block-id]').forEach(row=>{
+    row.addEventListener('mousedown',  onDown);
+    row.addEventListener('touchstart', onDown, {passive:false});
+  });
+}
+
+function applyOrder(){
+  const layout = getLayout();
+  if(!layout) return;
+  const home = document.getElementById('home');
+  const pad  = document.querySelector('#home .home-pad');
+  layout.order.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) home.insertBefore(el, pad);
+  });
+}
+
+function toggleBlock(id, show){
+  const el = document.getElementById(id);
+  if(el) el.style.display = show ? '' : 'none';
+  saveLayout();
+}
+
+function closeCustomizeModal(e){
+  if(!e || e.target===document.getElementById('customizeModal'))
+    document.getElementById('customizeModal').style.display='none';
 }
 
 /* ══ INDUSTRY ROUTES ══ */
@@ -1089,21 +2597,58 @@ function showRoute(ind){
 }
 
 /* ══ SUBJECT MODAL ══ */
-function openSubjModal(){document.getElementById('subjModal').style.display='flex'}
+const SUBJ_INFO = {
+  '22200': {ico:'🦺', name:'職安衛管理員 乙級技術士', desc:'298題 · 22200+共用科目'},
+  '08000': {ico:'🧋', name:'飲料調製丙級技術士', desc:'50題 · 咖啡茶飲調酒衛生'},
+  '14100': {ico:'💻', name:'電腦軟體應用丙級技術士', desc:'50題 · Word/Excel/PowerPoint'},
+  '09500': {ico:'🍞', name:'烘焙食品丙級技術士', desc:'50題 · 麵包蛋糕西點製作'},
+  'C0100': {ico:'🏗️', name:'營造業甲種職安業務主管', desc:'20題 · 施工安全法規'},
+  'C0200': {ico:'📋', name:'公共工程品管人員', desc:'15題 · 品質管理三級品管'},
+  'C0300': {ico:'👷', name:'工地主任', desc:'15題 · 施工管理採購法'},
+};
+let currentSubj = null;
+
+function openSubjModal(subj){
+  subj = subj || '22200';
+  currentSubj = subj;
+  const info = SUBJ_INFO[subj] || SUBJ_INFO['22200'];
+  document.getElementById('modalIco').textContent = info.ico;
+  document.getElementById('modalName').textContent = info.name;
+  document.getElementById('modalDesc').textContent = info.desc;
+  document.getElementById('subjModal').style.display='flex';
+}
 function closeSubjModal(e){
   if(!e||e.target===document.getElementById('subjModal'))
     document.getElementById('subjModal').style.display='none';
 }
-function comingSoon(n){alert(`「${n}」即將上線！\n\n成為王者會員後可第一時間解鎖。`)}
+function toggleDrawer(){
+  const drawer=document.getElementById('drawer');
+  const overlay=document.getElementById('drawerOverlay');
+  const open=drawer.style.left==='0px';
+  drawer.style.left=open?'-280px':'0px';
+  overlay.style.display=open?'none':'block';
+  // 更新抽屜裡的數字
+  if(!open){
+    document.getElementById('drawerStreak').textContent='🔥 '+S.streak+' 連勝';
+    document.getElementById('drawerTotal').textContent=Object.keys(S.answered).length;
+    const tot=Object.keys(S.answered).length;
+    const cor=Object.values(S.answered).filter(Boolean).length;
+    document.getElementById('drawerRate').textContent=tot?Math.round(cor/tot*100)+'%':'—';
+    document.getElementById('drawerWrong').textContent=S.wrongIds.size;
+  }
+}
+function comingSoon(n){alert(`「${n}」即將上線！\n\n敬請期待！`)}
 
 /* ══ QUIZ ══ */
 function isUnlocked(){return S.unlocked||S.memberOK}
 function effectiveLimit(){return isUnlocked()?9999:FREE_LIMIT+(S.shareUnlocked?SHARE_BONUS:0)}
 
 function startMode(mode){
+  // 篩選當前科目的題目
+  const pool = currentSubj ? QS.filter(q=>q.subj===currentSubj || (!q.subj && currentSubj==='22200')) : QS;
   let queue=[];
-  if(mode==='sequential') queue=QS.map(q=>q.id);
-  else if(mode==='random') queue=[...QS.map(q=>q.id)].sort(()=>Math.random()-.5);
+  if(mode==='sequential') queue=pool.map(q=>q.id);
+  else if(mode==='random') queue=[...pool.map(q=>q.id)].sort(()=>Math.random()-.5);
   else if(mode==='wrong'){
     if(S.wrongIds.size===0){alert('目前沒有錯題！');return;}
     queue=[...S.wrongIds].sort(()=>Math.random()-.5);
@@ -1355,9 +2900,9 @@ function reviewOne(id,from){
 
 /* ══ SHARE ══ */
 function doShare(){
-  const text='📱 推薦「考試王者 背多分」— 職安乙級等證照考題練習，無廣告買斷制，比那個廣告APP好用多了！';
+  const text='📱 推薦「考王」— 職安乙級等證照考題練習，無廣告買斷制，比那個廣告APP好用多了！';
   if(navigator.share){
-    navigator.share({title:'考試王者 背多分',text,url:window.location.href})
+    navigator.share({title:'考王',text,url:window.location.href})
       .then(()=>unlockShare()).catch(()=>{});
   } else {
     navigator.clipboard?.writeText(text+'\n'+window.location.href)
@@ -1367,8 +2912,10 @@ function doShare(){
 }
 function unlockShare(){
   S.shareUnlocked=true; saveS(); updateHome();
-  document.getElementById('shareUnlocked').style.display='block';
-  document.getElementById('shareBtn').style.display='none';
+  const su=document.getElementById('shareUnlocked');
+  const sb=document.getElementById('shareBtn');
+  if(su)su.style.display='block';
+  if(sb)sb.style.display='none';
   alert('🎉 感謝分享！\n\n已為你解鎖額外 20 題練習！\n現在免費可練前 40 題。');
 }
 
